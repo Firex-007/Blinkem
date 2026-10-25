@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, ShieldCheck, User, Building2, ArrowRight, X, Sparkles } from 'lucide-react';
+import { Phone, ShieldCheck, User, Building2, ArrowRight, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { t } from '../../i18n';
 
@@ -71,11 +71,18 @@ export default function Login() {
       <div className="absolute bottom-0 right-1/2 translate-x-1/2 w-[500px] h-[500px] rounded-full bg-accent/[0.06] blur-[100px] -mb-24 pointer-events-none" />
 
       <div className="w-full max-w-md glass-card border border-line shadow-card p-8 relative z-10 rounded-[28px]">
-        <div className="text-center mb-10">
-          <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-onprimary mx-auto mb-5 shadow-[0_8px_24px_rgba(31,91,255,0.35)]">
-            <Sparkles className="w-7 h-7" />
+        <div className="text-center mb-8 flex flex-col items-center">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-amber-500/10 border border-amber-500/20 shadow-[0_8px_20px_rgba(245,158,11,0.2)]">
+            <img
+              src="/logo-mark.png"
+              alt="Blink'em Logo"
+              className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(251,191,36,0.5)] transition-transform duration-300 hover:scale-105"
+            />
           </div>
-          <h1 className="text-[34px] font-800 text-ink tracking-[-0.025em] mb-2 leading-tight">Blink'em</h1>
+          <div className="flex items-center justify-center tracking-[-0.03em] font-black leading-none mb-2">
+            <span className="text-3xl font-black text-ink uppercase">BLINK</span>
+            <span className="text-3xl font-black text-amber-500 dark:text-amber-400 uppercase ml-[2px]">'EM</span>
+          </div>
           <p className="text-muted text-sm leading-relaxed">{t('app_tagline')}</p>
         </div>
 
