@@ -35,14 +35,78 @@ import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 
 const CATEGORIES = [
-  { slug: 'plumber', labelKey: 'cat_plumber', image: '/images/categories/plumber.jpg', color: 'text-blue-500 bg-blue-500/10' },
-  { slug: 'electrician', labelKey: 'cat_electrician', image: '/images/categories/electrician.jpg', color: 'text-amber-500 bg-amber-500/10' },
-  { slug: 'cleaner', labelKey: 'cat_cleaner', image: '/images/categories/cleaner.jpg', color: 'text-emerald-500 bg-emerald-500/10' },
-  { slug: 'carpenter', labelKey: 'cat_carpenter', image: '/images/categories/carpenter.jpg', color: 'text-orange-500 bg-orange-500/10' },
-  { slug: 'painter', labelKey: 'cat_painter', image: '/images/categories/painter.jpg', color: 'text-purple-500 bg-purple-500/10' },
-  { slug: 'ac_repair', labelKey: 'cat_ac_repair', image: '/images/categories/ac_repair.jpg', color: 'text-cyan-500 bg-cyan-500/10' },
-  { slug: 'cook', labelKey: 'cat_cook', image: '/images/categories/cook.jpg', color: 'text-rose-500 bg-rose-500/10' },
-  { slug: 'appliance_repair', labelKey: 'cat_appliance_repair', image: '/images/categories/appliance_repair.jpg', color: 'text-indigo-500 bg-indigo-500/10' },
+  {
+    slug: 'plumber',
+    labelKey: 'cat_plumber',
+    image: '/images/categories/plumber.jpg',
+    icon: Wrench,
+    startingPrice: 199,
+    accentColor: 'text-blue-500',
+    color: 'text-blue-500 bg-blue-500/10',
+  },
+  {
+    slug: 'electrician',
+    labelKey: 'cat_electrician',
+    image: '/images/categories/electrician.jpg',
+    icon: Zap,
+    startingPrice: 149,
+    accentColor: 'text-amber-500',
+    color: 'text-amber-500 bg-amber-500/10',
+  },
+  {
+    slug: 'cleaner',
+    labelKey: 'cat_cleaner',
+    image: '/images/categories/cleaner.jpg',
+    icon: Sparkles,
+    startingPrice: 299,
+    accentColor: 'text-emerald-500',
+    color: 'text-emerald-500 bg-emerald-500/10',
+  },
+  {
+    slug: 'carpenter',
+    labelKey: 'cat_carpenter',
+    image: '/images/categories/carpenter.jpg',
+    icon: Hammer,
+    startingPrice: 249,
+    accentColor: 'text-orange-500',
+    color: 'text-orange-500 bg-orange-500/10',
+  },
+  {
+    slug: 'painter',
+    labelKey: 'cat_painter',
+    image: '/images/categories/painter.jpg',
+    icon: Paintbrush,
+    startingPrice: 399,
+    accentColor: 'text-purple-500',
+    color: 'text-purple-500 bg-purple-500/10',
+  },
+  {
+    slug: 'ac_repair',
+    labelKey: 'cat_ac_repair',
+    image: '/images/categories/ac_repair.jpg',
+    icon: Snowflake,
+    startingPrice: 349,
+    accentColor: 'text-cyan-500',
+    color: 'text-cyan-500 bg-cyan-500/10',
+  },
+  {
+    slug: 'cook',
+    labelKey: 'cat_cook',
+    image: '/images/categories/cook.jpg',
+    icon: ChefHat,
+    startingPrice: 299,
+    accentColor: 'text-rose-500',
+    color: 'text-rose-500 bg-rose-500/10',
+  },
+  {
+    slug: 'appliance_repair',
+    labelKey: 'cat_appliance_repair',
+    image: '/images/categories/appliance_repair.jpg',
+    icon: PlugZap,
+    startingPrice: 249,
+    accentColor: 'text-indigo-500',
+    color: 'text-indigo-500 bg-indigo-500/10',
+  },
 ];
 
 const SEARCH_SUGGESTIONS = [
@@ -197,46 +261,66 @@ export default function Home() {
         {/* LEFT COLUMN: The Request Console */}
         <div className="home-primary-column space-y-6">
           <section className="request-console" data-name="request console">
-            {/* Headline & Locality Subtitle */}
-            <div className="space-y-1">
+            {/* Live Hyperlocal Dispatch Badge & Locality Subtitle */}
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-800 tracking-wider uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+                <span>Hyperlocal Speed Dispatch</span>
+              </div>
+
               <h1 className="home-display text-ink" data-name="request headline">
-                {t('home_search')}
+                Tell us what needs{' '}
+                <span className="bg-gradient-to-r from-primary via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  fixing...
+                </span>
               </h1>
-              <p className="home-helper flex items-center gap-1.5">
+
+              <p className="home-helper flex items-center gap-2 flex-wrap">
                 <span>{t('home_speak')}</span>
                 <span className="text-muted/60">•</span>
                 <button
                   type="button"
                   onClick={() => setIsLocationModalOpen(true)}
-                  className="text-primary font-700 hover:underline inline-flex items-center gap-0.5"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface2/80 hover:bg-surface2 text-primary font-700 text-xs border border-primary/20 hover:border-primary/40 shadow-xs transition-all hover:scale-[1.02] active:scale-95"
                 >
-                  <MapPin className="w-3.5 h-3.5" />
-                  {location?.name || 'T. Nagar'}
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  <span>{location?.name || 'T. Nagar'}</span>
+                  <ChevronDown className="w-3 h-3 opacity-60" />
                 </button>
               </p>
             </div>
 
             {/* Unified Voice & Typing Action Console */}
-            <div className="request-actions my-4">
-              {/* Voice Orb Trigger with Tooltip */}
-              <button
-                className="voice-orb hover:scale-105 active:scale-95 transition flex-shrink-0 shadow-lg relative group"
-                onClick={() => setVoiceOpen(true)}
-                aria-label={t('home_speak')}
-                title="Tap mic or hold [Space] to speak"
-              >
-                <Mic className="h-7 w-7" />
-                <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-surface2 text-muted text-[10px] font-700 border border-line opacity-0 group-hover:opacity-100 transition pointer-events-none">
-                  Hold [Space]
-                </span>
-              </button>
+            <div className="request-actions my-5">
+              {/* Voice Orb Trigger with Tooltip & Pulsing Glow Aura */}
+              <div className="relative flex-shrink-0">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-blue-400 opacity-30 blur-md group-hover:opacity-60 transition duration-500 animate-pulse pointer-events-none" />
+                <button
+                  className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-primary via-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(31,91,255,0.38)] hover:shadow-[0_12px_32px_rgba(31,91,255,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 group border-2 border-white/30"
+                  onClick={() => setVoiceOpen(true)}
+                  aria-label={t('home_speak')}
+                  title="Tap mic or hold [Space] to speak"
+                >
+                  <Mic className="h-6 w-6 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform duration-300" />
+                  
+                  {/* Micro live pulse dot */}
+                  <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent border border-white" />
+                  </span>
+
+                  <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-surface2 text-muted text-[10px] font-700 border border-line opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-xs">
+                    Hold [Space]
+                  </span>
+                </button>
+              </div>
 
               {/* Direct Typing Input Box */}
               <form
                 onSubmit={handleTypeSubmit}
-                className="relative flex-1 flex items-center bg-surface2/70 hover:bg-surface2 focus-within:bg-surface rounded-chip border border-line focus-within:border-primary transition pl-3 pr-1.5 py-1.5 shadow-sm"
+                className="relative flex-1 flex items-center bg-surface2/60 hover:bg-surface2/90 focus-within:bg-surface rounded-2xl border border-line/80 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300 pl-3.5 pr-2 py-2 shadow-xs hover:shadow-sm"
               >
-                <Search className="w-5 h-5 text-muted flex-shrink-0 z-10" />
+                <Search className="w-5 h-5 text-muted flex-shrink-0 z-10 transition-colors group-focus-within:text-primary" />
 
                 {/* Dynamic running suggestion text with lesser opacity */}
                 {!typeQuery && <SearchSuggestions />}
@@ -250,7 +334,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="px-3.5 py-2 rounded-chip bg-primary hover:bg-primary600 text-onprimary font-800 text-xs flex items-center gap-1 transition shadow-sm flex-shrink-0 active:scale-95 z-10"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-blue-600 hover:from-primary600 hover:to-blue-700 text-onprimary font-800 text-xs flex items-center gap-1.5 transition-all duration-200 shadow-[0_4px_12px_rgba(31,91,255,0.25)] hover:shadow-[0_6px_18px_rgba(31,91,255,0.35)] flex-shrink-0 active:scale-95 z-10"
                 >
                   <span className="hidden sm:inline">Find Pros</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -259,47 +343,78 @@ export default function Home() {
             </div>
 
             {/* Service Category Matrix */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2.5 pt-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-800 text-ink uppercase tracking-wider">
-                  Select Service Category
+                <span className="font-800 text-ink uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Select Service Category</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 </span>
-                <span className="text-muted font-600">8 Core Trades</span>
+                <span className="text-muted font-700 bg-surface2 px-2 py-0.5 rounded-full border border-line text-[11px]">
+                  8 Core Trades
+                </span>
               </div>
 
               <div className="service-grid" data-name="service category matrix">
                 {catsLoading
                   ? CATEGORIES.map((category) => (
                       <div className="category-skeleton" key={category.slug}>
-                        <Skeleton className="h-5 w-5 rounded-full" />
-                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-12 w-12 rounded-xl" />
+                        <Skeleton className="h-3.5 w-16" />
+                        <Skeleton className="h-2.5 w-10" />
                       </div>
                     ))
                   : availableCategories.map((category) => {
                       const isSelected = railCat === category.slug;
+                      const IconComponent = category.icon || Wrench;
                       return (
                         <button
                           key={category.slug}
-                          className={`service-choice transition-all duration-200 group flex flex-col items-center justify-center p-2 rounded-2xl ${
+                          className={`group relative flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl transition-all duration-300 text-left outline-none ${
                             isSelected
-                              ? 'ring-2 ring-primary bg-primary-soft/80 shadow-md scale-[1.03] z-10 opacity-100'
-                              : 'hover:bg-surface hover:shadow-sm opacity-75 hover:opacity-100 hover:scale-[1.02]'
+                              ? 'bg-gradient-to-b from-primary/15 via-primary/5 to-surface dark:from-primary/25 dark:via-primary/10 dark:to-surface2/60 border-2 border-primary shadow-[0_12px_28px_-6px_rgba(31,91,255,0.28)] scale-[1.03] -translate-y-1 z-10'
+                              : 'bg-surface/80 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line/80 hover:border-primary/50 shadow-xs hover:shadow-lg hover:-translate-y-1.5 active:scale-95'
                           }`}
                           onClick={() => handleSelectCategory(category.slug)}
                           onDoubleClick={() => handleStartRequestForCat(category.slug)}
                           aria-label={t(category.labelKey)}
                         >
-                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shadow-xs border border-line/60 flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+                          {/* Top Selected Indicator Line */}
+                          {isSelected && (
+                            <div className="absolute top-0 inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
+                          )}
+
+                          {/* Active Checkmark Pill */}
+                          {isSelected && (
+                            <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
+                              <CheckCircle2 className="w-3 h-3 text-white" />
+                            </span>
+                          )}
+
+                          {/* Thumbnail with Vignette and Floating Trade Icon */}
+                          <div className="relative w-13 h-13 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
                             <img
                               src={category.image}
                               alt={t(category.labelKey)}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-500 ease-out"
                               loading="lazy"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity" />
+                            
+                            {/* Floating Category Icon Badge */}
+                            <div className="absolute bottom-1 right-1 w-5 h-5 rounded-lg bg-surface/95 dark:bg-surface2/95 backdrop-blur-sm border border-line/60 flex items-center justify-center text-primary shadow-xs group-hover:scale-110 transition-transform">
+                              <IconComponent className="w-3 h-3" />
+                            </div>
                           </div>
-                          <span className="font-800 text-xs sm:text-[13px] leading-tight text-ink mt-1.5 truncate max-w-full">
-                            {t(category.labelKey)}
-                          </span>
+
+                          {/* Category Label and Pricing Tag */}
+                          <div className="w-full text-center mt-2 min-w-0">
+                            <span className="font-800 text-xs sm:text-[13px] leading-tight text-ink block truncate group-hover:text-primary transition-colors">
+                              {t(category.labelKey)}
+                            </span>
+                            <span className="text-[10px] font-700 text-muted/90 block mt-0.5 truncate group-hover:text-primary/80 transition-colors">
+                              from ₹{category.startingPrice || 199}
+                            </span>
+                          </div>
                         </button>
                       );
                     })}
@@ -313,22 +428,36 @@ export default function Home() {
               )}
             </div>
 
-            {/* Trust Reassurance Footnote */}
-            <div className="reassurance grid grid-cols-3 gap-2 text-center pt-3 mt-3 border-t border-line">
-              <div className="space-y-0.5">
-                <BadgeCheck className="w-4 h-4 text-success mx-auto" />
-                <span className="text-[11px] font-800 text-ink block">Verified Pros</span>
-                <span className="text-[10px] text-muted block">Identity &amp; skills check</span>
+            {/* Trust Reassurance Footnote (Modern Frosted Glass Pills) */}
+            <div className="reassurance grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 mt-4 border-t border-line/70">
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-success/30 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-success/15 text-success flex items-center justify-center flex-shrink-0">
+                  <BadgeCheck className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[12px] font-800 text-ink block leading-tight">Verified Pros</span>
+                  <span className="text-[10px] text-muted block leading-tight truncate">Govt ID &amp; skill checked</span>
+                </div>
               </div>
-              <div className="space-y-0.5">
-                <Clock3 className="w-4 h-4 text-primary mx-auto" />
-                <span className="text-[11px] font-800 text-ink block">&lt;10s Matching</span>
-                <span className="text-[10px] text-muted block">Real-time local quotes</span>
+
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-primary/30 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center flex-shrink-0">
+                  <Clock3 className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[12px] font-800 text-ink block leading-tight">&lt;10s Matching</span>
+                  <span className="text-[10px] text-muted block leading-tight truncate">Instant quotes from pros</span>
+                </div>
               </div>
-              <div className="space-y-0.5">
-                <ShieldCheck className="w-4 h-4 text-accent mx-auto" />
-                <span className="text-[11px] font-800 text-ink block">Fair Counter</span>
-                <span className="text-[10px] text-muted block">1-round price lock</span>
+
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-accent/30 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-accent/15 text-accent flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[12px] font-800 text-ink block leading-tight">Fair Counter</span>
+                  <span className="text-[10px] text-muted block leading-tight truncate">1-round price lock</span>
+                </div>
               </div>
             </div>
           </section>
