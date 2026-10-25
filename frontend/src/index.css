@@ -192,17 +192,17 @@ body {
 .bottom-nav-item.is-active { color: var(--primary); background: var(--primary-soft); }
 
 @media (min-width: 768px) {
-  body { padding: 24px; }
-  .nodi-shell { max-width: 1280px; min-height: calc(100dvh - 48px); border: 1px solid var(--border); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; }
-  .app-header { padding: 20px 32px 18px; }
-  .app-main { padding: 32px 32px 132px; }
-  .home-desktop-grid { grid-template-columns: minmax(0, 1.3fr) minmax(360px, .7fr); align-items: start; gap: 32px; }
-  .nearby-section { margin-top: 0; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-sm); }
-  .worker-rail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  body { padding: 0; }
+  .nodi-shell { max-width: 1400px; min-height: 100dvh; border: none; border-radius: 0; box-shadow: none; overflow: visible; }
+  .app-header { padding: 16px 32px; }
+  .app-main { padding: 28px 32px 48px; }
+  .home-desktop-grid { grid-template-columns: minmax(0, 1.25fr) minmax(420px, 0.95fr); align-items: start; gap: 32px; }
+  .nearby-section { margin-top: 0; padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-sm); }
+  .worker-rail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; overflow: visible; }
   .worker-rail > * { width: auto; min-width: 0; }
   .desktop-support-panel { margin-top: 18px; display: flex; align-items: center; gap: 12px; padding: 16px; border-top: 1px solid var(--border); color: var(--muted); }
   .desktop-support-panel strong { display: block; color: var(--text); font-size: 14px; }
   .desktop-support-panel p { margin-top: 3px; font-size: 13px; }
-  .bottom-nav { left: 32px; right: 32px; bottom: 24px; max-width: 1180px; }
-  .active-booking-bar { left: 32px; right: 32px; bottom: 102px; max-width: 1180px; }
+  .bottom-nav { display: none !important; }
+  .active-booking-bar { left: auto; right: 32px; bottom: 32px; max-width: 400px; }
 }
