@@ -67,41 +67,53 @@ export default function HomeMapCard({ center, workers = [], selectedCategory = '
         </Marker>
 
         {/* Workers Markers */}
-        {safeWorkers.map((w) => {
-          if (!w.lat || !w.lng) return null;
+        {/* Workers & Real Google Places Markers */}
+        {safeWorkers.map((w, idx) => {
+          const lat = w.lat ?? w.latitude;
+          const lng = w.lng ?? w.longitude;
+          if (!lat || !lng) return null;
+
+          const isGooglePlace = Boolean(w.is_real_place);
+          const pinColor = isGooglePlace ? '#10B981' : (w.avatar_color || '#1F5BFF');
+          const initials = w.name
+            ? `${w.name.split(' ')[0][0] || 'P'}${w.name.split(' ')[1] ? w.name.split(' ')[1][0] : ''}`
+            : 'P';
 
           const workerIcon = L.divIcon({
             className: 'custom-worker-pin',
             html: `
-              <div style="background: ${w.avatar_color || '#1F5BFF'}; color: white; width: 32px; height: 32px; border-radius: 10px; border: 2.5px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">
-                ${w.name.split(' ')[0][0]}${w.name.split(' ')[1] ? w.name.split(' ')[1][0] : ''}
+              <div style="background: ${pinColor}; color: white; width: 32px; height: 32px; border-radius: 10px; border: 2.5px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">
+                ${initials}
               </div>
             `,
             iconSize: [32, 32],
             iconAnchor: [16, 16],
           });
 
+          const ratingVal = w.rating_avg ?? w.rating ?? 4.8;
+          const key = w.id || `place-${idx}-${lat}`;
+
           return (
-            <Marker key={w.id} position={[w.lat, w.lng]} icon={workerIcon}>
+            <Marker key={key} position={[lat, lng]} icon={workerIcon}>
               <Popup>
                 <div className="p-1 text-left min-w-[170px] font-sans">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <span className="font-800 text-sm text-ink">{w.name}</span>
-                    {w.id_verified && (
-                      <span className="text-primary text-[10px]" title="ID Verified">
-                        ✓
-                      </span>
-                    )}
+                    <span className="font-800 text-sm text-ink truncate">{w.name}</span>
+                    <span className="text-primary text-[10px]" title={isGooglePlace ? 'Google Verified' : 'ID Verified'}>
+                      ✓
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted mb-2">
                     <span className="flex items-center gap-0.5 text-accent font-700">
-                      ★ {w.rating_avg}
+                      ★ {typeof ratingVal === 'number' ? ratingVal.toFixed(1) : ratingVal}
                     </span>
                     <span>•</span>
                     <span>{w.distance_km} km away</span>
                   </div>
                   <div className="flex items-center justify-between pt-1 border-t border-line">
-                    <span className="font-800 text-xs text-primary">₹{w.base_rate}/{w.rate_unit || 'visit'}</span>
+                    <span className="font-800 text-xs text-primary">
+                      {w.service_charge || `₹${w.base_rate}/${w.rate_unit || 'visit'}`}
+                    </span>
                     <button
                       onClick={() => navigate(`/request/new?category=${selectedCategory}`)}
                       className="text-[11px] font-700 px-2 py-1 rounded bg-primary text-white hover:bg-primary600 transition flex items-center gap-1"

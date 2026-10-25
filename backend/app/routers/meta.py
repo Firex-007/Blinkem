@@ -92,3 +92,28 @@ def get_nearby_workers(
     results.sort(key=lambda x: (x["eta_min"], x["dist"]))
 
     return [item["card"] for item in results[:6]]
+
+
+@router.get("/places/nearby")
+def get_nearby_places(
+    category: str = Query("plumber"),
+    lat: Optional[float] = Query(None),
+    lng: Optional[float] = Query(None),
+    radius_km: float = Query(10.0),
+):
+    """
+    Hyperlocal Blue-Collar Service Finder powered by Google Places (SerpAPI).
+    Returns real nearby verified businesses, GPS distance, ETA, rating, address, phone, and maps link.
+    """
+    from app.places_finder import find_services
+
+    query_lat = lat if lat is not None else settings.DEFAULT_LAT
+    query_lng = lng if lng is not None else settings.DEFAULT_LNG
+
+    return find_services(
+        latitude=query_lat,
+        longitude=query_lng,
+        service=category,
+        radius_km=radius_km,
+    )
+

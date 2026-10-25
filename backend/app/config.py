@@ -15,6 +15,7 @@ class Settings:
     DEFAULT_LAT: float = float(os.getenv("DEFAULT_LAT", "13.0418"))
     DEFAULT_LNG: float = float(os.getenv("DEFAULT_LNG", "80.2341"))
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./blinkem.db")
+    SERPAPI_KEY: str = os.getenv("SERPAPI_KEY", "")
 
 
 settings = Settings()

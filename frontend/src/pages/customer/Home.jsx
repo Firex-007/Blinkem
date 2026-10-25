@@ -28,12 +28,14 @@ import { t } from '../../i18n';
 import usePolling from '../../hooks/usePolling';
 import VoiceSheet from '../../components/VoiceSheet';
 import WorkerCard from '../../components/WorkerCard';
+import RealPlacesCard from '../../components/RealPlacesCard';
 import HomeMapCard from '../../components/HomeMapCard';
 import Skeleton from '../../components/Skeleton';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 import useScrollReveal from '../../hooks/useScrollReveal';
+import { getRealPlaces } from '../../utils/placesFinder';
 
 const CATEGORIES = [
   { slug: 'plumber', labelKey: 'cat_plumber', image: '/images/categories/plumber.jpg', startingPrice: 199 },
@@ -131,10 +133,22 @@ export default function Home() {
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState('');
   const [rightViewMode, setRightViewMode] = useState('both'); // 'both' | 'map' | 'cards'
+  const [proSourceTab, setProSourceTab] = useState('all'); // 'all' | 'blinkem' | 'google'
+  const [realPlaces, setRealPlaces] = useState([]);
 
   const curLat = location?.lat || 13.0418;
   const curLng = location?.lng || 80.2341;
   const mapCenter = useMemo(() => [curLat, curLng], [curLat, curLng]);
+
+  useEffect(() => {
+    let isMounted = true;
+    getRealPlaces(railCat, curLat, curLng).then((data) => {
+      if (isMounted) setRealPlaces(data || []);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [railCat, curLat, curLng]);
 
   const {
     data: categories,
@@ -153,6 +167,14 @@ export default function Home() {
     3000,
     true
   );
+
+  const allMapEntities = useMemo(() => {
+    const list = [...(workers || [])];
+    if (realPlaces && realPlaces.length > 0) {
+      list.push(...realPlaces);
+    }
+    return list;
+  }, [workers, realPlaces]);
 
   const { data: bookings, error: bookingsError } = usePolling(
     () => api.get('/bookings'),
@@ -524,43 +546,109 @@ export default function Home() {
               <div className="mb-3">
                 <HomeMapCard
                   center={mapCenter}
-                  workers={workers || []}
+                  workers={allMapEntities}
                   selectedCategory={railCat}
                 />
               </div>
             )}
 
+            {/* Pro Source Switcher: All / Google Places Live / Blink'em Pros */}
+            <div className="flex items-center gap-1.5 my-2.5 overflow-x-auto pb-1 text-xs">
+              <button
+                onClick={() => setProSourceTab('all')}
+                className={`px-3 py-1 rounded-full font-800 text-[11px] transition ${
+                  proSourceTab === 'all'
+                    ? 'bg-ink text-surface shadow-xs'
+                    : 'bg-surface2 text-muted hover:text-ink border border-line'
+                }`}
+              >
+                All ({(workers?.length || 0) + realPlaces.length})
+              </button>
+              <button
+                onClick={() => setProSourceTab('google')}
+                className={`px-3 py-1 rounded-full font-800 text-[11px] flex items-center gap-1 transition ${
+                  proSourceTab === 'google'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-surface2 text-muted hover:text-ink border border-line'
+                }`}
+              >
+                <CheckCircle2 className="w-3 h-3 text-emerald-300" />
+                <span>Google Places Live ({realPlaces.length})</span>
+              </button>
+              <button
+                onClick={() => setProSourceTab('blinkem')}
+                className={`px-3 py-1 rounded-full font-800 text-[11px] transition ${
+                  proSourceTab === 'blinkem'
+                    ? 'bg-primary text-onprimary shadow-xs'
+                    : 'bg-surface2 text-muted hover:text-ink border border-line'
+                }`}
+              >
+                Blink&apos;em Pros ({workers?.length || 0})
+              </button>
+            </div>
+
             {/* Nearby Verified Pros Rail / Grid (Shown in 'both' and 'cards' modes) */}
             {(rightViewMode === 'both' || rightViewMode === 'cards') && (
-              <div className="space-y-2">
-                {workersLoading ? (
+              <div className="space-y-3">
+                {workersLoading && !realPlaces.length ? (
                   <div className="worker-rail" aria-label={t('loading')}>
                     <Skeleton className="worker-skeleton" />
                     <Skeleton className="worker-skeleton" />
                   </div>
-                ) : workersError ? (
-                  <Card className="section-error-card">
-                    <p>{t('error')}</p>
-                    <Button variant="secondary" size="sm" onClick={retryWorkers}>
-                      {t('retry')}
-                    </Button>
-                  </Card>
-                ) : workers?.length ? (
-                  <div className="worker-rail" data-name="nearby worker rail">
-                    {workers.map((worker) => (
-                      <WorkerCard key={worker.id} worker={worker} compact />
-                    ))}
-                  </div>
                 ) : (
-                  <Card className="empty-workers">
-                    <div className="empty-icon">
-                      <Clock3 className="h-5 w-5" />
-                    </div>
-                    <p>{t('home_none_online')}</p>
-                    <Button variant="secondary" size="sm" onClick={() => navigate('/request/new')}>
-                      {t('home_create_request')}
-                    </Button>
-                  </Card>
+                  <div className="space-y-3">
+                    {/* Render Real Google Places (When tab is 'all' or 'google') */}
+                    {(proSourceTab === 'all' || proSourceTab === 'google') && realPlaces.length > 0 && (
+                      <div className="space-y-2">
+                        {proSourceTab === 'all' && (
+                          <div className="flex items-center justify-between text-xs font-800 text-muted px-1">
+                            <span className="flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Real Google Maps Places Nearby
+                            </span>
+                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                              Verified Directory
+                            </span>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {realPlaces.map((place, idx) => (
+                            <RealPlacesCard key={`place-${idx}-${place.name}`} place={place} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Render Blink'em Pros (When tab is 'all' or 'blinkem') */}
+                    {(proSourceTab === 'all' || proSourceTab === 'blinkem') && (
+                      <div className="space-y-2">
+                        {proSourceTab === 'all' && workers?.length > 0 && (
+                          <div className="flex items-center justify-between text-xs font-800 text-muted px-1 mt-2">
+                            <span>Blink&apos;em Instant Dispatch Pros</span>
+                            <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                              Online Dispatch
+                            </span>
+                          </div>
+                        )}
+                        {workers?.length ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" data-name="nearby worker rail">
+                            {workers.map((worker) => (
+                              <WorkerCard key={worker.id} worker={worker} compact />
+                            ))}
+                          </div>
+                        ) : proSourceTab === 'blinkem' ? (
+                          <Card className="empty-workers">
+                            <div className="empty-icon">
+                              <Clock3 className="h-5 w-5" />
+                            </div>
+                            <p>{t('home_none_online')}</p>
+                            <Button variant="secondary" size="sm" onClick={() => navigate('/request/new')}>
+                              {t('home_create_request')}
+                            </Button>
+                          </Card>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
