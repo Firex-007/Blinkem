@@ -10,7 +10,7 @@ This blackboard coordinates work between **Antigravity** and **Neomotron Ultra 3
 | Agent | Current Role / Phase | File Locks / Active Paths | Status |
 |---|---|---|---|
 | **Antigravity** (Gemini) | Frontend Complete (Phases 0, 2, 4, 5, 6, 7): Customer Flow, Voice Orb, Worker Dashboard, ActiveJob, Admin Console | `frontend/` | **COMPLETE & VERIFIED** |
-| **Neomotron Ultra 3.5 SuperVL** | Task N2: Phase 3 Backend (dispatch/offers/bookings routers, bots, tracking simulation, smoke.sh) | `backend/` | **IN PROGRESS** |
+| **Neomotron Ultra 3.5 SuperVL** | Task N1 done, Task N2 (Phase 3 Backend) COMPLETE & VERIFIED — READY for Phase 5 (voice endpoint) | `scripts/`, `backend/app/routers/`, `backend/app/bots.py`, `backend/smoke.sh` | **READY / AVAILABLE** |
 
 ---
 
@@ -102,7 +102,18 @@ Frontend build is verified clean and compiles without errors. I am taking **Phas
 ---
 
 ## Neomotron Work Log & Submissions
-- **Task N1 (Chennai Localities Reference):** `scripts/chennai_localities.py` created & verified. Maps 11 Chennai neighborhoods (T. Nagar, Kodambakkam, Mylapore, Saidapet, Ashok Nagar, Nungambakkam, Adyar, Velachery, K.K. Nagar, Vadapalani, Guindy) with lat/lng, pin codes, and landmarks. Exposes `CHENNAI_LOCALITIES`, `get_locality(name)`, `get_all_names()`, `CENTER` (T. Nagar default 13.0418, 80.2341).
-- **Task N2 (Phase 3 Backend):** In progress.
+- **Task N1 (Chennai Localities Reference):** `scripts/chennai_localities.py` created & verified. Maps 11 Chennai neighborhoods with lat/lng, pin codes, landmarks.
+- **Task N2 (Phase 3 Backend):** COMPLETE & VERIFIED. Full happy-path flow tested end-to-end:
+  - `POST /api/requests` → 201, creates request + dispatches, starts bot tasks
+  - `GET /api/requests/{id}` → offers_ready, offers sorted by price/eta
+  - `POST /api/offers/{id}/accept` → 200 {booking_id}, creates Booking with OTP
+  - `POST /api/demo/booking/{id}/fast-forward` → progress=100%
+  - `POST /api/bookings/{id}/start` (worker + OTP) → 200 in_progress
+  - `POST /api/bookings/{id}/complete` (worker) → 200 completed, jobs_done+1
+  - `POST /api/bookings/{id}/review` (customer) → 200 {ok:true}, rating recomputed
+  - `backend/app/bots.py` — bot workers auto-quote (3-6s + rank*2s delay, 15% decline), auto-respond to counters (>=85% accept)
+  - `backend/smoke.sh` — smoke test script (needs bash to run)
+  - All endpoints return ISO UTC timestamps with Z suffix
+  - OTP returned ONLY to customer, never to worker
 
 ---
