@@ -181,7 +181,7 @@ body {
 .empty-workers p { flex: 1; font-size: 13px; }
 .empty-icon, .support-icon { width: 40px; height: 40px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: var(--primary-soft); color: var(--primary); }
 .desktop-support-panel { display: none; }
-.active-booking-bar { position: fixed; z-index: 35; left: 16px; right: 16px; bottom: 88px; max-width: 448px; margin: 0 auto; min-height: 64px; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 18px; color: var(--primary-ink); background: var(--primary); box-shadow: var(--shadow); text-align: left; }
+.active-booking-bar { position: fixed; z-index: 35; left: 16px; right: 16px; bottom: 104px; max-width: 448px; margin: 0 auto; min-height: 64px; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 18px; color: var(--primary-ink); background: var(--primary); box-shadow: var(--shadow); text-align: left; }
 .booking-avatar { width: 36px; height: 36px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 20%); font-size: 12px; font-weight: 800; }
 .booking-copy { flex: 1; min-width: 0; }
 .booking-copy strong, .booking-copy span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -190,8 +190,8 @@ body {
 .bottom-nav { position: fixed; z-index: 40; left: 16px; right: 16px; bottom: 12px; max-width: 448px; height: 66px; margin: 0 auto; display: flex; align-items: center; justify-content: space-around; gap: 4px; padding: 7px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); }
 .bottom-nav-item { min-width: 86px; min-height: 50px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 14px; color: var(--muted); background: transparent; font-size: 12px; font-weight: 700; }
 .bottom-nav-item.is-active { color: var(--primary); background: var(--primary-soft); }
-.site-footer { position: relative; z-index: 1; margin-top: auto; border-top: 1px solid var(--border); background: var(--surface); }
-.site-footer-inner { max-width: 1400px; margin: 0 auto; padding: 24px 16px 156px; }
+.site-footer { position: relative; z-index: 1; margin-top: auto; border-top: 1px solid var(--border); background: var(--surface-2); }
+.site-footer-inner { max-width: 1400px; margin: 0 auto; padding: 18px 16px 112px; }
 .footer-download { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface-2); }
 .footer-download-icon { width: 40px; height: 40px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: var(--primary); color: var(--primary-ink); }
 .footer-download-copy { flex: 1; min-width: 0; }
@@ -199,8 +199,11 @@ body {
 .footer-download-copy strong { color: var(--text); font-size: 14px; }
 .footer-download-copy span { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .footer-download-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-.footer-download-actions a { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 12px; background: var(--primary); color: var(--primary-ink); font-size: 12px; font-weight: 800; }
+.footer-download-actions a { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 12px; background: var(--text); color: var(--surface); font-size: 12px; font-weight: 800; }
 .footer-base { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; color: var(--muted); font-size: 12px; }
+.footer-socials { display: flex; align-items: center; gap: 8px; }
+.footer-socials a { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; color: var(--text); background: var(--surface); }
+.footer-socials a:hover { color: var(--primary); border-color: var(--primary); }
 .footer-links { display: flex; align-items: center; gap: 14px; }
 .footer-links a { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
 .footer-links a:hover { color: var(--primary); }
@@ -219,5 +222,5 @@ body {
   .desktop-support-panel strong { display: block; color: var(--text); font-size: 14px; }
   .desktop-support-panel p { margin-top: 3px; font-size: 13px; }
   .bottom-nav { display: none !important; }
-  .active-booking-bar { left: auto; right: 32px; bottom: 32px; max-width: 400px; }
+  .active-booking-bar { left: auto; right: 32px; bottom: 52px; max-width: 400px; }
 }

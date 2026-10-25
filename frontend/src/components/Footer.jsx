@@ -1,4 +1,4 @@
-import { Download, ExternalLink, Globe2 } from 'lucide-react';
+import { Download, ExternalLink, Facebook, Globe2, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { t } from '../i18n';
 
@@ -21,6 +21,12 @@ export default function Footer() {
         )}
         <div className="footer-base">
           <span>{t('footer_copyright')}</span>
+          <div className="footer-socials" aria-label={t('footer_socials')}>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin className="h-4 w-4" /></a>
+            <a href="https://threads.net" target="_blank" rel="noreferrer" aria-label="Threads"><MessageCircle className="h-4 w-4" /></a>
+          </div>
           <div className="footer-links">
             <a href="https://blinkem.in" target="_blank" rel="noreferrer"><Globe2 className="h-4 w-4" />{t('footer_website')}</a>
             <a href="https://github.com/Firex-007/Blinkem" target="_blank" rel="noreferrer"><ExternalLink className="h-4 w-4" />{t('footer_project')}</a>
