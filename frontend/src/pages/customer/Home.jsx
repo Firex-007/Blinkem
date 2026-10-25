@@ -59,6 +59,15 @@ const SEARCH_SUGGESTIONS = [
   'cook for party or dinner',
 ];
 
+const DYNAMIC_ACTIONS = [
+  'fixed...',
+  'cleaned...',
+  'cooked...',
+  'repaired...',
+  'serviced...',
+  'painted...',
+];
+
 function SearchSuggestions() {
   const [index, setIndex] = useState(0);
 
@@ -135,6 +144,19 @@ export default function Home() {
   const [rightViewMode, setRightViewMode] = useState('both'); // 'both' | 'map' | 'cards'
   const [proSourceTab, setProSourceTab] = useState('all'); // 'all' | 'blinkem' | 'google'
   const [realPlaces, setRealPlaces] = useState([]);
+  const [actionIndex, setActionIndex] = useState(0);
+  const [isActionFading, setIsActionFading] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsActionFading(true);
+      setTimeout(() => {
+        setActionIndex((prev) => (prev + 1) % DYNAMIC_ACTIONS.length);
+        setIsActionFading(false);
+      }, 200);
+    }, 1100);
+    return () => clearInterval(timer);
+  }, []);
 
   const curLat = location?.lat || 13.0418;
   const curLng = location?.lng || 80.2341;
@@ -230,10 +252,16 @@ export default function Home() {
                   {t('home_hyperlocal_dispatch')}
                 </div>
 
-              <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
-                Tell us what needs{' '}
-                <span className="text-primary italic">
-                  fixing...
+              <h1 className="home-display font-uber text-ink leading-tight animate-header-enter" data-name="request headline">
+                Tell us what needs to be{' '}
+                <span
+                  className={`inline-block text-primary italic font-black transition-all duration-200 transform ${
+                    isActionFading
+                      ? 'opacity-0 -translate-y-2 scale-95 blur-[1px]'
+                      : 'opacity-100 translate-y-0 scale-100 blur-0'
+                  }`}
+                >
+                  {DYNAMIC_ACTIONS[actionIndex]}
                 </span>
               </h1>
 

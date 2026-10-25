@@ -288,3 +288,23 @@ body {
   .sticky-cta { bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto; }
   .active-booking-bar { bottom: 24px; max-width: 420px; margin: 32px 0 0 auto; }
 }
+
+/* Animated header entrance from left to right */
+@keyframes headerFadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-36px);
+  }
+  60% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-header-enter {
+  animation: headerFadeInLeft 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
