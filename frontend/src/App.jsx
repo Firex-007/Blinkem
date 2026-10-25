@@ -15,6 +15,7 @@ import Complete from './pages/customer/Complete';
 import Bookings from './pages/customer/Bookings';
 import WorkerHome from './pages/worker/WorkerHome';
 import ActiveJob from './pages/worker/ActiveJob';
+import AdminConsole from './pages/admin/AdminConsole';
 
 function Header() {
   const { lang } = useApp();
@@ -74,7 +75,7 @@ export default function App() {
           <Route path="/bookings" element={<Shell><Bookings /></Shell>} />
           <Route path="/worker" element={<Shell><WorkerHome /></Shell>} />
           <Route path="/worker/job/:id" element={<Shell><ActiveJob /></Shell>} />
-          <Route path="/admin" element={<Shell><div className="p-4 text-center text-muted">Admin Console (Phase 7)</div></Shell>} />
+          <Route path="/admin" element={<Shell><AdminConsole /></Shell>} />
         </Routes>
       </Router>
     </AppProvider>

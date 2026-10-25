@@ -6,7 +6,8 @@ import { t } from '../../i18n';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Chip from '../../components/Chip';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 const SERVICES = [
   { slug: 'plumber', label: 'cat.plumber' },
@@ -22,12 +23,16 @@ const SERVICES = [
 export default function RequestForm() {
   const { userId } = useApp();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [category, setCategory] = useState(searchParams.get('category') || 'plumber');
-  const [description, setDescription] = useState('');
-  const [urgency, setUrgency] = useState('now');
+  const voiceState = location.state || {};
+
+  const [category, setCategory] = useState(voiceState.category || searchParams.get('category') || 'plumber');
+  const [description, setDescription] = useState(voiceState.description || voiceState.transcript || '');
+  const [urgency, setUrgency] = useState(voiceState.urgency || 'now');
   const [address, setAddress] = useState('T. Nagar, Chennai');
-  const [budget, setBudget] = useState('');
+  const [budget, setBudget] = useState(voiceState.budget_hint ? String(voiceState.budget_hint) : '');
+  const [voiceTranscript, setVoiceTranscript] = useState(voiceState.transcript || null);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState(null);
 
@@ -55,9 +60,12 @@ export default function RequestForm() {
 
   return (
     <div className="space-y-4">
-      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm font-700 text-primary">
-        <ChevronLeft className="w-4 h-4" /> {t('back')}
-      </button>
+      {voiceTranscript && (
+        <div className="p-3 bg-soft border border-primary/20 rounded-card flex items-center gap-2 text-xs text-primary font-600 animate-slideUp">
+          <Sparkles className="w-4 h-4 shrink-0 text-primary" />
+          <span>Prefilled from voice: "{voiceTranscript}"</span>
+        </div>
+      )}
       <Card>
         <div className="space-y-4">
           <div>

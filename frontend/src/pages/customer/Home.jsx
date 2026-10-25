@@ -47,7 +47,7 @@ export default function Home() {
   const handleCategory = (slug) => navigate(`/request/new?category=${slug}`);
   const handleVoiceResult = (res) => {
     setVoiceOpen(false);
-    navigate(`/request/new?category=${res.category || 'plumber'}`);
+    navigate(`/request/new?category=${res.category || 'plumber'}`, { state: res });
   };
 
   return (
