@@ -16,7 +16,8 @@ const KEYWORDS = {
     'plumber', 'leak', 'leaking', 'tap', 'faucet', 'pipe', 'drain', 'drainage',
     'sink', 'washbasin', 'toilet', 'flush', 'cistern', 'commode', 'tank', 'sump',
     'water', 'motor', 'pump', 'blockage', 'valve', 'sewage', 'clogged', 'clog',
-    'thanni varala', 'thanni illa', 'thanni varale', 'water not coming', 'varala',
+    'bathroom', 'bathroomla', 'bath room', 'tanni', 'thanni', 'tanni varla', 'thanni varala',
+    'thanni illa', 'thanni varale', 'water not coming', 'varala', 'varla',
     'குழாய்', 'கசிவு', 'தண்ணீர்', 'தொட்டி', 'மோட்டார்', 'அடைப்பு', 'டேப்',
     'नल', 'पाइप', 'लीक', 'टपक', 'पानी', 'नाली', 'टैंक', 'मोटर',
     'thanni', 'thanneer', 'kasivu', 'odanji', 'udaivu', 'kuzhai', 'nal', 'paani'
@@ -97,7 +98,7 @@ export function classifyTradeFromText(text = '') {
     }
   }
 
-  let bestCat = 'electrician';
+  let bestCat = 'plumber';
   let bestScore = 0;
   for (const [cat, score] of Object.entries(scores)) {
     if (score > bestScore) {
@@ -108,9 +109,11 @@ export function classifyTradeFromText(text = '') {
 
   // If no match found, pick category based on first relevant word or general
   if (bestScore === 0) {
-    if (clean.includes('current') || clean.includes('power') || clean.includes('wire')) bestCat = 'electrician';
-    else if (clean.includes('water') || clean.includes('pipe')) bestCat = 'plumber';
-    else bestCat = 'electrician';
+    if (clean.includes('current') || clean.includes('power') || clean.includes('wire') || clean.includes('switch') || clean.includes('fan')) bestCat = 'electrician';
+    else if (clean.includes('water') || clean.includes('pipe') || clean.includes('bath') || clean.includes('thanni') || clean.includes('tap')) bestCat = 'plumber';
+    else if (clean.includes('clean') || clean.includes('dust') || clean.includes('wash')) bestCat = 'cleaner';
+    else if (clean.includes('wood') || clean.includes('door') || clean.includes('lock')) bestCat = 'carpenter';
+    else bestCat = 'plumber';
   }
 
   const isUrgent = URGENCY_TERMS.some((term) => clean.includes(term)) || true; // default now for emergency dispatch

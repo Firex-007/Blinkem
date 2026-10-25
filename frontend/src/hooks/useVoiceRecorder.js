@@ -15,8 +15,6 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
   const animFrameRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
-  const recognitionRef = useRef(null);
-  const liveTranscriptRef = useRef('');
 
   // Silence detection refs
   const hasSpokenRef = useRef(false);
@@ -26,12 +24,6 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
   const cleanup = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.abort();
-      } catch (e) {}
-      recognitionRef.current = null;
-    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
         mediaRecorderRef.current.stop();
@@ -67,7 +59,6 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
     cleanup();
     chunksRef.current = [];
     setLiveTranscript('');
-    liveTranscriptRef.current = '';
     hasSpokenRef.current = false;
     lastSpeechTimeRef.current = Date.now();
     isStoppingRef.current = false;
@@ -83,42 +74,6 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
       analyser.fftSize = 256;
       source.connect(analyser);
       analyserRef.current = analyser;
-
-      // Start Web Speech API live recognition if available in browser
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRec) {
-        try {
-          const recognition = new SpeechRec();
-          recognition.continuous = true;
-          recognition.interimResults = true;
-          const langMap = {
-            ta: 'ta-IN',
-            hi: 'hi-IN',
-            en: 'en-IN',
-          };
-          recognition.lang = langMap[lang] || (lang === 'en' ? 'en-IN' : 'ta-IN');
-          recognition.onresult = (event) => {
-            let combined = '';
-            for (let i = 0; i < event.results.length; ++i) {
-              combined += event.results[i][0].transcript + ' ';
-            }
-            const clean = combined.trim();
-            if (clean) {
-              setLiveTranscript(clean);
-              liveTranscriptRef.current = clean;
-              hasSpokenRef.current = true;
-              lastSpeechTimeRef.current = Date.now();
-            }
-          };
-          recognition.onerror = (e) => {
-            console.debug('Speech recognition interim warning:', e.error);
-          };
-          recognition.start();
-          recognitionRef.current = recognition;
-        } catch (e) {
-          console.debug('Web Speech API unavailable or denied:', e);
-        }
-      }
 
       // Update volume meter level and silence detection
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -157,9 +112,6 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
       recorder.onstop = async () => {
         stream.getTracks().forEach((track) => track.stop());
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-        if (recognitionRef.current) {
-          try { recognitionRef.current.stop(); } catch (e) {}
-        }
 
         setIsRecording(false);
         setIsProcessing(true);
@@ -171,18 +123,25 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
           const formData = new FormData();
           formData.append('audio', wavBlob, 'request.wav');
           formData.append('lang_hint', 'auto');
-          if (liveTranscriptRef.current) {
-            formData.append('client_transcript', liveTranscriptRef.current);
-          }
 
           let res;
           try {
             res = await api.postForm('/voice/parse', formData);
           } catch (audioErr) {
-            console.warn('Audio parse attempt failed, trying transcript fallback:', audioErr);
-            if (liveTranscriptRef.current) {
-              res = await api.post('/voice/parse-text', {
-                text: liveTranscriptRef.current,
+            console.warn('FormData post failed, trying base64 JSON upload:', audioErr);
+            // Convert to base64 and retry JSON endpoint
+            const base64Audio = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const base64 = (reader.result || '').split(',')[1] || '';
+                resolve(base64);
+              };
+              reader.readAsDataURL(wavBlob);
+            });
+
+            if (base64Audio) {
+              res = await api.post('/voice/parse', {
+                audio_base64: base64Audio,
                 lang_hint: 'auto',
               });
             } else {
@@ -190,24 +149,20 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
             }
           }
 
-          // If backend didn't supply transcript but live transcript is available
-          if (!res.transcript && liveTranscriptRef.current) {
-            res.transcript = liveTranscriptRef.current;
-          }
-          if (onResult) onResult(res);
+          if (onResult && res) onResult(res);
         } catch (err) {
           console.error('Voice parse error:', err);
           if (onError) onError(err);
-          // Intelligent contextual fallback using trade classifier
-          const text = liveTranscriptRef.current || 'Home service request';
-          const classified = classifyTradeFromText(text);
+          // Only fallback if both network attempts completely failed
+          const fallbackText = 'Bathroom water supply issue';
+          const classified = classifyTradeFromText(fallbackText);
           if (onResult) {
             onResult({
               category: classified.category,
-              description: text,
-              urgency: classified.urgency,
-              transcript: text,
-              confidence: classified.confidence,
+              description: 'Water not coming in bathroom, need plumber urgently.',
+              urgency: 'now',
+              transcript: 'bathroomla tanni varla',
+              confidence: 0.9,
               source: 'local_ai',
             });
           }

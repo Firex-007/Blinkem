@@ -67,12 +67,12 @@ Listen directly to the audio. Automatically detect the spoken language on your o
 
 Analyze what problem the user is describing and determine which skilled trade is required.
 Return ONLY valid JSON:
-- transcript: what was said verbatim in the original spoken language/script.
+- transcript: what was said verbatim in the original spoken language/script. If spoken in Tanglish or Hinglish (e.g. Tamil mixed with English like "bathroomla tanni varla" or "veetla kadhavu odanju pochu"), transcribe the FULL sentence verbatim in Romanized characters as spoken. DO NOT truncate to single words, and DO NOT drop non-English words.
 - detected_language: exactly one of: "ta", "en", "hi", "mixed". Identify this purely from the audio.
 - category: exactly one of: "plumber", "electrician", "cleaner", "carpenter", "painter", "ac_repair", "cook", "appliance_repair".
   Context reasoning:
+  * Water/pipe/drainage/bathroom water supply issues (leaks, tap, sink, drainage, toilet, tank, motor, thanni varala, water not coming) -> plumber.
   * Electrical issues (wires, current, fuse, switch, shock, spark, tripping, fan, light, MCB) -> electrician.
-  * Water/pipe/drainage issues (leaks, tap, sink, drainage, toilet, tank, motor) -> plumber.
   * AC cooling, gas leak, air conditioner repair -> ac_repair.
   * Deep cleaning, sweeping, mopping, bathroom cleaning, maid -> cleaner.
   * Woodwork, doors, cupboards, windows, locks, furniture -> carpenter.
@@ -131,8 +131,6 @@ def normalize(data: dict) -> dict:
 
 def parse_audio(wav_bytes: bytes, lang_hint: str = "auto", client_transcript: str = "") -> dict:
     prompt_text = PROMPT
-    if client_transcript:
-        prompt_text += f"\n\nPreliminary speech-to-text hint: '{client_transcript}'"
 
     models_to_try = [
         "gemini-flash-lite-latest",
