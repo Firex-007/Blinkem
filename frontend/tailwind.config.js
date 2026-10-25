@@ -13,6 +13,10 @@ export default {
         success: 'var(--success)', successsoft: 'var(--success-soft)',
         warning: 'var(--warning)', danger: 'var(--danger)', dangersoft: 'var(--danger-soft)',
       },
+      fontFamily: {
+        gravitas: ["'Gravitas One'", 'Georgia', 'serif'],
+        display: ["'Gravitas One'", 'Georgia', 'serif'],
+      },
       borderRadius: { card: 'var(--radius)', chip: 'var(--radius-sm)' },
       boxShadow: { card: 'var(--shadow)', sm2: 'var(--shadow-sm)' },
       keyframes: {

@@ -33,80 +33,17 @@ import Skeleton from '../../components/Skeleton';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Chip from '../../components/Chip';
+import useScrollReveal from '../../hooks/useScrollReveal';
 
 const CATEGORIES = [
-  {
-    slug: 'plumber',
-    labelKey: 'cat_plumber',
-    image: '/images/categories/plumber.jpg',
-    icon: Wrench,
-    startingPrice: 199,
-    accentColor: 'text-blue-500',
-    color: 'text-blue-500 bg-blue-500/10',
-  },
-  {
-    slug: 'electrician',
-    labelKey: 'cat_electrician',
-    image: '/images/categories/electrician.jpg',
-    icon: Zap,
-    startingPrice: 149,
-    accentColor: 'text-amber-500',
-    color: 'text-amber-500 bg-amber-500/10',
-  },
-  {
-    slug: 'cleaner',
-    labelKey: 'cat_cleaner',
-    image: '/images/categories/cleaner.jpg',
-    icon: Sparkles,
-    startingPrice: 299,
-    accentColor: 'text-emerald-500',
-    color: 'text-emerald-500 bg-emerald-500/10',
-  },
-  {
-    slug: 'carpenter',
-    labelKey: 'cat_carpenter',
-    image: '/images/categories/carpenter.jpg',
-    icon: Hammer,
-    startingPrice: 249,
-    accentColor: 'text-orange-500',
-    color: 'text-orange-500 bg-orange-500/10',
-  },
-  {
-    slug: 'painter',
-    labelKey: 'cat_painter',
-    image: '/images/categories/painter.jpg',
-    icon: Paintbrush,
-    startingPrice: 399,
-    accentColor: 'text-purple-500',
-    color: 'text-purple-500 bg-purple-500/10',
-  },
-  {
-    slug: 'ac_repair',
-    labelKey: 'cat_ac_repair',
-    image: '/images/categories/ac_repair.jpg',
-    icon: Snowflake,
-    startingPrice: 349,
-    accentColor: 'text-cyan-500',
-    color: 'text-cyan-500 bg-cyan-500/10',
-  },
-  {
-    slug: 'cook',
-    labelKey: 'cat_cook',
-    image: '/images/categories/cook.jpg',
-    icon: ChefHat,
-    startingPrice: 299,
-    accentColor: 'text-rose-500',
-    color: 'text-rose-500 bg-rose-500/10',
-  },
-  {
-    slug: 'appliance_repair',
-    labelKey: 'cat_appliance_repair',
-    image: '/images/categories/appliance_repair.jpg',
-    icon: PlugZap,
-    startingPrice: 249,
-    accentColor: 'text-indigo-500',
-    color: 'text-indigo-500 bg-indigo-500/10',
-  },
+  { slug: 'plumber', labelKey: 'cat_plumber', image: '/images/categories/plumber.jpg', startingPrice: 199 },
+  { slug: 'electrician', labelKey: 'cat_electrician', image: '/images/categories/electrician.jpg', startingPrice: 149 },
+  { slug: 'cleaner', labelKey: 'cat_cleaner', image: '/images/categories/cleaner.jpg', startingPrice: 299 },
+  { slug: 'carpenter', labelKey: 'cat_carpenter', image: '/images/categories/carpenter.jpg', startingPrice: 249 },
+  { slug: 'painter', labelKey: 'cat_painter', image: '/images/categories/painter.jpg', startingPrice: 399 },
+  { slug: 'ac_repair', labelKey: 'cat_ac_repair', image: '/images/categories/ac_repair.jpg', startingPrice: 349 },
+  { slug: 'cook', labelKey: 'cat_cook', image: '/images/categories/cook.jpg', startingPrice: 299 },
+  { slug: 'appliance_repair', labelKey: 'cat_appliance_repair', image: '/images/categories/appliance_repair.jpg', startingPrice: 249 },
 ];
 
 const SEARCH_SUGGESTIONS = [
@@ -189,6 +126,7 @@ const FILTERS = CATEGORIES.slice(0, 5);
 export default function Home() {
   const { location, setIsLocationModalOpen } = useApp();
   const navigate = useNavigate();
+  useScrollReveal();
   const [railCat, setRailCat] = useState('plumber');
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState('');
@@ -260,24 +198,22 @@ export default function Home() {
       <div className="home-desktop-grid">
         {/* LEFT COLUMN: The Request Console */}
         <div className="home-primary-column space-y-6">
-          <section className="request-console" data-name="request console">
+          <section className="request-console scroll-reveal" data-name="request console">
             {/* Live Hyperlocal Dispatch Badge & Locality Subtitle */}
             <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-800 tracking-wider uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
-                <span>Hyperlocal Speed Dispatch</span>
+              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-800 tracking-wider uppercase">
+                Hyperlocal Speed Dispatch
               </div>
 
-              <h1 className="home-display text-ink" data-name="request headline">
+              <h1 className="home-display font-gravitas text-ink leading-tight" data-name="request headline">
                 Tell us what needs{' '}
-                <span className="bg-gradient-to-r from-primary via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <span className="text-primary italic">
                   fixing...
                 </span>
               </h1>
 
               <p className="home-helper flex items-center gap-2 flex-wrap">
                 <span>{t('home_speak')}</span>
-                <span className="text-muted/60">•</span>
                 <button
                   type="button"
                   onClick={() => setIsLocationModalOpen(true)}
@@ -302,12 +238,6 @@ export default function Home() {
                   title="Tap mic or hold [Space] to speak"
                 >
                   <Mic className="h-6 w-6 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform duration-300" />
-                  
-                  {/* Micro live pulse dot */}
-                  <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent border border-white" />
-                  </span>
 
                   <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-surface2 text-muted text-[10px] font-700 border border-line opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-xs">
                     Hold [Space]
@@ -343,13 +273,12 @@ export default function Home() {
             </div>
 
             {/* Service Category Matrix */}
-            <div className="space-y-2.5 pt-1">
+            <div className="space-y-3 pt-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-800 text-ink uppercase tracking-wider flex items-center gap-1.5">
-                  <span>Select Service Category</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <span className="font-gravitas text-sm text-ink tracking-tight uppercase">
+                  Select Service Category
                 </span>
-                <span className="text-muted font-700 bg-surface2 px-2 py-0.5 rounded-full border border-line text-[11px]">
+                <span className="text-muted font-800 tracking-wider bg-surface2 px-2.5 py-1 rounded-full border border-line text-[10px] uppercase">
                   8 Core Trades
                 </span>
               </div>
@@ -358,14 +287,13 @@ export default function Home() {
                 {catsLoading
                   ? CATEGORIES.map((category) => (
                       <div className="category-skeleton" key={category.slug}>
-                        <Skeleton className="h-12 w-12 rounded-xl" />
+                        <Skeleton className="h-14 w-14 rounded-xl" />
                         <Skeleton className="h-3.5 w-16" />
                         <Skeleton className="h-2.5 w-10" />
                       </div>
                     ))
                   : availableCategories.map((category) => {
                       const isSelected = railCat === category.slug;
-                      const IconComponent = category.icon || Wrench;
                       return (
                         <button
                           key={category.slug}
@@ -383,27 +311,15 @@ export default function Home() {
                             <div className="absolute top-0 inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
                           )}
 
-                          {/* Active Checkmark Pill */}
-                          {isSelected && (
-                            <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
-                              <CheckCircle2 className="w-3 h-3 text-white" />
-                            </span>
-                          )}
-
-                          {/* Thumbnail with Vignette and Floating Trade Icon */}
-                          <div className="relative w-13 h-13 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
+                          {/* Thumbnail: Clean and clear photo without icons */}
+                          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
                             <img
                               src={category.image}
                               alt={t(category.labelKey)}
                               className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-500 ease-out"
                               loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity" />
-                            
-                            {/* Floating Category Icon Badge */}
-                            <div className="absolute bottom-1 right-1 w-5 h-5 rounded-lg bg-surface/95 dark:bg-surface2/95 backdrop-blur-sm border border-line/60 flex items-center justify-center text-primary shadow-xs group-hover:scale-110 transition-transform">
-                              <IconComponent className="w-3 h-3" />
-                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-60 group-hover:opacity-10 transition-opacity" />
                           </div>
 
                           {/* Category Label and Pricing Tag */}
@@ -428,7 +344,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* Trust Reassurance Footnote (Modern Frosted Glass Pills) */}
+            {/* Trust Reassurance Footnote */}
             <div className="reassurance grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 mt-4 border-t border-line/70">
               <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-success/30 transition-all">
                 <div className="w-8 h-8 rounded-lg bg-success/15 text-success flex items-center justify-center flex-shrink-0">
@@ -462,25 +378,20 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 4 Instant Fix Packages (2x2 Grid) to fill the left blank space */}
-          <section className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3">
+          {/* 4 Instant Fix Packages (2x2 Grid) */}
+          <section className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3 scroll-reveal">
             <div className="flex items-center justify-between pb-1">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
-                  <Zap className="w-3.5 h-3.5" />
-                </div>
-                <h2 className="text-sm font-800 text-ink tracking-tight">
-                  Popular 15-Min Instant Fixes
-                </h2>
-              </div>
-              <span className="text-[11px] font-700 text-muted bg-surface2 px-2 py-0.5 rounded-full border border-line">
-                ⚡ Rapid Dispatch
+              <h2 className="font-gravitas text-base sm:text-lg text-ink tracking-tight">
+                Popular 15-Min Instant Fixes
+              </h2>
+              <span className="text-[10px] font-800 tracking-wider text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20 uppercase">
+                Rapid Dispatch
               </span>
             </div>
 
             {/* 2x2 Grid of 4 Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {INSTANT_FIX_PACKAGES.map((pkg) => (
+              {INSTANT_FIX_PACKAGES.map((pkg, idx) => (
                 <div
                   key={pkg.id}
                   onClick={() => {
@@ -495,10 +406,10 @@ export default function Home() {
                   }}
                   role="button"
                   tabIndex={0}
-                  className="group p-3 rounded-2xl bg-surface2/60 hover:bg-surface border border-line hover:border-primary/50 transition-all duration-200 cursor-pointer flex flex-col justify-between shadow-xs hover:shadow-md hover:scale-[1.01]"
+                  className={`group p-3 rounded-2xl bg-surface2/60 hover:bg-surface border border-line hover:border-primary/50 transition-all duration-300 cursor-pointer flex flex-col justify-between shadow-xs hover:shadow-md hover:scale-[1.01] scroll-reveal scroll-reveal-delay-${idx + 1}`}
                 >
                   <div className="flex items-start gap-2.5">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs border border-line/60 flex-shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs border border-line/60 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
                       <img
                         src={pkg.image}
                         alt=""
@@ -517,8 +428,8 @@ export default function Home() {
 
                   <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-line/60 text-xs">
                     <div className="flex items-center gap-1.5 font-800 text-ink">
-                      <span>₹{pkg.price}</span>
-                      <span className="text-[10px] text-muted font-600 bg-surface px-1.5 py-0.5 rounded border border-line">
+                      <span className="font-gravitas text-sm">₹{pkg.price}</span>
+                      <span className="text-[10px] text-muted font-700 bg-surface px-1.5 py-0.5 rounded border border-line">
                         ETA {pkg.eta}
                       </span>
                     </div>
@@ -545,12 +456,11 @@ export default function Home() {
 
         {/* RIGHT COLUMN: Live Chennai Radar Map & Nearby Active Workers */}
         <aside className="home-secondary-column space-y-4">
-          <section className="nearby-section" data-name="nearby workers">
+          <section className="nearby-section scroll-reveal" data-name="nearby workers">
             {/* Section Header with Locality & View Toggle */}
             <div className="section-heading flex items-center justify-between pb-2 border-b border-line">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-800 text-ink">{t('home_available')}</h2>
-                <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                <h2 className="font-gravitas text-base sm:text-lg text-ink tracking-tight">{t('home_available')}</h2>
               </div>
 
               {/* View Switcher: Map vs List */}

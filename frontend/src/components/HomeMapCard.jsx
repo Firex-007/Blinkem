@@ -120,7 +120,6 @@ export default function HomeMapCard({ center, workers = [], selectedCategory = '
       {/* Floating Info Overlay */}
       <div className="absolute top-3 left-3 z-20 pointer-events-none">
         <div className="px-3 py-1.5 rounded-full glass-card border border-white/40 shadow-sm flex items-center gap-2 text-xs font-700 text-ink">
-          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
           <span>{safeWorkers.length} verified pros live in your area</span>
         </div>
       </div>
