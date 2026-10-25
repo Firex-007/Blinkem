@@ -234,9 +234,18 @@ export function estimateArrivalMinutes(distanceKm) {
  * Rank services based on distance, rating, and open status
  */
 export function rankPlaces(places) {
-  return places.sort((a, b) => {
-    const scoreA = (10 - a.distance_km) + a.rating * 2 + (a.open_state.includes('Open') ? 5 : 0);
-    const scoreB = (10 - b.distance_km) + b.rating * 2 + (b.open_state.includes('Open') ? 5 : 0);
+  if (!Array.isArray(places)) return [];
+  return [...places].sort((a, b) => {
+    const distA = Number(a?.distance_km ?? 5);
+    const distB = Number(b?.distance_km ?? 5);
+    const ratingA = Number(a?.rating ?? 4.5);
+    const ratingB = Number(b?.rating ?? 4.5);
+    const stateA = String(a?.open_state || a?.availability || '').toLowerCase();
+    const stateB = String(b?.open_state || b?.availability || '').toLowerCase();
+    const openA = stateA.includes('open') ? 5 : 0;
+    const openB = stateB.includes('open') ? 5 : 0;
+    const scoreA = (10 - distA) + ratingA * 2 + openA;
+    const scoreB = (10 - distB) + ratingB * 2 + openB;
     return scoreB - scoreA;
   });
 }

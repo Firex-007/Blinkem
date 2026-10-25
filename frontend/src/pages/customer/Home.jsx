@@ -168,13 +168,16 @@ export default function Home() {
     true
   );
 
+  const safeWorkers = Array.isArray(workers) ? workers : [];
+  const safeRealPlaces = Array.isArray(realPlaces) ? realPlaces : [];
+
   const allMapEntities = useMemo(() => {
-    const list = [...(workers || [])];
-    if (realPlaces && realPlaces.length > 0) {
-      list.push(...realPlaces);
+    const list = [...safeWorkers];
+    if (safeRealPlaces.length > 0) {
+      list.push(...safeRealPlaces);
     }
     return list;
-  }, [workers, realPlaces]);
+  }, [safeWorkers, safeRealPlaces]);
 
   const { data: bookings, error: bookingsError } = usePolling(
     () => api.get('/bookings'),
@@ -573,7 +576,7 @@ export default function Home() {
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3 text-emerald-300" />
-                <span>Google Places Live ({realPlaces.length})</span>
+                <span>Google Places Live ({safeRealPlaces.length})</span>
               </button>
               <button
                 onClick={() => setProSourceTab('blinkem')}
@@ -583,14 +586,14 @@ export default function Home() {
                     : 'bg-surface2 text-muted hover:text-ink border border-line'
                 }`}
               >
-                Blink&apos;em Pros ({workers?.length || 0})
+                Blink&apos;em Pros ({safeWorkers.length})
               </button>
             </div>
 
             {/* Nearby Verified Pros Rail / Grid (Shown in 'both' and 'cards' modes) */}
             {(rightViewMode === 'both' || rightViewMode === 'cards') && (
               <div className="space-y-3">
-                {workersLoading && !realPlaces.length ? (
+                {workersLoading && !safeRealPlaces.length ? (
                   <div className="worker-rail" aria-label={t('loading')}>
                     <Skeleton className="worker-skeleton" />
                     <Skeleton className="worker-skeleton" />
@@ -598,7 +601,7 @@ export default function Home() {
                 ) : (
                   <div className="space-y-3">
                     {/* Render Real Google Places (When tab is 'all' or 'google') */}
-                    {(proSourceTab === 'all' || proSourceTab === 'google') && realPlaces.length > 0 && (
+                    {(proSourceTab === 'all' || proSourceTab === 'google') && safeRealPlaces.length > 0 && (
                       <div className="space-y-2">
                         {proSourceTab === 'all' && (
                           <div className="flex items-center justify-between text-xs font-800 text-muted px-1">
@@ -611,7 +614,7 @@ export default function Home() {
                           </div>
                         )}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {realPlaces.map((place, idx) => (
+                          {safeRealPlaces.map((place, idx) => (
                             <RealPlacesCard key={`place-${idx}-${place.name}`} place={place} />
                           ))}
                         </div>
@@ -621,7 +624,7 @@ export default function Home() {
                     {/* Render Blink'em Pros (When tab is 'all' or 'blinkem') */}
                     {(proSourceTab === 'all' || proSourceTab === 'blinkem') && (
                       <div className="space-y-2">
-                        {proSourceTab === 'all' && workers?.length > 0 && (
+                        {proSourceTab === 'all' && safeWorkers.length > 0 && (
                           <div className="flex items-center justify-between text-xs font-800 text-muted px-1 mt-2">
                             <span>Blink&apos;em Instant Dispatch Pros</span>
                             <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full">
@@ -629,9 +632,9 @@ export default function Home() {
                             </span>
                           </div>
                         )}
-                        {workers?.length ? (
+                        {safeWorkers.length ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" data-name="nearby worker rail">
-                            {workers.map((worker) => (
+                            {safeWorkers.map((worker) => (
                               <WorkerCard key={worker.id} worker={worker} compact />
                             ))}
                           </div>
@@ -671,7 +674,7 @@ export default function Home() {
             </div>
           </section>
 
-          {bookingsError && (
+          {bookingsError && activeBooking && (
             <p className="booking-refresh-warning">{t('home_booking_refresh_error')}</p>
           )}
         </aside>
