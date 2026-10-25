@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Navigation, Star, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
@@ -6,11 +6,20 @@ import { useNavigate } from 'react-router-dom';
 
 function MapController({ center }) {
   const map = useMap();
+  const prevCenterRef = useRef([0, 0]);
+
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.flyTo(center, 14, { duration: 1.2 });
+    if (!center || !center[0] || !center[1]) return;
+    const [lat, lng] = center;
+    const [prevLat, prevLng] = prevCenterRef.current;
+
+    // Only animate flyTo if latitude/longitude genuinely changed
+    if (Math.abs(lat - prevLat) > 0.0001 || Math.abs(lng - prevLng) > 0.0001) {
+      prevCenterRef.current = [lat, lng];
+      map.flyTo(center, 14, { duration: 1.0 });
     }
-  }, [center, map]);
+  }, [center?.[0], center?.[1], map]);
+
   return null;
 }
 

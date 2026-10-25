@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   BadgeCheck,
   ChefHat,
@@ -56,6 +56,31 @@ const SEARCH_SUGGESTIONS = [
   'cook for party or dinner',
 ];
 
+function SearchSuggestions() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % SEARCH_SUGGESTIONS.length);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="absolute left-9 sm:left-10 right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-45">
+      <span className="text-ink dark:text-white font-500 whitespace-nowrap">
+        Search
+      </span>
+      <span
+        key={index}
+        className="text-primary font-700 italic truncate"
+      >
+        &ldquo;{SEARCH_SUGGESTIONS[index]}&rdquo;
+      </span>
+    </div>
+  );
+}
+
 const INSTANT_FIX_PACKAGES = [
   {
     id: 'pipe-leak',
@@ -104,17 +129,10 @@ export default function Home() {
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState('');
   const [rightViewMode, setRightViewMode] = useState('both'); // 'both' | 'map' | 'cards'
-  const [suggestionIndex, setSuggestionIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSuggestionIndex((prev) => (prev + 1) % SEARCH_SUGGESTIONS.length);
-    }, 2800);
-    return () => clearInterval(timer);
-  }, []);
 
   const curLat = location?.lat || 13.0418;
   const curLng = location?.lng || 80.2341;
+  const mapCenter = useMemo(() => [curLat, curLng], [curLat, curLng]);
 
   const {
     data: categories,
@@ -174,7 +192,7 @@ export default function Home() {
   };
 
   return (
-    <div className="home-page animate-fade" data-name="customer home">
+    <div className="home-page" data-name="customer home">
       <div className="home-desktop-grid">
         {/* LEFT COLUMN: The Request Console */}
         <div className="home-primary-column space-y-6">
@@ -221,19 +239,7 @@ export default function Home() {
                 <Search className="w-5 h-5 text-muted flex-shrink-0 z-10" />
 
                 {/* Dynamic running suggestion text with lesser opacity */}
-                {!typeQuery && (
-                  <div className="absolute left-9 sm:left-10 right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-45">
-                    <span className="text-ink dark:text-white font-500 whitespace-nowrap">
-                      Search
-                    </span>
-                    <span
-                      key={suggestionIndex}
-                      className="text-primary font-700 italic truncate animate-fadeIn"
-                    >
-                      &ldquo;{SEARCH_SUGGESTIONS[suggestionIndex]}&rdquo;
-                    </span>
-                  </div>
-                )}
+                {!typeQuery && <SearchSuggestions />}
 
                 <input
                   type="text"
@@ -478,7 +484,7 @@ export default function Home() {
             {(rightViewMode === 'both' || rightViewMode === 'map') && (
               <div className="mb-3">
                 <HomeMapCard
-                  center={[curLat, curLng]}
+                  center={mapCenter}
                   workers={workers || []}
                   selectedCategory={railCat}
                 />
