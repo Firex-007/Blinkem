@@ -129,7 +129,7 @@ body {
   min-height: 100dvh;
 }
 
-.nodi-shell { min-height: 100dvh; width: 100%; max-width: 480px; margin: 0 auto; position: relative; display: flex; flex-direction: column; background: var(--bg); }
+.nodi-shell { min-height: 100dvh; width: 100%; max-width: 480px; margin: 0 auto; position: relative; display: flex; flex-direction: column; background: transparent; z-index: 1; }
 .app-header { position: sticky; top: 0; z-index: 30; padding: 12px 16px 14px; background: var(--bg); border-bottom: 1px solid var(--border); }
 .app-header-top, .app-header-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .app-header-bottom { margin-top: 12px; }

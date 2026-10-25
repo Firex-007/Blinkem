@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from
 import { ChevronDown, ChevronLeft, MapPin } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
 import Logo from './components/Logo';
+import BackgroundWallpaper from './components/BackgroundWallpaper';
 import ThemeToggle from './components/ThemeToggle';
 import RoleSwitcher from './components/RoleSwitcher';
 import LangToggle from './components/LangToggle';
@@ -144,6 +145,7 @@ function Shell({ children }) {
 export default function App() {
   return (
     <AppProvider>
+      <BackgroundWallpaper />
       <Router>
         <Routes>
           <Route path="/" element={<Shell><Home /></Shell>} />
