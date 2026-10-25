@@ -16,6 +16,7 @@ const KEYWORDS = {
     'plumber', 'leak', 'leaking', 'tap', 'faucet', 'pipe', 'drain', 'drainage',
     'sink', 'washbasin', 'toilet', 'flush', 'cistern', 'commode', 'tank', 'sump',
     'water', 'motor', 'pump', 'blockage', 'valve', 'sewage', 'clogged', 'clog',
+    'thanni varala', 'thanni illa', 'thanni varale', 'water not coming', 'varala',
     'குழாய்', 'கசிவு', 'தண்ணீர்', 'தொட்டி', 'மோட்டார்', 'அடைப்பு', 'டேப்',
     'नल', 'पाइप', 'लीक', 'टपक', 'पानी', 'नाली', 'टैंक', 'मोटर',
     'thanni', 'thanneer', 'kasivu', 'odanji', 'udaivu', 'kuzhai', 'nal', 'paani'
@@ -30,7 +31,7 @@ const KEYWORDS = {
   ],
   cleaner: [
     'clean', 'cleaning', 'cleaner', 'deep clean', 'maid', 'sweep', 'sweeping',
-    'mop', 'mopping', 'dust', 'dusting', 'bathroom wash', 'toilet clean', 'sofa clean',
+    'mop', 'mopping', 'dust', 'dusting', 'bathroom wash', 'bathroom clean', 'toilet clean', 'sofa clean',
     'kitchen clean', 'garbage', 'housekeeping', 'floor wash',
     'சுத்தம்', 'பெருக்க', 'கழுவ', 'துடைக்க', 'குப்பை',
     'सफाई', 'झाड़ू', 'पोछा', 'धुलाई', 'कचरा',
@@ -39,7 +40,7 @@ const KEYWORDS = {
   carpenter: [
     'carpenter', 'wood', 'door', 'window', 'cupboard', 'wardrobe', 'cabinet',
     'shelf', 'table', 'chair', 'desk', 'bed', 'cot', 'furniture', 'latch', 'lock',
-    'handle', 'hinge', 'plywood', 'repair wood',
+    'handle', 'hinge', 'plywood', 'repair wood', 'veetla kadhavu', 'kadhavu odanju', 'odanju pochu',
     'தச்சர்', 'கதவு', 'ஜன்னல்', 'பூட்டு', 'மேசை', 'நாற்காலி', 'மரவேலை',
     'बढ़ई', 'दरवाजा', 'खिड़की', 'ताला', 'अलमारी', 'कुर्सी', 'मेज', 'लकड़ी',
     'kadhavu', 'thatchar', 'mesai', 'poottu', 'saavi', 'darwaza', 'lakdi'

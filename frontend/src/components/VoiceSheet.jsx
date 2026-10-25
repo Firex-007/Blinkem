@@ -61,7 +61,7 @@ export default function VoiceSheet({ open, onClose, onResult }) {
   } = useVoiceRecorder({
     lang,
     autoStopSilence: true,
-    silenceThresholdMs: 1800,
+    silenceThresholdMs: 3500,
     onResult: (res) => {
       setReviewData(res);
       setEditedDesc(res.description || '');

@@ -3,7 +3,7 @@ import { blobToWav16kMono } from '../lib/wav';
 import { classifyTradeFromText } from '../lib/tradeClassifier';
 import { api } from '../api';
 
-export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, silenceThresholdMs = 1800, lang = 'auto' } = {}) {
+export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, silenceThresholdMs = 3500, lang = 'auto' } = {}) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -132,7 +132,7 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
 
         // Silence / VAD Detection
         const now = Date.now();
-        if (currentLevel > 0.08) {
+        if (currentLevel > 0.02) {
           hasSpokenRef.current = true;
           lastSpeechTimeRef.current = now;
         } else if (hasSpokenRef.current && autoStopSilence) {
@@ -220,10 +220,10 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
       recorder.start(100);
       setIsRecording(true);
 
-      // Max 15 seconds recording auto-stop safety
+      // Max 25 seconds recording auto-stop safety
       timerRef.current = setTimeout(() => {
         if (recorder.state === 'recording') stopRecording();
-      }, 15000);
+      }, 25000);
     } catch (err) {
       console.error('Mic access error:', err);
       if (onError) onError(err);
