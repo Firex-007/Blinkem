@@ -43,7 +43,7 @@ Example response shape:
   "workers": [{
     "id": "demo-w-101", "name": "Muthu K", "categories": ["plumber"],
     "service": "Plumber", "locality": "T. Nagar", "rating": 4.8,
-    "rating_count": 126, "phone": "+91 90000 00001",
+    "rating_count": 126, "phone": "+91 00000 00001",
     "availability": "available_now", "id_verified": true,
     "skill_verified": true, "bio": "...", "distance_km": 0.4,
     "eta_min": 5
@@ -51,7 +51,7 @@ Example response shape:
   "shops": [{
     "id": "demo-s-202", "name": "ABC Plumbing & Hardware",
     "category": "Plumbing and hardware", "locality": "T. Nagar",
-    "address": "...", "phone": "+91 90000 00102",
+    "address": "...", "phone": "+91 00000 00102",
     "hours": "8:30 AM–9:00 PM", "open_now": true,
     "distance_km": 0.3, "eta_min": 5
   }]
@@ -73,9 +73,7 @@ Example response shape:
    and a contact action. Show a small **Demo profile** label for this fixture.
 4. Render shop fields: name, category, locality, full address, distance, hours,
    open/closed label, and a contact action.
-5. Contact actions may use `tel:` links for the fixture values. Keep them marked
-   as demo contacts in UI or accessibility text. These numbers are synthetic;
-   they are not real workers or businesses.
+5. Show the fixture phone value as a clearly marked Demo contact detail. Do not make it a `tel:` link or launch a call; all values are intentionally non-dialable placeholders.
 6. Include existing-system-consistent loading, retryable error, and empty states.
    Do not show a false empty state while the request is pending.
 7. Keep the production `GET /api/nearby-workers` response unchanged. The
@@ -105,8 +103,8 @@ existing customer home page. Reuse existing cards, buttons, chips, typography,
 and CSS/Tailwind design tokens. Do not introduce hardcoded hex colors. Render
 the fixture's name/service/locality/rating/distance/ETA/availability/verification/
 bio/contact for workers, and name/category/locality/address/hours/distance/contact
-for shops. Use tel: actions and clearly mark all contacts/profiles as demo data.
-The fixture values are synthetic.
+for shops. Show phone values as clearly marked Demo contact details. Do not use tel: links or launch calls.
+The fixture values are intentionally non-dialable placeholders.
 
 Refetch when location or category changes. Use T. Nagar fallback coordinates.
 Include loading, retryable error, and empty states. Preserve the current home
