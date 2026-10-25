@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { X } from 'lucide-react';
 
 export default function BottomSheet({ open, onClose, title, children }) {
   if (!open) return null;
@@ -12,7 +12,9 @@ export default function BottomSheet({ open, onClose, title, children }) {
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] rounded-t-[28px] bg-surface border-t border-l border-r border-line shadow-card z-50 p-4 pb-8 animate-slideUp">
         <div className="flex items-center justify-between mb-4">
           <span className="font-700 text-ink">{title}</span>
-          <button onClick={onClose} className="p-1 rounded-full text-muted hover:bg-surface2" aria-label="Close">✕</button>
+          <button onClick={onClose} className="p-1 rounded-full text-muted hover:bg-surface2 hover:text-ink transition" aria-label="Close">
+            <X className="w-5 h-5" />
+          </button>
         </div>
         {children}
       </div>

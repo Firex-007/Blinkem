@@ -24,7 +24,6 @@ def get_categories(db: Session = Depends(get_db)):
             "name_en": c.name_en,
             "name_ta": c.name_ta,
             "name_hi": c.name_hi,
-            "emoji": c.emoji,
             "icon": c.icon,
             "price_min": c.price_min,
             "price_max": c.price_max,

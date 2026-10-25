@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe, ChevronDown } from 'lucide-react';
+import { Globe, ChevronDown, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { t } from '../i18n';
 
@@ -30,7 +30,7 @@ export default function LangToggle({ className }) {
               aria-label={`Switch to ${l.label}`}
             >
               <span className="font-700">{l.label}</span>
-              {lang === l.code && <span className="ml-auto text-xs text-primary">✓</span>}
+              {lang === l.code && <Check className="w-3.5 h-3.5 text-primary ml-auto" />}
             </button>
           ))}
         </div>

@@ -28,7 +28,6 @@ class Category(Base):
     name_en = Column(String, nullable=False)
     name_ta = Column(String, nullable=False)
     name_hi = Column(String, nullable=False)
-    emoji = Column(String, nullable=False)
     icon = Column(String, nullable=False)
     price_min = Column(Integer, nullable=False)
     price_max = Column(Integer, nullable=False)

@@ -291,7 +291,7 @@ export default function AdminConsole() {
             { label: 'Completion Rate', value: `${stats?.completion_rate ?? 91}%` },
             { label: 'Workers Online', value: stats?.workers_online ?? 6 },
             { label: 'Avg Match Speed', value: `${stats?.avg_first_offer_seconds ?? 6}s` },
-            { label: 'Platform Rating', value: `★ ${stats?.avg_rating ?? 4.8}` },
+            { label: 'Platform Rating', value: `${stats?.avg_rating ?? 4.8} / 5.0` },
           ].map((tile) => (
             <div
               key={tile.label}

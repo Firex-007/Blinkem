@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mic, Square, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { Mic, Square, Loader2, Sparkles, AlertCircle, X } from 'lucide-react';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import { api } from '../api';
 import { t } from '../i18n';
@@ -82,10 +82,10 @@ export default function VoiceSheet({ open, onClose, onResult }) {
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-surface2 flex items-center justify-center text-muted hover:text-ink font-700 text-xs transition"
+            className="w-7 h-7 rounded-full bg-surface2 flex items-center justify-center text-muted hover:text-ink transition"
             aria-label="Close"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 

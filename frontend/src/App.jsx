@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronDown } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
 import Logo from './components/Logo';
 import ThemeToggle from './components/ThemeToggle';
@@ -38,7 +38,7 @@ function Header() {
         <Logo className="flex-shrink-0" />
         <div className="flex items-center gap-1.5 text-xs font-700 text-muted">
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-primary" /> <span className="font-700 text-ink">T. Nagar ▾</span>
+            <span className="w-2 h-2 rounded-full bg-primary" /> <span className="font-700 text-ink flex items-center gap-0.5">T. Nagar <ChevronDown className="w-3.5 h-3.5 text-muted inline" /></span>
           </span>
           <LangToggle />
         </div>

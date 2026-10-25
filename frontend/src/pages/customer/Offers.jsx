@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Shield, Sparkles, ArrowUpDown, Loader2, IndianRupee } from 'lucide-react';
+import { Shield, Sparkles, ArrowUpDown, Loader2, IndianRupee, X } from 'lucide-react';
 import { api } from '../../api';
 import { t } from '../../i18n';
 import usePolling from '../../hooks/usePolling';
@@ -196,9 +196,10 @@ export default function Offers() {
               </div>
               <button
                 onClick={() => setCounterOffer(null)}
-                className="w-8 h-8 rounded-full bg-surface2 flex items-center justify-center text-muted font-700"
+                className="w-8 h-8 rounded-full bg-surface2 flex items-center justify-center text-muted hover:text-ink transition"
+                aria-label="Close"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
