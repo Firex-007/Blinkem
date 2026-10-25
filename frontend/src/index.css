@@ -56,7 +56,8 @@
 html {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Plus Jakarta Sans', 'Noto Sans Tamil', 'Noto Sans Devanagari', system-ui, sans-serif;
+  font-family: 'Outfit', 'Plus Jakarta Sans', 'Noto Sans Tamil', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
   scroll-behavior: smooth;
 }
 
@@ -173,8 +174,12 @@ body {
   pointer-events: none;
 }
 
-.home-display { max-width: 440px; font-size: 30px; line-height: 1.15; letter-spacing: -0.02em; }
-.font-gravitas, .font-display-serif { font-family: 'Gravitas One', Georgia, serif; font-weight: 400; letter-spacing: -0.015em; }
+.home-display { max-width: 440px; font-size: 32px; font-weight: 800; line-height: 1.12; letter-spacing: -0.035em; }
+.font-uber, .font-gravitas, .font-display-serif, .font-display {
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
 .home-helper { margin-top: 8px; color: var(--muted); font-size: 14px; }
 .request-actions { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
 .service-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }

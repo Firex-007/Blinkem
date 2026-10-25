@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { CHENNAI_LOCALITIES, findClosestLocality } from '../data/chennaiLocalities';
+import {
+  getCookieConsent,
+  setCookieConsent,
+  saveUserPreferences,
+  loadUserPreferences,
+} from '../utils/cookieManager';
 
 const AppContext = createContext(null);
 
@@ -42,32 +48,63 @@ export const REGISTERED_ACCOUNTS = {
 export const DEMO_USERS = REGISTERED_ACCOUNTS;
 
 export function AppProvider({ children }) {
+  const [cookieConsent, setCookieConsentState] = useState(() => getCookieConsent());
+  const [isCookieModalOpen, setIsCookieModalOpen] = useState(false);
+
+  const [accounts, setAccounts] = useState(() => {
+    // If cookie consent is 'none', do NOT load stored profile
+    const consent = getCookieConsent();
+    if (consent === 'none') {
+      return { ...REGISTERED_ACCOUNTS };
+    }
+    const { profile } = loadUserPreferences();
+    if (profile && profile.id) {
+      return {
+        ...REGISTERED_ACCOUNTS,
+        [String(profile.id)]: { ...REGISTERED_ACCOUNTS[String(profile.id)], ...profile },
+      };
+    }
+    return { ...REGISTERED_ACCOUNTS };
+  });
+
   const [theme, setTheme] = useState(() => {
     if (typeof localStorage === 'undefined') return 'light';
+    const consent = getCookieConsent();
+    if (consent === 'none') return 'light';
     return localStorage.getItem('theme') || 'light';
   });
 
   const [lang, setLang] = useState(() => {
     if (typeof localStorage === 'undefined') return 'en';
+    const consent = getCookieConsent();
+    if (consent === 'none') return 'en';
     return localStorage.getItem('lang') || 'en';
   });
 
   const [userId, setUserId] = useState(() => {
     if (typeof localStorage === 'undefined') return '1';
+    const consent = getCookieConsent();
+    if (consent === 'none') return '1';
     return localStorage.getItem('userId') || '1';
   });
 
   const [location, setLocation] = useState(() => {
-    if (typeof localStorage === 'undefined') return CHENNAI_LOCALITIES[0];
-    const saved = localStorage.getItem('userLocation');
-    try {
-      return saved ? JSON.parse(saved) : CHENNAI_LOCALITIES[0];
-    } catch {
-      return CHENNAI_LOCALITIES[0];
+    const consent = getCookieConsent();
+    if (consent === 'none') return CHENNAI_LOCALITIES[0];
+    const { location: savedLoc } = loadUserPreferences();
+    if (savedLoc) return savedLoc;
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('userLocation');
+      try {
+        return saved ? JSON.parse(saved) : CHENNAI_LOCALITIES[0];
+      } catch {
+        return CHENNAI_LOCALITIES[0];
+      }
     }
+    return CHENNAI_LOCALITIES[0];
   });
 
-  const [locationStatus, setLocationStatus] = useState('idle'); // 'idle' | 'detecting' | 'granted' | 'denied'
+  const [locationStatus, setLocationStatus] = useState('idle');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAccountFlyoutOpen, setIsAccountFlyoutOpen] = useState(false);
@@ -78,24 +115,76 @@ export function AppProvider({ children }) {
     else document.documentElement.classList.remove('dark');
   }, [theme]);
 
+  const updateCookieConsent = (level) => {
+    setCookieConsent(level);
+    setCookieConsentState(level);
+    if (level === 'none') {
+      // Wipe preferences from storage and reset to default
+      setAccounts({ ...REGISTERED_ACCOUNTS });
+      setLocation(CHENNAI_LOCALITIES[0]);
+    } else {
+      // Save current state
+      const current = accounts[userId] || accounts['1'];
+      saveUserPreferences(current, location);
+    }
+  };
+
   const setThemePersist = (v) => {
     setTheme(v);
-    if (typeof localStorage !== 'undefined') localStorage.setItem('theme', v);
+    if (cookieConsent !== 'none' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('theme', v);
+    }
   };
 
   const setLangPersist = (v) => {
     setLang(v);
-    if (typeof localStorage !== 'undefined') localStorage.setItem('lang', v);
+    if (cookieConsent !== 'none' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('lang', v);
+    }
   };
 
   const setUserIdPersist = (v) => {
     setUserId(String(v));
-    if (typeof localStorage !== 'undefined') localStorage.setItem('userId', String(v));
+    if (cookieConsent !== 'none' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('userId', String(v));
+    }
   };
 
   const setLocationPersist = (loc) => {
     setLocation(loc);
-    if (typeof localStorage !== 'undefined') localStorage.setItem('userLocation', JSON.stringify(loc));
+    if (cookieConsent !== 'none') {
+      saveUserPreferences(accounts[userId] || accounts['1'], loc);
+    }
+  };
+
+  const updateUserProfile = (fields) => {
+    setAccounts((prev) => {
+      const activeId = String(userId);
+      const current = prev[activeId] || prev['1'];
+      const updated = { ...current, ...fields };
+      const nextAccounts = { ...prev, [activeId]: updated };
+      if (cookieConsent !== 'none') {
+        saveUserPreferences(updated, location);
+      }
+      return nextAccounts;
+    });
+  };
+
+  const currentUser = accounts[userId] || accounts['1'];
+  const role = currentUser?.role || 'customer';
+
+  const setRole = (targetRole) => {
+    if (targetRole === 'worker') setUserIdPersist('3');
+    else if (targetRole === 'admin') setUserIdPersist('99');
+    else setUserIdPersist('1');
+  };
+
+  const logoutUser = () => {
+    setUserIdPersist('1');
+    if (cookieConsent === 'none') {
+      setAccounts({ ...REGISTERED_ACCOUNTS });
+      setLocation(CHENNAI_LOCALITIES[0]);
+    }
   };
 
   const detectLocation = () => {
@@ -131,15 +220,6 @@ export function AppProvider({ children }) {
     });
   };
 
-  const currentUser = DEMO_USERS[userId] || DEMO_USERS['1'];
-  const role = currentUser?.role || 'customer';
-
-  const setRole = (targetRole) => {
-    if (targetRole === 'worker') setUserIdPersist('3');
-    else if (targetRole === 'admin') setUserIdPersist('99');
-    else setUserIdPersist('1');
-  };
-
   return (
     <AppContext.Provider
       value={{
@@ -152,6 +232,8 @@ export function AppProvider({ children }) {
         role,
         setRole,
         currentUser,
+        updateUserProfile,
+        logoutUser,
         location,
         setLocation: setLocationPersist,
         locationStatus,
@@ -162,6 +244,10 @@ export function AppProvider({ children }) {
         setIsLoginModalOpen,
         isAccountFlyoutOpen,
         setIsAccountFlyoutOpen,
+        cookieConsent,
+        updateCookieConsent,
+        isCookieModalOpen,
+        setIsCookieModalOpen,
       }}
     >
       {children}

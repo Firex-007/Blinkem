@@ -9,6 +9,7 @@ import LangToggle from './components/LangToggle';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 import AccountFlyout from './components/AccountFlyout';
+import CookieBanner from './components/CookieBanner';
 import LocationModal from './components/LocationModal';
 import LoginModal from './components/LoginModal';
 import Home from './pages/customer/Home';
@@ -187,6 +188,7 @@ function Shell({ children }) {
         />
         <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
         <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+        <CookieBanner />
       </div>
       {/* Footer sits outside the min-100dvh shell: it is the dead end, only reached at the very bottom */}
       <Footer />

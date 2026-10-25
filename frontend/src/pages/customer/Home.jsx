@@ -205,7 +205,7 @@ export default function Home() {
                 Hyperlocal Speed Dispatch
               </div>
 
-              <h1 className="home-display font-gravitas text-ink leading-tight" data-name="request headline">
+              <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
                 Tell us what needs{' '}
                 <span className="text-primary italic">
                   fixing...
@@ -275,7 +275,7 @@ export default function Home() {
             {/* Service Category Matrix */}
             <div className="space-y-3 pt-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-gravitas text-sm text-ink tracking-tight uppercase">
+                <span className="font-uber text-sm text-ink tracking-tight uppercase">
                   Select Service Category
                 </span>
                 <span className="text-muted font-800 tracking-wider bg-surface2 px-2.5 py-1 rounded-full border border-line text-[10px] uppercase">
@@ -381,7 +381,7 @@ export default function Home() {
           {/* 4 Instant Fix Packages (2x2 Grid) */}
           <section className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3 scroll-reveal">
             <div className="flex items-center justify-between pb-1">
-              <h2 className="font-gravitas text-base sm:text-lg text-ink tracking-tight">
+              <h2 className="font-uber text-base sm:text-lg text-ink tracking-tight">
                 Popular 15-Min Instant Fixes
               </h2>
               <span className="text-[10px] font-800 tracking-wider text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20 uppercase">
@@ -428,7 +428,7 @@ export default function Home() {
 
                   <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-line/60 text-xs">
                     <div className="flex items-center gap-1.5 font-800 text-ink">
-                      <span className="font-gravitas text-sm">₹{pkg.price}</span>
+                      <span className="font-uber text-sm">₹{pkg.price}</span>
                       <span className="text-[10px] text-muted font-700 bg-surface px-1.5 py-0.5 rounded border border-line">
                         ETA {pkg.eta}
                       </span>
@@ -460,7 +460,7 @@ export default function Home() {
             {/* Section Header with Locality & View Toggle */}
             <div className="section-heading flex items-center justify-between pb-2 border-b border-line">
               <div className="flex items-center gap-2">
-                <h2 className="font-gravitas text-base sm:text-lg text-ink tracking-tight">{t('home_available')}</h2>
+                <h2 className="font-uber text-base sm:text-lg text-ink tracking-tight">{t('home_available')}</h2>
               </div>
 
               {/* View Switcher: Map vs List */}
