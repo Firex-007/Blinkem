@@ -27,3 +27,5 @@ export function usePolling(fn, ms = 2000, enabled = true) {
 
   return { data, error, loading, refetch: run };
 }
+
+export default usePolling;

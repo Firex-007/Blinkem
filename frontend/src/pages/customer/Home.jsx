@@ -1,25 +1,25 @@
 import { useState } from 'react';
-import { MapPin, Mic, Zap, Clock, ShieldCheck, RupeeCoin } from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { api } from '../api';
-import { t } from '../i18n';
-import usePolling from '../hooks/usePolling';
-import CategoryTile from '../components/CategoryTile';
-import WorkerCard from '../components/WorkerCard';
-import VoiceSheet from '../components/VoiceSheet';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import Chip from '../components/Chip';
+import { MapPin, Mic, Zap, Clock, ShieldCheck, IndianRupee, Wrench, Sparkles, Paintbrush, Hammer, CookingPot } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { api } from '../../api';
+import { t } from '../../i18n';
+import usePolling from '../../hooks/usePolling';
+import CategoryTile from '../../components/CategoryTile';
+import WorkerCard from '../../components/WorkerCard';
+import VoiceSheet from '../../components/VoiceSheet';
+import Button from '../../components/Button';
+import Card from '../../components/Card';
+import Chip from '../../components/Chip';
 import { useNavigate } from 'react-router-dom';
 
 const GRID = [
   { slug: 'plumber', labelKey: 'cat.plumber', icon: <Wrench className="w-6 h-6" /> },
   { slug: 'electrician', labelKey: 'cat.electrician', icon: <Zap className="w-6 h-6" /> },
-  { slug: 'cleaner', labelKey: 'cat.cleaner', icon: <Mic className="w-6 h-6" /> },
-  { slug: 'carpenter', labelKey: 'cat.carpenter', icon: <Wrench className="w-6 h-6" /> },
-  { slug: 'painter', labelKey: 'cat.painter', icon: <Mic className="w-6 h-6" /> },
+  { slug: 'cleaner', labelKey: 'cat.cleaner', icon: <Sparkles className="w-6 h-6" /> },
+  { slug: 'carpenter', labelKey: 'cat.carpenter', icon: <Hammer className="w-6 h-6" /> },
+  { slug: 'painter', labelKey: 'cat.painter', icon: <Paintbrush className="w-6 h-6" /> },
   { slug: 'ac_repair', labelKey: 'cat.ac_repair', icon: <Zap className="w-6 h-6" /> },
-  { slug: 'cook', labelKey: 'cat.cook', icon: <Mic className="w-6 h-6" /> },
+  { slug: 'cook', labelKey: 'cat.cook', icon: <CookingPot className="w-6 h-6" /> },
   { slug: 'appliance_repair', labelKey: 'cat.appliance_repair', icon: <Wrench className="w-6 h-6" /> },
 ];
 
@@ -133,7 +133,7 @@ export default function Home() {
           <Zap className="w-3 h-3" /> <span>{t('home.fast')}</span>
         </Chip>
         <Chip tone="neutral" className="h-6 px-2 text-xs flex items-center gap-1">
-          <RupeeCoin className="w-3 h-3" /> <span>{t('home.your_price')}</span>
+          <IndianRupee className="w-3 h-3" /> <span>{t('home.your_price')}</span>
         </Chip>
       </div>
 

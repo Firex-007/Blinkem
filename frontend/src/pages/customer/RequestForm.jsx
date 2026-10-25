@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { MapPin, Clock, Send, ChevronLeft } from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { api } from '../api';
-import { t } from '../i18n';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import Chip from '../components/Chip';
+import { useApp } from '../../context/AppContext';
+import { api } from '../../api';
+import { t } from '../../i18n';
+import Button from '../../components/Button';
+import Card from '../../components/Card';
+import Chip from '../../components/Chip';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const SERVICES = [

@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { AppProvider, useApp } from '../context/AppContext';
-import Logo from '../components/Logo';
-import ThemeToggle from '../components/ThemeToggle';
-import RoleSwitcher from '../components/RoleSwitcher';
-import LangToggle from '../components/LangToggle';
-import BottomNav from '../components/BottomNav';
-import Home from '../pages/customer/Home';
-import RequestForm from '../pages/customer/RequestForm';
+import { AppProvider, useApp } from './context/AppContext';
+import Logo from './components/Logo';
+import ThemeToggle from './components/ThemeToggle';
+import RoleSwitcher from './components/RoleSwitcher';
+import LangToggle from './components/LangToggle';
+import BottomNav from './components/BottomNav';
+import Home from './pages/customer/Home';
+import RequestForm from './pages/customer/RequestForm';
 
 function Header() {
   const { lang } = useApp();

@@ -14,7 +14,7 @@ class Settings:
     DEMO_SPEED: float = float(os.getenv("DEMO_SPEED", "15"))
     DEFAULT_LAT: float = float(os.getenv("DEFAULT_LAT", "13.0418"))
     DEFAULT_LNG: float = float(os.getenv("DEFAULT_LNG", "80.2341"))
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./nodi.db")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./blinkem.db")
 
 
 settings = Settings()
