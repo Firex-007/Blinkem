@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg:#F4F7FF; --surface:#FFFFFF; --surface-2:#EAF0FF;
+  --text:#0A1A3F; --muted:#5A6B8F; --border:#DCE5FA;
+  --primary:#1F5BFF; --primary-600:#1747CC; --primary-ink:#FFFFFF; --primary-soft:#E3ECFF;
+  --accent:#FFB400; --accent-ink:#3A2A00;
+  --success:#12B76A; --success-soft:#DDF7EA; --warning:#F59E0B; --danger:#E5484D; --danger-soft:#FDE7E8;
+  --shadow:0 8px 24px rgba(31,91,255,.10); --shadow-sm:0 2px 8px rgba(10,26,63,.06);
+  --radius:20px; --radius-sm:12px;
+}
+.dark{
+  --bg:#050A17; --surface:#0D1630; --surface-2:#142048;
+  --text:#EAF0FF; --muted:#8FA1C9; --border:#1D2B57;
+  --primary:#4C82FF; --primary-600:#6E9BFF; --primary-ink:#04112E; --primary-soft:#12224F;
+  --accent:#FFC93D; --accent-ink:#2B1F00;
+  --success:#32D583; --success-soft:#0E2E22; --warning:#FBBF24; --danger:#FF6B70; --danger-soft:#3A1519;
+  --shadow:0 8px 24px rgba(0,0,0,.5); --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+}
+html{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans','Noto Sans Tamil','Noto Sans Devanagari',system-ui,sans-serif;}
+body{font-size:15px;line-height:1.45;margin:0}
+[lang=ta] body,[lang=hi] body,.ta,.hi{line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#root{display:flex;flex-direction:column;min-height:100dvh}

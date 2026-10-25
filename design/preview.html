@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blink'em — UI reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Tamil:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F7FF;--surface:#fff;--surface-2:#EAF0FF;--text:#0A1A3F;--muted:#5A6B8F;--border:#DCE5FA;--primary:#1F5BFF;--primary-ink:#fff;--primary-soft:#E3ECFF;--accent:#FFB400;--accent-ink:#3A2A00;--success:#12B76A;--success-soft:#DDF7EA;--danger:#E5484D;--shadow:0 8px 24px rgba(31,91,255,.10);--shadow-sm:0 2px 8px rgba(10,26,63,.06);--page:#E6ECFB;--frame:#0A1A3F}
+[data-theme=dark]{--bg:#050A17;--surface:#0D1630;--surface-2:#142048;--text:#EAF0FF;--muted:#8FA1C9;--border:#1D2B57;--primary:#4C82FF;--primary-ink:#04112E;--primary-soft:#12224F;--accent:#FFC93D;--accent-ink:#2B1F00;--success:#32D583;--success-soft:#0E2E22;--danger:#FF6B70;--shadow:0 8px 24px rgba(0,0,0,.5);--shadow-sm:0 2px 8px rgba(0,0,0,.4);--page:#020510;--frame:#1D2B57}
+*{box-sizing:border-box;margin:0}body{font-family:'Plus Jakarta Sans','Noto Sans Tamil',system-ui,sans-serif;background:var(--page);color:var(--text);font-size:15px;line-height:1.45;padding:20px}
+.top{max-width:1500px;margin:0 auto 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{font-size:18px;font-weight:800}.top p{color:var(--muted);font-size:13px}
+.tg{display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:6px 14px;font-weight:700;cursor:pointer;color:var(--text);font-family:inherit;font-size:14px}
+.row{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;max-width:1500px;margin:auto}
+.cap{text-align:center;font-weight:700;font-size:13px;color:var(--muted);margin-bottom:8px}
+.phone{width:340px;height:700px;border:8px solid var(--frame);border-radius:38px;background:var(--bg);position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.scr{height:100%;padding:14px 14px 90px;overflow:hidden}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hd{display:flex;align-items:center;gap:8px;margin-bottom:12px}.loc{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;flex:1}
+.ib{width:34px;height:34px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;font-size:12px;font-weight:700}
+.demo{font-size:11px;font-weight:700;background:var(--primary-soft);color:var(--primary);padding:6px 10px;border-radius:99px}
+h2.d{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.chip{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--primary-soft);color:var(--primary);white-space:nowrap}
+.chip.a{background:var(--accent);color:var(--accent-ink)}.chip.s{background:var(--success-soft);color:var(--success)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm);padding:14px}
+.hero{margin:14px 0;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
+.hero .t{flex:1}.hero b{display:block;font-size:14px;font-weight:700}.hero span{font-size:12px;color:var(--muted)}
+.mic{width:48px;height:48px;border-radius:50%;background:var(--primary);color:var(--primary-ink);display:grid;place-items:center;box-shadow:0 6px 16px rgba(31,91,255,.4)}
+.sec{font-size:16px;font-weight:700;margin:12px 0 8px;display:flex;justify-content:space-between}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:8px 2px;text-align:center;font-size:11px;font-weight:600}
+.tile i{display:grid;place-items:center;width:38px;height:38px;margin:0 auto 4px;border-radius:12px;background:var(--primary-soft);font-style:normal;font-size:18px}
+.rail{display:flex;gap:10px;overflow:hidden}.wc{min-width:150px}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;flex:none}
+.meta{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.star{color:var(--accent)}.ok{color:var(--success)}
+.bar{position:absolute;left:12px;right:12px;bottom:76px;background:var(--primary);color:var(--primary-ink);border-radius:18px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.bar .av{background:rgba(255,255,255,.22);width:36px;height:36px;font-size:13px}.bar small{display:block;opacity:.8;font-size:11px}
+.pg{height:4px;background:rgba(255,255,255,.3);border-radius:4px;margin-top:6px}.pg i{display:block;height:100%;width:64%;background:currentColor;border-radius:4px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:64px;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;font-size:11px;font-weight:600;color:var(--muted)}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;border-radius:14px}.nav .on{color:var(--primary);background:var(--primary-soft)}
+.dim{position:absolute;inset:0;background:rgba(5,10,23,.55)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;padding:10px 18px 22px;text-align:center}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 12px}
+.orb{position:relative;width:84px;height:84px;margin:14px auto}.orb .mic{width:84px;height:84px;position:relative;z-index:2}
+.orb:before,.orb:after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--primary);animation:ring 1.6s ease-out infinite}.orb:after{animation-delay:.8s}
+@keyframes ring{0%{transform:scale(.9);opacity:.6}100%{transform:scale(1.8);opacity:0}}
+.wave{display:flex;gap:4px;justify-content:center;align-items:center;height:30px}.wave b{width:4px;height:26px;border-radius:4px;background:var(--primary);animation:w 1s ease-in-out infinite}
+.wave b:nth-child(2n){animation-delay:.15s}.wave b:nth-child(3n){animation-delay:.3s}@keyframes w{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+.q{font-size:14px;font-weight:600;margin:6px 0 10px}.chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.btn{height:46px;border-radius:14px;border:0;font:700 14px 'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;flex:1;background:var(--primary);color:var(--primary-ink)}
+.btn.s{background:var(--primary-soft);color:var(--primary)}
+.of{margin-bottom:10px}.of .r1{display:flex;gap:10px;align-items:center}.of .nm{font-weight:700;display:flex;align-items:center;gap:4px}
+.pr{margin-left:auto;text-align:right}.pr b{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;display:block;line-height:1}
+.btns{display:flex;gap:8px;margin-top:10px}
+.map{height:210px;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--surface-2);position:relative}
+.otp{display:flex;gap:8px;justify-content:center;margin:8px 0}.otp b{width:46px;height:54px;border-radius:14px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-size:26px;font-weight:800}
+.st{display:flex;gap:10px;font-size:13px;font-weight:600;margin:6px 0}.st i{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);margin-top:2px;flex:none}.st.d i{background:var(--primary);border-color:var(--primary)}.st.c i{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-soft)}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="chk" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+</defs></svg>
+<div class="top"><div><h1>Blink'em — UI reference (not production code)</h1><p>Real app: lucide-react icons instead of emoji, tokens from docs/06. Toggle theme to check both modes.</p></div>
+<button class="tg" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark'">◐ Light / Dark</button></div>
+<div class="row">
+
+<div><div class="cap">1 · Home</div><div class="phone"><div class="scr">
+<div class="hd"><div class="loc"><svg class="i"><use href="#pin"/></svg>Home · T. Nagar ▾</div><div class="ib">EN▾</div><div class="demo">Demo: Customer ▾</div></div>
+<h2 class="d">Skilled hands,<br>in minutes.</h2>
+<div style="margin-top:8px"><span class="chip a"><svg class="i" style="width:14px;height:14px"><use href="#bolt"/></svg>~18 min avg arrival</span></div>
+<div class="card hero"><div class="t"><b>Tell us what needs fixing…</b><span>Speak in Tamil, Hindi or English</span></div><div class="mic"><svg class="i" style="width:24px;height:24px"><use href="#mic"/></svg></div></div>
+<div class="sec">What do you need?</div>
+<div class="grid"><div class="tile"><i>🔧</i>Plumber</div><div class="tile"><i>⚡</i>Electric</div><div class="tile"><i>🧹</i>Cleaning</div><div class="tile"><i>🪚</i>Carpenter</div><div class="tile"><i>🎨</i>Painter</div><div class="tile"><i>❄️</i>AC Repair</div><div class="tile"><i>🍳</i>Cook</div><div class="tile"><i>🛠️</i>Appliance</div></div>
+<div class="sec">Available near you now <span style="color:var(--primary);font-size:13px">See all</span></div>
+<div class="rail"><div class="card wc"><div class="av" style="background:#1F5BFF">MK</div><div class="nm" style="font-weight:700;margin-top:6px">Muthu K <svg class="i ok" style="width:15px;height:15px"><use href="#chk"/></svg></div><div class="meta"><span class="star">★</span>4.8 · 140 jobs</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><b style="font-size:13px">from ₹299</b><span class="chip a">9 min</span></div></div>
+<div class="card wc"><div class="av" style="background:#0EA5E9">RP</div><div class="nm" style="font-weight:700;margin-top:6px">Ramesh P <svg class="i ok" style="width:15px;height:15px"><use href="#chk"/></svg></div><div class="meta"><span class="star">★</span>4.9 · 210 jobs</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><b style="font-size:13px">from ₹399</b><span class="chip a">12 min</span></div></div></div>
+<div class="bar"><div class="av">MK</div><div style="flex:1"><b style="font-size:13px">Muthu is on the way</b><small>Arrives in ~6 min</small><div class="pg"><i></i></div></div><svg class="i"><use href="#clock"/></svg></div>
+</div><div class="nav"><div class="on"><svg class="i"><use href="#home"/></svg>Home</div><div><svg class="i"><use href="#list"/></svg>Bookings</div><div><svg class="i"><use href="#user"/></svg>Account</div></div></div></div>
+
+<div><div class="cap">2 · Voice sheet</div><div class="phone"><div class="scr" style="opacity:.5"><h2 class="d">Skilled hands,<br>in minutes.</h2></div><div class="dim"></div>
+<div class="sheet" style="padding-bottom:26px"><div class="grab"></div><div class="orb"><div class="mic"><svg class="i" style="width:32px;height:32px"><use href="#mic"/></svg></div></div>
+<div class="wave"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>
+<div style="color:var(--muted);font-size:12px;margin:6px 0 14px">Understood · 0:04</div>
+<div class="q">“Sink la water leak aaguthu, udane aal venum”</div>
+<div class="chips"><span class="chip">🔧 Plumber</span><span class="chip a">⚡ Now</span><span class="chip s">Kitchen sink leaking</span></div>
+<div class="btns"><button class="btn s">Edit</button><button class="btn" style="flex:2">Find workers</button></div></div></div></div>
+
+<div><div class="cap">3 · Offers</div><div class="phone"><div class="scr">
+<div class="hd"><div class="ib">←</div><b style="font-size:17px;flex:1">Workers ready to help</b><span class="chip">3 offers</span></div>
+<div style="display:flex;gap:6px;margin-bottom:10px"><span class="chip" style="background:var(--primary);color:var(--primary-ink)">Cheapest</span><span class="chip">Fastest</span><span class="chip">Top rated</span></div>
+<div class="card of"><div class="r1"><div class="av" style="background:#1F5BFF">MK</div><div><div class="nm">Muthu K <svg class="i ok" style="width:15px;height:15px"><use href="#chk"/></svg></div><div class="meta"><span class="star">★</span>4.8 · 1.4 km · ID ✔ Skill ✔</div></div><div class="pr"><b>₹299</b><span class="chip s" style="height:20px;font-size:10px">Fair price</span></div></div>
+<div class="btns"><span class="chip a" style="height:46px;border-radius:14px;padding:0 12px">~9 min</span><button class="btn">Book</button><button class="btn s">Offer price</button></div></div>
+<div class="card of"><div class="r1"><div class="av" style="background:#6366F1">SR</div><div><div class="nm">Selvam R <svg class="i ok" style="width:15px;height:15px"><use href="#chk"/></svg></div><div class="meta"><span class="star">★</span>4.6 · 2.1 km · ID ✔ Skill ✔</div></div><div class="pr"><b>₹349</b><span class="chip s" style="height:20px;font-size:10px">Fair price</span></div></div>
+<div class="btns"><span class="chip a" style="height:46px;border-radius:14px;padding:0 12px">~13 min</span><button class="btn">Book</button><button class="btn s">Offer price</button></div></div>
+<div class="card of"><div class="r1"><div class="av" style="background:#0891B2">KM</div><div><div class="nm">Karthik M</div><div class="meta"><span class="star">★</span>4.3 · 3.8 km · ID ✔</div></div><div class="pr"><b>₹279</b><span class="chip s" style="height:20px;font-size:10px">Fair price</span></div></div>
+<div class="btns"><div style="flex:1;text-align:center;font-weight:600;color:var(--muted);align-self:center;font-size:13px">Waiting for Karthik…</div></div></div>
+<div class="meta" style="justify-content:center;margin-top:4px">You only pay after the job is done.</div>
+</div></div></div>
+
+<div><div class="cap">4 · Tracking</div><div class="phone"><div class="scr">
+<div class="hd"><div class="ib">←</div><b style="font-size:17px;flex:1">Your booking</b></div>
+<div class="map"><svg viewBox="0 0 300 210" width="100%" height="100%"><g stroke="var(--border)" stroke-width="10" fill="none" stroke-linecap="round"><path d="M0 60H300M0 140H300M70 0V210M200 0V210"/></g><path d="M60 150C110 140 120 90 190 70" stroke="var(--primary)" stroke-width="3.5" stroke-dasharray="7 7" fill="none"/><circle cx="190" cy="70" r="11" fill="var(--primary)"/><circle cx="190" cy="70" r="4.5" fill="var(--primary-ink)"/><circle cx="104" cy="118" r="14" fill="var(--accent)"/><text x="104" y="123" text-anchor="middle" font-size="14">🔧</text></svg></div>
+<div style="font-size:22px;font-weight:800;margin:12px 0 2px">Arrives in ~6 min</div><div class="meta">Muthu K is on the way</div>
+<div class="card" style="margin:12px 0"><div class="meta" style="justify-content:center">Share this code when Muthu arrives</div><div class="otp"><b>4</b><b>8</b><b>2</b><b>1</b></div></div>
+<div class="st d"><i></i>Confirmed</div><div class="st c"><i></i>On the way</div><div class="st"><i></i>Work in progress</div><div class="st"><i></i>Completed</div>
+<div class="card" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center"><span class="meta">Agreed price</span><b style="font-size:18px">₹299</b></div>
+</div></div></div>
+
+</div></body></html>

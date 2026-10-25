@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+*.db
+*.sqlite3
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.log
+page_*.png
+.system_generated/
