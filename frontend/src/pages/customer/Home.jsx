@@ -60,12 +60,13 @@ const SEARCH_SUGGESTIONS = [
 ];
 
 const DYNAMIC_ACTIONS = [
-  'fixed...',
-  'cleaned...',
-  'cooked...',
-  'repaired...',
-  'serviced...',
-  'painted...',
+  'to be fixed...',
+  'to be cleaned...',
+  'to be cooked...',
+  'to be repaired...',
+  'to be serviced...',
+  'to be painted...',
+  'fixing...',
 ];
 
 function SearchSuggestions() {
@@ -145,17 +146,32 @@ export default function Home() {
   const [proSourceTab, setProSourceTab] = useState('all'); // 'all' | 'blinkem' | 'google'
   const [realPlaces, setRealPlaces] = useState([]);
   const [actionIndex, setActionIndex] = useState(0);
-  const [isActionFading, setIsActionFading] = useState(false);
+  const [animPhase, setAnimPhase] = useState('idle'); // 'idle' | 'exit' | 'enter'
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setIsActionFading(true);
-      setTimeout(() => {
+    let enterTimer;
+    let idleTimer;
+    const interval = setInterval(() => {
+      // 1. Dash out towards the right
+      setAnimPhase('exit');
+
+      // 2. After slide-out (280ms), switch word and reset position to far left
+      enterTimer = setTimeout(() => {
         setActionIndex((prev) => (prev + 1) % DYNAMIC_ACTIONS.length);
-        setIsActionFading(false);
-      }, 200);
-    }, 1100);
-    return () => clearInterval(timer);
+        setAnimPhase('enter');
+
+        // 3. Immediately transition into place from left
+        idleTimer = setTimeout(() => {
+          setAnimPhase('idle');
+        }, 30);
+      }, 280);
+    }, 2400);
+
+    return () => {
+      clearInterval(interval);
+      if (enterTimer) clearTimeout(enterTimer);
+      if (idleTimer) clearTimeout(idleTimer);
+    };
   }, []);
 
   const curLat = location?.lat || 13.0418;
@@ -252,16 +268,22 @@ export default function Home() {
                   {t('home_hyperlocal_dispatch')}
                 </div>
 
-              <h1 className="home-display font-uber text-ink leading-tight animate-header-enter" data-name="request headline">
-                Tell us what needs to be{' '}
-                <span
-                  className={`inline-block text-primary italic font-black transition-all duration-200 transform ${
-                    isActionFading
-                      ? 'opacity-0 -translate-y-2 scale-95 blur-[1px]'
-                      : 'opacity-100 translate-y-0 scale-100 blur-0'
-                  }`}
-                >
-                  {DYNAMIC_ACTIONS[actionIndex]}
+              <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
+                <span className="block text-ink font-800">
+                  Tell us what needs
+                </span>
+                <span className="block overflow-hidden relative pt-0.5 pb-1 min-h-[1.25em]">
+                  <span
+                    className={`inline-block text-primary italic font-black tracking-tight whitespace-nowrap transition-all duration-300 ease-out transform ${
+                      animPhase === 'enter'
+                        ? '-translate-x-14 opacity-0 scale-95'
+                        : animPhase === 'exit'
+                        ? 'translate-x-14 opacity-0 scale-95'
+                        : 'translate-x-0 opacity-100 scale-100'
+                    }`}
+                  >
+                    {DYNAMIC_ACTIONS[actionIndex]}
+                  </span>
                 </span>
               </h1>
 
