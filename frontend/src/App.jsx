@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, MapPin } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
 import Logo from './components/Logo';
@@ -12,6 +12,7 @@ import AccountFlyout from './components/AccountFlyout';
 import CookieBanner from './components/CookieBanner';
 import LocationModal from './components/LocationModal';
 import LoginModal from './components/LoginModal';
+import Login from './pages/auth/Login';
 import Home from './pages/customer/Home';
 import RequestForm from './pages/customer/RequestForm';
 import Searching from './pages/customer/Searching';
@@ -196,23 +197,30 @@ function Shell({ children }) {
   );
 }
 
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useApp();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return children;
+}
+
 export default function App() {
   return (
     <AppProvider>
       <BackgroundWallpaper />
       <Router>
         <Routes>
-          <Route path="/" element={<Shell><Home /></Shell>} />
-          <Route path="/request/new" element={<Shell><RequestForm /></Shell>} />
-          <Route path="/request/:id/searching" element={<Shell><Searching /></Shell>} />
-          <Route path="/request/:id/offers" element={<Shell><Offers /></Shell>} />
-          <Route path="/booking/:id" element={<Shell><Tracking /></Shell>} />
-          <Route path="/booking/:id/complete" element={<Shell><Complete /></Shell>} />
-          <Route path="/bookings" element={<Shell><Bookings /></Shell>} />
-          <Route path="/profile" element={<Shell><Profile /></Shell>} />
-          <Route path="/worker" element={<Shell><WorkerHome /></Shell>} />
-          <Route path="/worker/job/:id" element={<Shell><ActiveJob /></Shell>} />
-          <Route path="/admin" element={<Shell><AdminConsole /></Shell>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<ProtectedRoute><Shell><Home /></Shell></ProtectedRoute>} />
+          <Route path="/request/new" element={<ProtectedRoute><Shell><RequestForm /></Shell></ProtectedRoute>} />
+          <Route path="/request/:id/searching" element={<ProtectedRoute><Shell><Searching /></Shell></ProtectedRoute>} />
+          <Route path="/request/:id/offers" element={<ProtectedRoute><Shell><Offers /></Shell></ProtectedRoute>} />
+          <Route path="/booking/:id" element={<ProtectedRoute><Shell><Tracking /></Shell></ProtectedRoute>} />
+          <Route path="/booking/:id/complete" element={<ProtectedRoute><Shell><Complete /></Shell></ProtectedRoute>} />
+          <Route path="/bookings" element={<ProtectedRoute><Shell><Bookings /></Shell></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Shell><Profile /></Shell></ProtectedRoute>} />
+          <Route path="/worker" element={<ProtectedRoute><Shell><WorkerHome /></Shell></ProtectedRoute>} />
+          <Route path="/worker/job/:id" element={<ProtectedRoute><Shell><ActiveJob /></Shell></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Shell><AdminConsole /></Shell></ProtectedRoute>} />
         </Routes>
       </Router>
     </AppProvider>

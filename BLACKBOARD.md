@@ -10,7 +10,7 @@ This blackboard coordinates work between **Antigravity** and **Neomotron Ultra 3
 | Agent | Current Role / Phase | File Locks / Active Paths | Status |
 |---|---|---|---|
 | **Antigravity** (Gemini) | UI/UX Flagship Overhaul (v1.2): Live Map on Home, GPS Permission, Location Picker, Role Switcher, Profile/Settings, Glassmorphism | `frontend/`, `HANDOFF.md` | **COMPLETE & VERIFIED** |
-| **Neomotron Ultra 3.5 SuperVL** | Task N1 done, Task N2 (Phase 3 Backend) COMPLETE & VERIFIED — Standby for submission & smoke validation | `scripts/`, `backend/` | **STANDBY / COMPLETE** |
+| **Neomotron Ultra 3.5 SuperVL** | Task N1 done, Task N2 (Phase 3 Backend) COMPLETE & VERIFIED — Login/Auth system complete, white screen fixed, all fixes verified | `scripts/`, `backend/`, `frontend/src/pages/auth/`, `frontend/src/context/AppContext.jsx`, `frontend/src/App.jsx`, `frontend/src/i18n.js`, `frontend/src/index.css` | **COMPLETE & VERIFIED** |
 
 ---
 
@@ -121,6 +121,15 @@ Frontend build is verified clean and compiles without errors. I am taking **Phas
   - All endpoints return ISO UTC timestamps with Z suffix
   - OTP returned ONLY to customer, never to worker
 
+- **Task N3 (Login/Auth System & White Screen Fix):** COMPLETE & VERIFIED.
+  - `frontend/src/pages/auth/Login.jsx` — Fixed auth guard: `navigate()` moved into `useEffect` (React rules violation resolved). Role selection (Customer/Worker/Admin) + phone + OTP login flow. Demo mode (no password needed). Auto-redirects to `/` when authenticated.
+  - `frontend/src/context/AppContext.jsx` — Added `isAuthenticated` state, `login(id)` function, updated `logoutUser()` to clear auth state from `localStorage`.
+  - `frontend/src/App.jsx` — `ProtectedRoute` wrapper on all app routes (`/`, `/request/*`, `/booking/*`, `/bookings`, `/profile`, `/worker/*`, `/admin`). `/login` route is public.
+  - `frontend/src/i18n.js` — Added EN/TA/HI translations: `home_hyperlocal_dispatch`, `home_select_category`, `choose_role`, `phone_login`, `enter_mobile`, `send_otp`, `enter_otp`, `verify_enter`, `change_number`, `demo_mode`.
+  - `frontend/src/pages/customer/Home.jsx` — Replaced hardcoded `"Hyperlocal Speed Dispatch"` and `"Select Service Category"` with `t()` calls.
+  - `frontend/vite.config.js` — Fixed proxy port `8001` → `8000` (was pointing to wrong backend port).
+  - Build: 1562 modules, 0 errors. Vite dev server serving HTTP 200 on `:5173`. Backend `GET /api/health` → `{"ok":true}` on `:8000`.
+
 - **v1.2 (UI/UX Flagship Overhaul & Navigation Complete):**
   - **Live Chennai Hyperlocal Map**: Interactive Leaflet radar map embedded directly on Customer Home (`HomeMapCard.jsx`) with live worker pins, distance badges, and 1-tap book popups.
   - **GPS Permission & Location Selector**: Added "Enable Hyperlocal GPS" banner and `LocationModal.jsx` with search for 11 Chennai localities.
@@ -129,4 +138,23 @@ Frontend build is verified clean and compiles without errors. I am taking **Phas
   - **Glassmorphism Design System**: `.glass-card`, `.glass-pill`, glowing mesh gradient backdrops, and responsive mobile-first / desktop-elevated container.
   - **HANDOFF.md**: Complete project report, demo script, architecture, and bug resolutions published.
 
+- **v1.4 (Voice Bulletproofing, UI Breathing Space & Production Verification):**
+  - **VoiceSheet Bulletproofing** (`VoiceSheet.jsx`):
+    - Added mic permission denial handler with instant fallback to a typed problem description form (`AlertTriangle` banner + manual submit).
+    - Result screen fields made fully editable: customer can adjust both description (`<textarea>`) and category (`<select>`) before dispatching.
+    - Added low-confidence detection (`confidence < 0.5`) displaying an amber warning advising user to review details.
+    - Replaced hardcoded status emojis and symbols with standard SVGs / Lucide icons.
+  - **Breathing Space & Design Polish** (`index.css`, `Home.jsx`, `BottomNav.jsx`):
+    - Changed service-grid to 2-column on mobile (`<480px`) with 4-column at `min-width: 480px` for optimal tap targets and visibility at a distance.
+    - Adjusted body line-height to 1.55 and bottom navigation padding to 96px for clean spacing.
+    - Formatted `BottomNav.jsx` into clean, maintainable component code.
+  - **Auth & Route Guarding** (`App.jsx`, `Login.jsx`, `AppContext.jsx`):
+    - Implemented clean `ProtectedRoute` gating unauthorized users to `/login`.
+    - Login flow supports 1-tap quick role select (Customer/Worker/Admin) and simulated mobile OTP with demo hints.
+  - **Build & Server Verification**:
+    - `vite build` passes with 0 errors (1562 modules transformed).
+    - Backend API verified active: `GET /api/health` returns `{"ok": true}`.
+    - Git status verified and ready for merge & push to `origin/main`.
+
 ---
+

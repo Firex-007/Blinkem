@@ -5,6 +5,7 @@ import {
   Loader2,
   Sparkles,
   AlertCircle,
+  AlertTriangle,
   X,
   RotateCcw,
   ArrowRight,
@@ -14,8 +15,6 @@ import {
   Hammer,
   Paintbrush,
   CookingPot,
-  Clock,
-  ShieldCheck,
 } from 'lucide-react';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import { api } from '../api';
@@ -44,6 +43,10 @@ const SAMPLE_CHIPS = [
 export default function VoiceSheet({ open, onClose, onResult }) {
   const [textLoading, setTextLoading] = useState(false);
   const [reviewData, setReviewData] = useState(null);
+  const [micDenied, setMicDenied] = useState(false);
+  const [typedFallback, setTypedFallback] = useState('');
+  const [editedDesc, setEditedDesc] = useState('');
+  const [editedCat, setEditedCat] = useState('');
 
   const {
     isRecording,
@@ -58,8 +61,13 @@ export default function VoiceSheet({ open, onClose, onResult }) {
     silenceThresholdMs: 1800,
     onResult: (res) => {
       setReviewData(res);
+      setEditedDesc(res.description || '');
+      setEditedCat(res.category || '');
     },
     onError: (err) => {
+      if (err && (err.name === 'NotAllowedError' || (err.message && err.message.includes('Permission')))) {
+        setMicDenied(true);
+      }
       console.warn('Voice recording issue:', err);
     },
   });
@@ -103,13 +111,31 @@ export default function VoiceSheet({ open, onClose, onResult }) {
   const handleClose = () => {
     cleanup();
     setReviewData(null);
+    setMicDenied(false);
+    setTypedFallback('');
     onClose();
   };
 
   const handleProceed = () => {
     if (reviewData && onResult) {
-      onResult(reviewData);
+      onResult({ ...reviewData, description: editedDesc || reviewData.description, category: editedCat || reviewData.category });
     }
+  };
+
+  const handleTypedSubmit = async (e) => {
+    e.preventDefault();
+    const text = typedFallback.trim();
+    if (!text) return;
+    try {
+      setTextLoading(true);
+      try {
+        const res = await api.post('/voice/parse-text', { text });
+        setReviewData(res); setEditedDesc(res.description || ''); setEditedCat(res.category || '');
+      } catch {
+        const fb = { category: 'plumber', description: text, urgency: 'now', transcript: text, confidence: 0.4, source: 'fallback' };
+        setReviewData(fb); setEditedDesc(text); setEditedCat('plumber');
+      }
+    } finally { setTextLoading(false); }
   };
 
   const handleReRecord = () => {
@@ -123,23 +149,19 @@ export default function VoiceSheet({ open, onClose, onResult }) {
       setTextLoading(true);
       try {
         const res = await api.post('/voice/parse-text', { text: sample.text });
-        setReviewData(res);
+        setReviewData(res); setEditedDesc(res.description || ''); setEditedCat(res.category || '');
       } catch (e) {
-        setReviewData({
-          category: sample.cat,
-          description: sample.desc,
-          urgency: sample.urgency,
-          transcript: sample.text,
-          detected_language: 'mixed',
-          source: 'sample',
-        });
+        const fb = { category: sample.cat, description: sample.desc, urgency: sample.urgency, transcript: sample.text, detected_language: 'mixed', confidence: 1.0, source: 'sample' };
+        setReviewData(fb); setEditedDesc(sample.desc); setEditedCat(sample.cat);
       }
     } finally {
       setTextLoading(false);
     }
   };
 
-  const selectedMeta = CATEGORY_META[reviewData?.category] || CATEGORY_META.plumber;
+  const lowConfidence = reviewData && typeof reviewData.confidence === 'number' && reviewData.confidence < 0.5;
+
+  const selectedMeta = CATEGORY_META[editedCat || reviewData?.category] || CATEGORY_META.plumber;
   const CategoryIcon = selectedMeta.icon;
 
   return (
@@ -152,7 +174,7 @@ export default function VoiceSheet({ open, onClose, onResult }) {
       />
 
       {/* Sheet Container */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] rounded-t-[32px] glass-card border-t border-l border-r border-line shadow-2xl z-50 p-6 flex flex-col space-y-5 animate-slideUp">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] rounded-t-[32px] glass-card border-t border-l border-r border-line shadow-2xl z-50 p-6 flex flex-col space-y-5 animate-slideUp max-h-[92dvh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-2 border-b border-line">
           <div className="flex items-center gap-2">
@@ -170,15 +192,47 @@ export default function VoiceSheet({ open, onClose, onResult }) {
           </button>
         </div>
 
-        {/* REVIEW & CONFIRMATION SCREEN (Shown when speech is processed) */}
-        {reviewData ? (
+        {/* MIC DENIED STATE */}
+        {micDenied && !reviewData && (
+          <div className="space-y-4 py-2">
+            <div className="p-4 rounded-card bg-dangersoft border border-danger/30 space-y-2">
+              <div className="flex items-center gap-2 text-danger font-800 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                <span>Microphone access denied</span>
+              </div>
+              <p className="text-xs text-ink/80 leading-relaxed">Allow mic access in browser settings, or type your request below.</p>
+            </div>
+            <form onSubmit={handleTypedSubmit} className="space-y-3">
+              <label className="text-xs font-700 text-muted uppercase tracking-wider block">Type your service request</label>
+              <textarea
+                value={typedFallback}
+                onChange={(e) => setTypedFallback(e.target.value)}
+                placeholder="e.g. Kitchen sink leaking, need plumber urgently"
+                rows={3}
+                className="w-full px-4 py-3 rounded-[14px] bg-surface2 border border-line text-sm text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none font-500 transition-all"
+              />
+              <Button variant="primary" full loading={textLoading} type="submit">Find workers</Button>
+            </form>
+          </div>
+        )}
+
+        {/* REVIEW & CONFIRMATION SCREEN */}
+        {reviewData && (
           <div className="space-y-4 animate-fade py-1">
             <div className="text-center space-y-1">
               <span className="inline-flex items-center gap-1.5 text-xs font-800 text-success uppercase tracking-wider">
                 <CheckCircle2 className="w-4 h-4" /> Speech Understood
               </span>
-              <h3 className="font-800 text-lg text-ink">Review What You Said</h3>
+              <h3 className="font-800 text-lg text-ink">Review your request</h3>
             </div>
+
+            {/* Low confidence warning */}
+            {lowConfidence && (
+              <div className="flex items-center gap-2 p-3 rounded-[14px] bg-accent/10 border border-accent/30 text-xs font-700 text-amber-700 dark:text-amber-400">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <span>Please confirm the service type — we weren't entirely sure</span>
+              </div>
+            )}
 
             {/* Transcript Quote Bubble */}
             <div className="p-4 rounded-card bg-surface2/70 border border-line space-y-1 relative">
@@ -207,13 +261,17 @@ export default function VoiceSheet({ open, onClose, onResult }) {
                 </div>
               </div>
 
-              <div className="space-y-1 pt-1 border-t border-line">
+              <div className="space-y-1.5 pt-1 border-t border-line">
                 <span className="text-xs font-700 text-muted uppercase tracking-wider block">
                   Problem Summary
                 </span>
-                <p className="text-sm font-600 text-ink leading-snug">
-                  {reviewData.description || 'Inspection and repair needed'}
-                </p>
+                <textarea
+                  value={editedDesc}
+                  onChange={(e) => setEditedDesc(e.target.value)}
+                  rows={2}
+                  placeholder="Describe the problem…"
+                  className="w-full px-3 py-2 rounded-[10px] bg-surface2 border border-line text-sm text-ink focus:outline-none focus:border-primary resize-none font-500 transition-all"
+                />
               </div>
 
               <div className="flex items-center justify-between text-xs text-muted pt-1">
@@ -237,13 +295,15 @@ export default function VoiceSheet({ open, onClose, onResult }) {
                 onClick={handleProceed}
                 className="py-3 px-4 rounded-chip bg-primary hover:bg-primary600 text-onprimary font-800 text-xs flex items-center justify-center gap-1.5 shadow-md hover:scale-[1.02] active:scale-[0.98] transition"
               >
-                <span>Proceed</span>
+                <span>Find workers</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
-        ) : (
-          /* ACTIVE RECORDING / LISTENING SCREEN */
+        )}
+
+        {/* ACTIVE RECORDING / LISTENING SCREEN */}
+        {!reviewData && !micDenied && (
           <div className="space-y-4 py-2">
             {/* Live Wave & Mic Button */}
             <div className="text-center space-y-4">
@@ -335,13 +395,13 @@ export default function VoiceSheet({ open, onClose, onResult }) {
                 <Sparkles className="w-3.5 h-3.5 text-primary" />
                 <span>Or select a common service request:</span>
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 {SAMPLE_CHIPS.map((sample, idx) => (
                   <button
                     key={idx}
                     disabled={isRecording || isProcessing || textLoading}
                     onClick={() => handleSampleClick(sample)}
-                    className="text-left p-2.5 rounded-chip bg-surface2 hover:bg-soft text-ink text-xs font-600 transition flex items-center justify-between group border border-line/60"
+                    className="text-left p-3 rounded-[14px] bg-surface2 hover:bg-soft text-ink text-xs font-600 transition flex items-center justify-between group border border-line/60 disabled:opacity-50"
                   >
                     <span className="truncate pr-2">"{sample.text}"</span>
                     <span className="text-[10px] text-muted group-hover:text-primary shrink-0 uppercase font-800">

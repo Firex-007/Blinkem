@@ -226,9 +226,9 @@ export default function Home() {
           <section className="request-console scroll-reveal" data-name="request console">
             {/* Live Hyperlocal Dispatch Badge & Locality Subtitle */}
             <div className="space-y-1.5">
-              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-800 tracking-wider uppercase">
-                Hyperlocal Speed Dispatch
-              </div>
+                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-800 tracking-wider uppercase">
+                  {t('home_hyperlocal_dispatch')}
+                </div>
 
               <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
                 Tell us what needs{' '}
@@ -301,7 +301,7 @@ export default function Home() {
             <div className="space-y-3 pt-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-uber text-sm text-ink tracking-tight uppercase">
-                  Select Service Category
+                  {t('home_select_category')}
                 </span>
                 <span className="text-muted font-800 tracking-wider bg-surface2 px-2.5 py-1 rounded-full border border-line text-[10px] uppercase">
                   8 Core Trades

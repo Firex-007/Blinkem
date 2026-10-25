@@ -88,6 +88,13 @@ export function AppProvider({ children }) {
     return localStorage.getItem('userId') || '1';
   });
 
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof localStorage === 'undefined') return true;
+    const consent = getCookieConsent();
+    if (consent === 'none') return true;
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+
   const [location, setLocation] = useState(() => {
     const consent = getCookieConsent();
     if (consent === 'none') return CHENNAI_LOCALITIES[0];
@@ -179,8 +186,25 @@ export function AppProvider({ children }) {
     else setUserIdPersist('1');
   };
 
+  const login = (id) => {
+    const acct = REGISTERED_ACCOUNTS[String(id)];
+    if (!acct) return false;
+    setUserId(String(id));
+    setIsAuthenticated(true);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userId', String(id));
+    }
+    return true;
+  };
+
   const logoutUser = () => {
-    setUserIdPersist('1');
+    setUserId('1');
+    setIsAuthenticated(false);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('userId');
+    }
     if (cookieConsent === 'none') {
       setAccounts({ ...REGISTERED_ACCOUNTS });
       setLocation(CHENNAI_LOCALITIES[0]);
@@ -229,6 +253,9 @@ export function AppProvider({ children }) {
         setLang: setLangPersist,
         userId,
         setUserId: setUserIdPersist,
+        login,
+        isAuthenticated,
+        setIsAuthenticated,
         role,
         setRole,
         currentUser,
