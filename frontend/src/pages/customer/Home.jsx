@@ -411,7 +411,7 @@ export default function Home() {
                     })}
               </div>
 
-              {catsError && (
+              {catsError && availableCategories.length === 0 && (
                 <div className="section-error" role="alert">
                   <span>{t('error')}</span>
                   <button onClick={retryCategories}>{t('retry')}</button>
