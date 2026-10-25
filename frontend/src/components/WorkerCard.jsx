@@ -1,40 +1,24 @@
-import { ShieldCheck, Star, MapPin, Clock, Wrench } from 'lucide-react';
+import { BadgeCheck, MapPin, Star, Wrench } from 'lucide-react';
+import { t } from '../i18n';
 
 export default function WorkerCard({ worker, compact = true }) {
-  const badges = [];
-  if (worker.id_verified) badges.push(<ShieldCheck key="id" className="w-3 h-3 text-success" />);
-  if (worker.skill_verified) badges.push(<Wrench key="skill" className="w-3 h-3 text-success" />);
-
-  const style = compact
-    ? 'w-44 flex flex-col gap-2 p-3'
-    : 'flex flex-col gap-2';
+  const initials = worker.name ? worker.name.split(' ').map((part) => part[0]).join('').toUpperCase().slice(0, 2) : 'W';
+  const jobs = worker.jobs_done ?? worker.jobsDone ?? 0;
+  const cardClass = compact ? 'worker-card worker-card-compact' : 'worker-card';
 
   return (
-    <div className={`bg-surface border border-line rounded-card shadow-sm2 p-3 ${style}`}>
-      <div className="flex items-center justify-between gap-2">
-        <div className="w-12 h-12 rounded-full bg-soft text-primary flex items-center justify-center shrink-0 font-700 text-xs">
-          {worker.name ? worker.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : 'W'}
+    <article className={cardClass} data-name="worker card">
+      <div className="worker-card-top">
+        <div className="worker-avatar">{initials}</div>
+        <div className="worker-badges" aria-label={t('home_verified_workers')}>
+          {worker.id_verified && <span className="worker-badge"><BadgeCheck className="h-3.5 w-3.5" />{t('badge_id')}</span>}
+          {worker.skill_verified && <span className="worker-badge"><Wrench className="h-3.5 w-3.5" />{t('badge_skill')}</span>}
         </div>
-        <div className="flex gap-1">{badges}</div>
       </div>
-      <div className="flex items-baseline gap-1">
-        <span className="font-700 text-ink text-sm leading-tight">{worker.name}</span>
-        <span className="text-muted text-[11px] ml-auto">{worker.rating_avg}</span>
-        <Star className="w-3 h-3 fill-yellow-400 text-accent" />
-      </div>
-      <div className="flex items-center gap-1 text-muted text-[11px]">
-        <MapPin className="w-3 h-3" />
-        <span>{worker.area_name} · {worker.distance_km !== undefined ? worker.distance_km + ' km' : ''}</span>
-      </div>
-      <div className="flex items-center justify-between text-xs text-muted mt-1">
-        <span>₹{worker.base_rate} / {worker.rate_unit}</span>
-        <Chip tone="accent" className="h-5 px-2 text-[10px]">{worker.is_online ? 'Online' : 'Offline'}</Chip>
-      </div>
-    </div>
+      <div className="worker-name">{worker.name || t('worker_tab')}</div>
+      <div className="worker-meta"><Star className="h-3.5 w-3.5 fill-accent text-accent" />{worker.rating_avg || '—'} · {jobs} jobs</div>
+      <div className="worker-meta"><MapPin className="h-3.5 w-3.5" />{worker.area_name || 'T. Nagar'} · {worker.distance_km ?? '—'} km</div>
+      <div className="worker-card-foot"><span className="worker-price">₹{worker.base_rate} / {worker.rate_unit}</span><span className="worker-eta">{worker.eta_min ? `${worker.eta_min} min` : t('online')}</span></div>
+    </article>
   );
-}
-
-function Chip({ children, tone = 'neutral', className }) {
-  const tones = { neutral: 'bg-surface2 text-muted', primary: 'bg-soft text-primary', success: 'bg-successsoft text-success', accent: 'bg-accent text-onaccent', danger: 'bg-dangersoft text-danger' }[tone] || '';
-  return <span className={`inline-flex items-center h-6 px-2 rounded-full text-[10px] font-600 ${tones} ${className || ''}`}>{children}</span>;
 }

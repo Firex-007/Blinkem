@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronDown, User, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronLeft, MapPin } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
 import Logo from './components/Logo';
 import ThemeToggle from './components/ThemeToggle';
@@ -21,52 +21,36 @@ import ActiveJob from './pages/worker/ActiveJob';
 import AdminConsole from './pages/admin/AdminConsole';
 
 function Header() {
-  const { location: userLocation, setIsLocationModalOpen, currentUser } = useApp();
+  const { location: userLocation, setIsLocationModalOpen } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const isRoot = ['/', '/worker', '/admin', '/profile'].includes(location.pathname);
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 glass border-b border-line sticky top-0 z-30">
-      <div className="flex items-center gap-2">
+    <header className="app-header">
+      <div className="app-header-top">
+        <div className="flex items-center gap-2">
         {!isRoot && (
           <button
             onClick={() => navigate(-1)}
             aria-label="Back"
-            className="w-8 h-8 rounded-full bg-surface2 flex items-center justify-center text-ink hover:bg-soft transition mr-1"
+            className="icon-touch mr-1"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
         )}
         <Logo className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')} />
         
-        {/* Interactive Location Selector Button */}
-        <button
-          onClick={() => setIsLocationModalOpen(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full glass-pill text-xs font-700 text-ink hover:border-primary transition group shadow-sm"
-          title="Click to select or detect your location in Chennai"
-        >
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
-          <span className="truncate max-w-[90px]">{userLocation?.name || 'T. Nagar'}</span>
-          <ChevronDown className="w-3 h-3 text-muted group-hover:text-primary transition" />
-        </button>
+        </div>
+        <RoleSwitcher />
       </div>
-
-      <div className="flex items-center gap-1.5">
-        <LangToggle />
-        <ThemeToggle />
-        <RoleSwitcher className="ml-0.5" />
-        
-        {/* User Profile Avatar Icon */}
-        <button
-          onClick={() => navigate('/profile')}
-          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-800 shadow-sm hover:scale-105 transition ml-1"
-          style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
-          title={`Signed in as ${currentUser?.name || 'User'}`}
-          aria-label="Go to Profile"
-        >
-          {currentUser?.name ? currentUser.name[0] : 'U'}
+      <div className="app-header-bottom">
+        <button onClick={() => setIsLocationModalOpen(true)} className="location-control" title="Change area">
+          <MapPin className="h-5 w-5" />
+          <span>{userLocation?.name || 'T. Nagar'}, Chennai</span>
+          <ChevronDown className="h-4 w-4" />
         </button>
+        <div className="header-tools"><LangToggle /><ThemeToggle /></div>
       </div>
     </header>
   );
@@ -75,9 +59,9 @@ function Header() {
 function Shell({ children }) {
   const { isLocationModalOpen, setIsLocationModalOpen, isLoginModalOpen, setIsLoginModalOpen } = useApp();
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[480px] md:max-w-[540px] bg-bg relative flex flex-col shadow-2xl md:my-5 md:rounded-[32px] md:border md:border-line/80 overflow-hidden">
+    <div className="nodi-shell">
       <Header />
-      <main className="flex-1 px-4 py-4 pb-24">{children}</main>
+      <main className="app-main">{children}</main>
       <BottomNav />
       <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
       <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
