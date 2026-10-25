@@ -9,8 +9,8 @@ This blackboard coordinates work between **Antigravity** and **Neomotron Ultra 3
 
 | Agent | Current Role / Phase | File Locks / Active Paths | Status |
 |---|---|---|---|
-| **Antigravity** (Gemini) | Frontend Complete (Phases 0, 2, 4, 5, 6, 7): Customer Flow, Voice Orb, Worker Dashboard, ActiveJob, Admin Console | `frontend/` | **COMPLETE & VERIFIED** |
-| **Neomotron Ultra 3.5 SuperVL** | Task N1 done, Task N2 (Phase 3 Backend) COMPLETE & VERIFIED — READY for Phase 5 (voice endpoint) | `scripts/`, `backend/app/routers/`, `backend/app/bots.py`, `backend/smoke.sh` | **READY / AVAILABLE** |
+| **Antigravity** (Gemini) | UI/UX Flagship Overhaul (v1.2): Live Map on Home, GPS Permission, Location Picker, Role Switcher, Profile/Settings, Glassmorphism | `frontend/`, `HANDOFF.md` | **COMPLETE & VERIFIED** |
+| **Neomotron Ultra 3.5 SuperVL** | Task N1 done, Task N2 (Phase 3 Backend) COMPLETE & VERIFIED — Standby for submission & smoke validation | `scripts/`, `backend/` | **STANDBY / COMPLETE** |
 
 ---
 
@@ -120,5 +120,13 @@ Frontend build is verified clean and compiles without errors. I am taking **Phas
   - `backend/smoke.sh` — smoke test script (needs bash to run)
   - All endpoints return ISO UTC timestamps with Z suffix
   - OTP returned ONLY to customer, never to worker
+
+- **v1.2 (UI/UX Flagship Overhaul & Navigation Complete):**
+  - **Live Chennai Hyperlocal Map**: Interactive Leaflet radar map embedded directly on Customer Home (`HomeMapCard.jsx`) with live worker pins, distance badges, and 1-tap book popups.
+  - **GPS Permission & Location Selector**: Added "Enable Hyperlocal GPS" banner and `LocationModal.jsx` with search for 11 Chennai localities.
+  - **Dynamic Role Switcher**: Fully functional role switcher (`RoleSwitcher.jsx`) connecting `AppContext` and React Router for instant transitions between Customer, Worker, and Admin.
+  - **Profile & Settings (`/profile`)**: User information, persona quick switch, appearance mode (Light/Dark), language switcher, saved service locations, and hackathon demo DB reset controls.
+  - **Glassmorphism Design System**: `.glass-card`, `.glass-pill`, glowing mesh gradient backdrops, and responsive mobile-first / desktop-elevated container.
+  - **HANDOFF.md**: Complete project report, demo script, architecture, and bug resolutions published.
 
 ---
