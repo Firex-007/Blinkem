@@ -4,8 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import engine, Base, SessionLocal
 from app import models  # Ensures all models are registered with Base.metadata
-from app.seed import seed_data
-from app.routers import meta, requests, worker, bookings
+from app.routers import meta, requests, worker, bookings, voice
 
 # Ensure tables exist immediately
 Base.metadata.create_all(bind=engine)
@@ -37,3 +36,4 @@ app.include_router(meta.router)
 app.include_router(requests.router)
 app.include_router(worker.router)
 app.include_router(bookings.router)
+app.include_router(voice.router)

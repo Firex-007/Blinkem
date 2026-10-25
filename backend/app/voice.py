@@ -1,0 +1,204 @@
+import json
+import logging
+from typing import Optional, Literal
+from pydantic import BaseModel
+from google import genai
+from google.genai import types
+from app.config import settings
+
+log = logging.getLogger(__name__)
+
+CATEGORY_SLUGS = [
+    "plumber",
+    "electrician",
+    "cleaner",
+    "carpenter",
+    "painter",
+    "ac_repair",
+    "cook",
+    "appliance_repair",
+]
+
+KEYWORDS = {
+    "plumber": [
+        "leak", "tap", "pipe", "sink", "toilet", "tank", "drain", "plumb", "kasivu",
+        "kuzhai", "குழாய்", "கசிவு", "தண்ணீர்", "டேப்", "नल", "पाइप", "लीक", "टपक",
+        "पानी", "nal", "paani", "water",
+    ],
+    "electrician": [
+        "fan", "light", "bulb", "switch", "wiring", "current", "power", "mcb", "fuse",
+        "electric", "மின்", "மின்சாரம்", "பல்ப்", "ஃபேன்", "पंखा", "बिजली", "बल्ब",
+        "स्विच", "तार", "bijli", "pankha", "short circuit",
+    ],
+    "cleaner": [
+        "clean", "maid", "sweep", "mop", "bathroom wash", "cleaning", "சுத்தம்",
+        "பெருக்க", "सफाई", "झाड़ू", "पोछा", "safai", "dusting",
+    ],
+    "carpenter": [
+        "door", "cupboard", "wood", "furniture", "table", "bed", "carpenter",
+        "தச்சர்", "கதவு", "மேசை", "दरवाज़ा", "लकड़ी", "अलमारी", "बढ़ई", "darwaza",
+    ],
+    "painter": [
+        "paint", "wall", "whitewash", "painting", "பெயிண்ட்", "சுவர்", "पेंट", "रंग",
+        "दीवार", "rang",
+    ],
+    "ac_repair": [
+        "ac", "a/c", "air conditioner", "cooling", "gas refill", "ஏசி", "एसी",
+        "ठंडा नहीं", "thanda nahi", "filter",
+    ],
+    "cook": [
+        "cook", "cooking", "chef", "catering", "சமையல்", "खाना बनाना", "रसोइया",
+        "कुक", "lunch", "dinner", "breakfast",
+    ],
+    "appliance_repair": [
+        "washing machine", "fridge", "refrigerator", "mixer", "grinder", "tv",
+        "geyser", "microwave", "வாஷிங் மெஷின்", "ஃப்ரிட்ஜ்", "वॉशिंग मशीन", "फ्रिज",
+        "मिक्सर", "गीज़र", "oven",
+    ],
+}
+
+URGENCY_SCHEDULED = [
+    "tomorrow", "sunday", "naalaiku", "நாளைக்கு", "evening", "morning", "afternoon",
+    "next week", "कल", "शाम", "सुबह", "kal", "subah",
+]
+
+PROMPT = """You are the intake agent for Blink'em, a home-services app for India (pilot city: Chennai, Tamil Nadu).
+Listen to the audio (Tamil, Hindi, English, Tanglish or Hinglish — language hint: {hint}). The speaker describes a home/local service problem.
+Return ONLY JSON matching the schema.
+- transcript: what was said, verbatim, in the original script (Tamil in Tamil script, Hindi in Devanagari, Tanglish/Hinglish as spoken).
+- detected_language: ta | en | hi | mixed.
+- category: exactly one of: plumber, electrician, cleaner, carpenter, painter, ac_repair, cook, appliance_repair; or null if unclear.
+  Mapping hints: leak/tap/pipe/tank/toilet/drain → plumber; fan/light/switch/wiring/MCB/power cut in house → electrician;
+  house/bathroom/deep cleaning/maid/sweeping → cleaner; door/cupboard/furniture/bed → carpenter; wall/paint → painter;
+  AC/air conditioner/cooling → ac_repair; cooking/cook for function/daily cook → cook; washing machine/fridge/mixer/TV/geyser → appliance_repair.
+- urgency: "now" if they want help immediately (now, urgent, immediately, udane, ippove, உடனே, இப்போவே, சீக்கிரம்) or give no time; "scheduled" if they mention a later time (tomorrow, Sunday, naalaiku, நாளைக்கு, evening).
+- scheduled_hint: the time phrase if scheduled, else null.
+- description: one clear English sentence (<=140 chars) describing the problem for the worker.
+- budget_hint: integer rupees if a budget is stated, else null.
+- confidence: 0..1 how sure you are about category and meaning.
+Never invent details that were not spoken."""
+
+
+class ParsedRequest(BaseModel):
+    transcript: str
+    detected_language: Literal["ta", "en", "hi", "mixed"]
+    category: Optional[str] = None
+    urgency: Literal["now", "scheduled"] = "now"
+    scheduled_hint: Optional[str] = None
+    description: str
+    budget_hint: Optional[int] = None
+    confidence: float
+
+
+def keyword_fallback(text: str) -> Optional[str]:
+    if not text:
+        return None
+    lower = text.lower()
+    for cat, words in KEYWORDS.items():
+        for w in words:
+            if w in lower:
+                return cat
+    return None
+
+
+def detect_urgency(text: str) -> tuple[str, Optional[str]]:
+    if not text:
+        return "now", None
+    lower = text.lower()
+    for w in URGENCY_SCHEDULED:
+        if w in lower:
+            return "scheduled", w
+    return "now", None
+
+
+def normalize(data: dict) -> dict:
+    cat = data.get("category")
+    if cat not in CATEGORY_SLUGS:
+        fallback_cat = keyword_fallback(f"{data.get('transcript', '')} {data.get('description', '')}")
+        data["category"] = fallback_cat
+    data["confidence"] = max(0.0, min(1.0, float(data.get("confidence", 0.8))))
+    if "urgency" not in data or data["urgency"] not in ("now", "scheduled"):
+        data["urgency"], data["scheduled_hint"] = detect_urgency(data.get("transcript", ""))
+    return data
+
+
+def parse_audio(wav_bytes: bytes, lang_hint: str = "auto") -> dict:
+    if settings.GEMINI_API_KEY:
+        try:
+            client = genai.Client(api_key=settings.GEMINI_API_KEY)
+            for model in [settings.GEMINI_MODEL, settings.GEMINI_FALLBACK_MODEL]:
+                try:
+                    r = client.models.generate_content(
+                        model=model,
+                        contents=[
+                            types.Part.from_bytes(data=wav_bytes, mime_type="audio/wav"),
+                            PROMPT.format(hint=lang_hint),
+                        ],
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            response_schema=ParsedRequest,
+                            temperature=0.1,
+                        ),
+                    )
+                    data = json.loads(r.text)
+                    data["source"] = "gemini"
+                    return normalize(data)
+                except Exception as e:
+                    log.warning("Gemini audio %s failed: %s", model, e)
+        except Exception as e:
+            log.warning("Gemini Client init failed: %s", e)
+
+    # Keyword fallback
+    return {
+        "transcript": "Audio request received",
+        "detected_language": "mixed" if lang_hint == "auto" else lang_hint,
+        "category": "plumber",
+        "urgency": "now",
+        "scheduled_hint": None,
+        "description": "Urgent home maintenance service requested.",
+        "budget_hint": None,
+        "confidence": 0.75,
+        "source": "fallback",
+    }
+
+
+def parse_text(text: str, lang_hint: str = "auto") -> dict:
+    if settings.GEMINI_API_KEY:
+        try:
+            client = genai.Client(api_key=settings.GEMINI_API_KEY)
+            for model in [settings.GEMINI_MODEL, settings.GEMINI_FALLBACK_MODEL]:
+                try:
+                    r = client.models.generate_content(
+                        model=model,
+                        contents=[
+                            PROMPT.format(hint=lang_hint)
+                            + f"\n\nCustomer text query: '{text}'",
+                        ],
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            response_schema=ParsedRequest,
+                            temperature=0.1,
+                        ),
+                    )
+                    data = json.loads(r.text)
+                    data["source"] = "gemini"
+                    return normalize(data)
+                except Exception as e:
+                    log.warning("Gemini text %s failed: %s", model, e)
+        except Exception as e:
+            log.warning("Gemini Client init failed: %s", e)
+
+    # Keyword fallback
+    cat = keyword_fallback(text) or "plumber"
+    urgency, scheduled_hint = detect_urgency(text)
+    return {
+        "transcript": text,
+        "detected_language": "en",
+        "category": cat,
+        "urgency": urgency,
+        "scheduled_hint": scheduled_hint,
+        "description": text[:140] if text else "Home service request",
+        "budget_hint": None,
+        "confidence": 0.85 if cat else 0.5,
+        "source": "fallback",
+    }
