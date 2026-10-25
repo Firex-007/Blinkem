@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import engine, Base, SessionLocal
 from app import models  # Ensures all models are registered with Base.metadata
+from app.seed import seed_data
 from app.routers import meta, requests, worker, bookings, voice
 
 # Ensure tables exist immediately
