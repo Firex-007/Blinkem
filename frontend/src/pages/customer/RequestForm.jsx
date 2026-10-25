@@ -48,7 +48,7 @@ export default function RequestForm() {
         category, description, lat: 13.0418, lng: 80.2341, address,
         urgency, scheduled_at: null,
         budget_hint: budget ? parseInt(budget, 10) : null,
-        voice_transcript: null,
+        voice_transcript: voiceTranscript,
       });
       navigate(`/request/${res.id}/searching`);
     } catch (e) {

@@ -1,4 +1,9 @@
-const API_BASE = '';
+const API_BASE = '/api';
+
+function normalizePath(path) {
+  if (path.startsWith('/api')) return path;
+  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+}
 
 function headers() {
   const h = { 'Content-Type': 'application/json' };
@@ -18,7 +23,8 @@ async function request(method, path, body, form) {
   } else if (body) {
     opts.body = JSON.stringify(body);
   }
-  const res = await fetch(`${API_BASE}${path}`, opts);
+  const url = normalizePath(path);
+  const res = await fetch(url, opts);
   let data;
   try { data = await res.json(); } catch { data = {}; }
   if (!res.ok) throw new Error(data.detail || `Request failed (${res.status})`);

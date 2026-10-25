@@ -9,10 +9,11 @@ router = APIRouter(prefix="/api/voice", tags=["voice"])
 async def api_parse_audio(
     audio: UploadFile = File(...),
     lang_hint: str = Form("auto"),
+    client_transcript: str = Form(""),
 ):
     wav_bytes = await audio.read()
     # Run blocking call in threadpool with ~12s safety
-    res = await run_in_threadpool(parse_audio, wav_bytes, lang_hint)
+    res = await run_in_threadpool(parse_audio, wav_bytes, lang_hint, client_transcript)
     return res
 
 

@@ -2,10 +2,11 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { blobToWav16kMono } from '../lib/wav';
 import { api } from '../api';
 
-export function useVoiceRecorder({ onResult, onError } = {}) {
+export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, silenceThresholdMs = 1800 } = {}) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [liveTranscript, setLiveTranscript] = useState('');
 
   const mediaRecorderRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -13,10 +14,23 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
   const animFrameRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const liveTranscriptRef = useRef('');
+
+  // Silence detection refs
+  const hasSpokenRef = useRef(false);
+  const lastSpeechTimeRef = useRef(0);
+  const isStoppingRef = useRef(false);
 
   const cleanup = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
         mediaRecorderRef.current.stop();
@@ -29,15 +43,33 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
     }
     setIsRecording(false);
     setAudioLevel(0);
+    isStoppingRef.current = false;
   }, []);
 
   useEffect(() => {
     return cleanup;
   }, [cleanup]);
 
+  const stopRecording = useCallback(() => {
+    if (isStoppingRef.current) return;
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      isStoppingRef.current = true;
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        console.warn('Error stopping media recorder:', e);
+      }
+    }
+  }, []);
+
   const startRecording = async () => {
     cleanup();
     chunksRef.current = [];
+    setLiveTranscript('');
+    liveTranscriptRef.current = '';
+    hasSpokenRef.current = false;
+    lastSpeechTimeRef.current = Date.now();
+    isStoppingRef.current = false;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -51,14 +83,60 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
       source.connect(analyser);
       analyserRef.current = analyser;
 
-      // Update volume meter level
+      // Start Web Speech API live recognition if available in browser
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRec) {
+        try {
+          const recognition = new SpeechRec();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-IN'; // defaults to Indian English / mixed phonetics
+          recognition.onresult = (event) => {
+            let combined = '';
+            for (let i = 0; i < event.results.length; ++i) {
+              combined += event.results[i][0].transcript + ' ';
+            }
+            const clean = combined.trim();
+            if (clean) {
+              setLiveTranscript(clean);
+              liveTranscriptRef.current = clean;
+              hasSpokenRef.current = true;
+              lastSpeechTimeRef.current = Date.now();
+            }
+          };
+          recognition.onerror = (e) => {
+            console.debug('Speech recognition interim warning:', e.error);
+          };
+          recognition.start();
+          recognitionRef.current = recognition;
+        } catch (e) {
+          console.debug('Web Speech API unavailable or denied:', e);
+        }
+      }
+
+      // Update volume meter level and silence detection
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       const updateLevel = () => {
         analyser.getByteFrequencyData(dataArray);
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
         const avg = sum / dataArray.length;
-        setAudioLevel(Math.min(1, avg / 128));
+        const currentLevel = Math.min(1, avg / 128);
+        setAudioLevel(currentLevel);
+
+        // Silence / VAD Detection
+        const now = Date.now();
+        if (currentLevel > 0.08) {
+          hasSpokenRef.current = true;
+          lastSpeechTimeRef.current = now;
+        } else if (hasSpokenRef.current && autoStopSilence) {
+          // If user spoke and has now been silent for silenceThresholdMs, auto-stop
+          if (now - lastSpeechTimeRef.current > silenceThresholdMs) {
+            stopRecording();
+            return;
+          }
+        }
+
         animFrameRef.current = requestAnimationFrame(updateLevel);
       };
       updateLevel();
@@ -73,6 +151,9 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
       recorder.onstop = async () => {
         stream.getTracks().forEach((track) => track.stop());
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+        if (recognitionRef.current) {
+          try { recognitionRef.current.stop(); } catch (e) {}
+        }
 
         setIsRecording(false);
         setIsProcessing(true);
@@ -83,33 +164,42 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
 
           const formData = new FormData();
           formData.append('audio', wavBlob, 'request.wav');
+          if (liveTranscriptRef.current) {
+            formData.append('client_transcript', liveTranscriptRef.current);
+          }
 
           const res = await api.postForm('/voice/parse', formData);
+          // If backend didn't supply transcript but live transcript is available
+          if (!res.transcript && liveTranscriptRef.current) {
+            res.transcript = liveTranscriptRef.current;
+          }
           if (onResult) onResult(res);
         } catch (err) {
           console.error('Voice parse error:', err);
           if (onError) onError(err);
-          // Offline fallback result to ensure continuous service availability
+          // Intelligent fallback using live transcript if available
+          const text = liveTranscriptRef.current || 'Home service request';
           if (onResult) {
             onResult({
               category: 'plumber',
-              description: 'Urgent home repair required',
+              description: text,
               urgency: 'now',
-              transcript: 'Sink leak',
+              transcript: text,
               source: 'fallback',
             });
           }
         } finally {
           setIsProcessing(false);
+          isStoppingRef.current = false;
         }
       };
 
       recorder.start(100);
       setIsRecording(true);
 
-      // Max 15 seconds recording auto-stop
+      // Max 15 seconds recording auto-stop safety
       timerRef.current = setTimeout(() => {
-        if (recorder.state === 'recording') recorder.stop();
+        if (recorder.state === 'recording') stopRecording();
       }, 15000);
     } catch (err) {
       console.error('Mic access error:', err);
@@ -118,18 +208,14 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
-    }
-  };
-
   return {
     isRecording,
     isProcessing,
     audioLevel,
+    liveTranscript,
     startRecording,
     stopRecording,
+    cleanup,
   };
 }
 

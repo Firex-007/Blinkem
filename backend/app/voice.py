@@ -122,7 +122,11 @@ def normalize(data: dict) -> dict:
     return data
 
 
-def parse_audio(wav_bytes: bytes, lang_hint: str = "auto") -> dict:
+def parse_audio(wav_bytes: bytes, lang_hint: str = "auto", client_transcript: str = "") -> dict:
+    prompt_text = PROMPT.format(hint=lang_hint)
+    if client_transcript:
+        prompt_text += f"\n\nPreliminary speech-to-text hint: '{client_transcript}'"
+
     if settings.GEMINI_API_KEY:
         try:
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
@@ -132,7 +136,7 @@ def parse_audio(wav_bytes: bytes, lang_hint: str = "auto") -> dict:
                         model=model,
                         contents=[
                             types.Part.from_bytes(data=wav_bytes, mime_type="audio/wav"),
-                            PROMPT.format(hint=lang_hint),
+                            prompt_text,
                         ],
                         config=types.GenerateContentConfig(
                             response_mime_type="application/json",
@@ -142,6 +146,9 @@ def parse_audio(wav_bytes: bytes, lang_hint: str = "auto") -> dict:
                     )
                     data = json.loads(r.text)
                     data["source"] = "gemini"
+                    # If gemini didn't get transcript but client transcript is available
+                    if not data.get("transcript") and client_transcript:
+                        data["transcript"] = client_transcript
                     return normalize(data)
                 except Exception as e:
                     log.warning("Gemini audio %s failed: %s", model, e)
@@ -149,15 +156,18 @@ def parse_audio(wav_bytes: bytes, lang_hint: str = "auto") -> dict:
             log.warning("Gemini Client init failed: %s", e)
 
     # Keyword fallback
+    detected_cat = keyword_fallback(client_transcript) if client_transcript else None
+    cat = detected_cat or "plumber"
+    urgency, scheduled_hint = detect_urgency(client_transcript)
     return {
-        "transcript": "Audio request received",
+        "transcript": client_transcript if client_transcript else "Voice service request",
         "detected_language": "mixed" if lang_hint == "auto" else lang_hint,
-        "category": "plumber",
-        "urgency": "now",
-        "scheduled_hint": None,
-        "description": "Urgent home maintenance service requested.",
+        "category": cat,
+        "urgency": urgency,
+        "scheduled_hint": scheduled_hint,
+        "description": client_transcript if client_transcript else "Home service request.",
         "budget_hint": None,
-        "confidence": 0.75,
+        "confidence": 0.85 if detected_cat else 0.6,
         "source": "fallback",
     }
 
