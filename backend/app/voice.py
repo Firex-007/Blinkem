@@ -62,20 +62,27 @@ URGENCY_SCHEDULED = [
     "next week", "कल", "शाम", "सुबह", "kal", "subah",
 ]
 
-PROMPT = """You are the intake agent for Blink'em, a home-services app for India (pilot city: Chennai, Tamil Nadu).
-Listen to the audio (Tamil, Hindi, English, Tanglish or Hinglish — language hint: {hint}). The speaker describes a home/local service problem.
-Return ONLY JSON matching the schema.
-- transcript: what was said, verbatim, in the original script (Tamil in Tamil script, Hindi in Devanagari, Tanglish/Hinglish as spoken).
-- detected_language: ta | en | hi | mixed.
-- category: exactly one of: plumber, electrician, cleaner, carpenter, painter, ac_repair, cook, appliance_repair; or null if unclear.
-  Mapping hints: leak/tap/pipe/tank/toilet/drain → plumber; fan/light/switch/wiring/MCB/power cut in house → electrician;
-  house/bathroom/deep cleaning/maid/sweeping → cleaner; door/cupboard/furniture/bed → carpenter; wall/paint → painter;
-  AC/air conditioner/cooling → ac_repair; cooking/cook for function/daily cook → cook; washing machine/fridge/mixer/TV/geyser → appliance_repair.
-- urgency: "now" if they want help immediately (now, urgent, immediately, udane, ippove, உடனே, இப்போவே, சீக்கிரம்) or give no time; "scheduled" if they mention a later time (tomorrow, Sunday, naalaiku, நாளைக்கு, evening).
-- scheduled_hint: the time phrase if scheduled, else null.
-- description: one clear English sentence (<=140 chars) describing the problem for the worker.
-- budget_hint: integer rupees if a budget is stated, else null.
-- confidence: 0..1 how sure you are about category and meaning.
+PROMPT = """You are the AI dispatch intake agent for Blink'em, an on-demand hyperlocal home services platform.
+Listen directly to the audio. Automatically detect the spoken language on your own (Tamil, English, Hindi, Tanglish, or Hinglish) using your multimodal audio understanding. Do NOT assume any language in advance.
+
+Analyze what problem the user is describing and determine which skilled trade is required.
+Return ONLY valid JSON:
+- transcript: what was said verbatim in the original spoken language/script.
+- detected_language: exactly one of: "ta", "en", "hi", "mixed". Identify this purely from the audio.
+- category: exactly one of: "plumber", "electrician", "cleaner", "carpenter", "painter", "ac_repair", "cook", "appliance_repair".
+  Context reasoning:
+  * Electrical issues (wires, current, fuse, switch, shock, spark, tripping, fan, light, MCB) -> electrician.
+  * Water/pipe/drainage issues (leaks, tap, sink, drainage, toilet, tank, motor) -> plumber.
+  * AC cooling, gas leak, air conditioner repair -> ac_repair.
+  * Deep cleaning, sweeping, mopping, bathroom cleaning, maid -> cleaner.
+  * Woodwork, doors, cupboards, windows, locks, furniture -> carpenter.
+  * Wall painting, dampness, whitewash -> painter.
+  * Home appliances (washing machine, fridge, microwave, mixer, TV) -> appliance_repair.
+  * Cooking, meal preparation, catering -> cook.
+- urgency: "now" for immediate/emergency help, or "scheduled" if a later date/time is specified.
+- scheduled_hint: time phrase if scheduled, else null.
+- description: one clear English sentence (<=140 characters) summarizing the problem for the worker.
+- confidence: 0.0 to 1.0 representing your certainty.
 Never invent details that were not spoken."""
 
 
@@ -123,7 +130,7 @@ def normalize(data: dict) -> dict:
 
 
 def parse_audio(wav_bytes: bytes, lang_hint: str = "auto", client_transcript: str = "") -> dict:
-    prompt_text = PROMPT.format(hint=lang_hint)
+    prompt_text = PROMPT
     if client_transcript:
         prompt_text += f"\n\nPreliminary speech-to-text hint: '{client_transcript}'"
 
@@ -210,8 +217,7 @@ def parse_text(text: str, lang_hint: str = "auto") -> dict:
                     r = client.models.generate_content(
                         model=model,
                         contents=[
-                            PROMPT.format(hint=lang_hint)
-                            + f"\n\nCustomer text query: '{text}'",
+                            PROMPT + f"\n\nCustomer query text: '{text}'",
                         ],
                         config=types.GenerateContentConfig(
                             response_mime_type="application/json",

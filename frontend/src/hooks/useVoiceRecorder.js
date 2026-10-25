@@ -170,7 +170,7 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
 
           const formData = new FormData();
           formData.append('audio', wavBlob, 'request.wav');
-          formData.append('lang_hint', lang || 'auto');
+          formData.append('lang_hint', 'auto');
           if (liveTranscriptRef.current) {
             formData.append('client_transcript', liveTranscriptRef.current);
           }
@@ -183,7 +183,7 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
             if (liveTranscriptRef.current) {
               res = await api.post('/voice/parse-text', {
                 text: liveTranscriptRef.current,
-                lang_hint: lang || 'auto',
+                lang_hint: 'auto',
               });
             } else {
               throw audioErr;
