@@ -13,6 +13,8 @@ import Offers from './pages/customer/Offers';
 import Tracking from './pages/customer/Tracking';
 import Complete from './pages/customer/Complete';
 import Bookings from './pages/customer/Bookings';
+import WorkerHome from './pages/worker/WorkerHome';
+import ActiveJob from './pages/worker/ActiveJob';
 
 function Header() {
   const { lang } = useApp();
@@ -70,8 +72,8 @@ export default function App() {
           <Route path="/booking/:id" element={<Shell><Tracking /></Shell>} />
           <Route path="/booking/:id/complete" element={<Shell><Complete /></Shell>} />
           <Route path="/bookings" element={<Shell><Bookings /></Shell>} />
-          <Route path="/worker" element={<Shell><div className="p-4 text-center text-muted">Worker Home (Phase 6)</div></Shell>} />
-          <Route path="/worker/job/:id" element={<Shell><div className="p-4 text-center text-muted">Active Job (Phase 6)</div></Shell>} />
+          <Route path="/worker" element={<Shell><WorkerHome /></Shell>} />
+          <Route path="/worker/job/:id" element={<Shell><ActiveJob /></Shell>} />
           <Route path="/admin" element={<Shell><div className="p-4 text-center text-muted">Admin Console (Phase 7)</div></Shell>} />
         </Routes>
       </Router>
