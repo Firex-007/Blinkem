@@ -18,7 +18,7 @@ export default function Bookings() {
     true
   );
 
-  const allBookings = bookings || [];
+  const allBookings = Array.isArray(bookings) ? bookings : [];
   const activeBookings = allBookings.filter(
     (b) => b.status === 'confirmed' || b.status === 'in_progress'
   );

@@ -143,6 +143,7 @@ class Booking(Base):
     eta_min = Column(Integer, nullable=False)
     worker_start_lat = Column(Float, nullable=False)
     worker_start_lng = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=utcnow)
     confirmed_at = Column(DateTime, default=utcnow)
     started_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)

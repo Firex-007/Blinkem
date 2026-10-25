@@ -41,7 +41,7 @@ export default function Home() {
   );
 
   // find an active confirmed/in_progress booking for the floating bar
-  const active = (bookings || []).find((b) => b.status === 'confirmed' || b.status === 'in_progress');
+  const active = Array.isArray(bookings) ? bookings.find((b) => b.status === 'confirmed' || b.status === 'in_progress') : null;
   if (active && !activeBooking) setActiveBooking(active);
 
   const handleCategory = (slug) => navigate(`/request/new?category=${slug}`);

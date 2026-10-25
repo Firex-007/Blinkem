@@ -152,7 +152,7 @@ def list_bookings(db: Session = Depends(get_db), user: User = Depends(get_curren
     else:
         q = q.filter(Booking.customer_id == user.id)
 
-    bookings = q.order_by(Booking.created_at.desc()).all()
+    bookings = q.order_by(Booking.confirmed_at.desc()).all()
     results = []
     for b in bookings:
         if user.role == "worker":

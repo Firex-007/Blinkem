@@ -289,13 +289,13 @@ def get_worker_jobs(db: Session = Depends(get_db), worker: Worker = Depends(get_
     active = (
         db.query(Booking)
         .filter(Booking.worker_id == worker.id, Booking.status.in_(["confirmed", "in_progress"]))
-        .order_by(Booking.created_at.desc())
+        .order_by(Booking.confirmed_at.desc())
         .all()
     )
     past = (
         db.query(Booking)
         .filter(Booking.worker_id == worker.id, Booking.status.in_(["completed", "cancelled"]))
-        .order_by(Booking.created_at.desc())
+        .order_by(Booking.confirmed_at.desc())
         .all()
     )
 
