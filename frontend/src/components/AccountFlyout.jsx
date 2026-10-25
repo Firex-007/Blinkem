@@ -58,11 +58,13 @@ export default function AccountFlyout({ open, onClose }) {
         {/* Header: User Profile Info */}
         <div className="flex items-start justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-3">
-            <div
-              className="w-11 h-11 rounded-full flex items-center justify-center text-white font-black text-base shadow-sm flex-shrink-0"
-              style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
-            >
-              {currentUser?.name ? currentUser.name[0] : 'U'}
+            <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 border-2 border-primary/30 relative">
+              <img
+                src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
+                alt={currentUser?.name || 'Account'}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full bg-success border-2 border-surface" />
             </div>
             <div className="min-width-0">
               <h3 className="font-800 text-ink text-sm sm:text-base leading-tight truncate">

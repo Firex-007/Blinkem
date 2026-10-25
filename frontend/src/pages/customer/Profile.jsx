@@ -64,14 +64,13 @@ export default function Profile() {
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="flex items-center gap-4 relative z-10">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-800 shadow-md flex-shrink-0"
-            style={{ backgroundColor: currentUser.avatarColor || '#1F5BFF' }}
-          >
-            {currentUser.name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')}
+          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-md flex-shrink-0 border-2 border-primary/40 relative">
+            <img
+              src={currentUser.avatarUrl || '/images/users/priya.jpg'}
+              alt={currentUser.name}
+              className="w-full h-full object-cover"
+            />
+            <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-success border-2 border-surface" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">

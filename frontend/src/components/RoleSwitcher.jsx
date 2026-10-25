@@ -7,26 +7,23 @@ const ROLES = [
   {
     id: '1',
     label: 'Customer',
-    desc: 'Browse & book services on-demand',
+    desc: 'Priya Sharma • Browse & book services',
     path: '/',
-    icon: User,
-    tone: 'text-primary bg-primary-soft',
+    image: '/images/users/priya.jpg',
   },
   {
     id: '3',
     label: 'Partner Pro',
-    desc: 'Manage jobs, send quotes & enter start OTP',
+    desc: 'Muthu K • Live jobs & send quotes',
     path: '/worker',
-    icon: ShieldCheck,
-    tone: 'text-success bg-success-soft',
+    image: '/images/users/muthu.jpg',
   },
   {
     id: '99',
     label: 'Operations',
-    desc: 'KYC approvals, live dispatch logs & metrics',
+    desc: 'Meera R • KYC approvals & metrics',
     path: '/admin',
-    icon: Building2,
-    tone: 'text-purple-600 bg-purple-100 dark:text-purple-300 dark:bg-purple-950/50',
+    image: '/images/users/meera.jpg',
   },
 ];
 
@@ -36,7 +33,6 @@ export default function RoleSwitcher({ className }) {
   const [open, setOpen] = useState(false);
 
   const current = ROLES.find((r) => r.id === String(userId)) || ROLES[0];
-  const Icon = current.icon;
 
   const handleSelectRole = (role) => {
     setUserId(role.id);
@@ -51,9 +47,11 @@ export default function RoleSwitcher({ className }) {
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-ink hover:border-primary transition shadow-sm"
         aria-label="Switch Role"
       >
-        <span className={`w-5 h-5 rounded-full flex items-center justify-center ${current.tone}`}>
-          <Icon className="w-3 h-3" />
-        </span>
+        <img
+          src={current.image}
+          alt={current.label}
+          className="w-5 h-5 rounded-full object-cover border border-line/80 shadow-xs"
+        />
         <span className="text-xs font-800">{current.label}</span>
         <ChevronDown className={`w-3 h-3 text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -72,7 +70,6 @@ export default function RoleSwitcher({ className }) {
               </span>
             </div>
             {ROLES.map((r) => {
-              const RIcon = r.icon;
               const isSelected = r.id === String(userId);
               return (
                 <button
@@ -85,9 +82,11 @@ export default function RoleSwitcher({ className }) {
                   }`}
                   aria-label={`Switch to ${r.label}`}
                 >
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${r.tone}`}>
-                    <RIcon className="w-4 h-4" />
-                  </span>
+                  <img
+                    src={r.image}
+                    alt={r.label}
+                    className="w-8 h-8 rounded-full object-cover border border-line flex-shrink-0 shadow-xs"
+                  />
                   <div className="flex-1 min-w-0">
                     <span className="text-xs font-700 block text-ink">{r.label}</span>
                     <span className="text-[10px] text-muted block line-clamp-1">{r.desc}</span>

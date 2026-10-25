@@ -20,6 +20,7 @@ import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 import Skeleton from '../../components/Skeleton';
+import { getWorkerImage } from '../../utils/workerImages';
 
 export default function Tracking() {
   const { id } = useParams();
@@ -231,11 +232,13 @@ export default function Tracking() {
       <div className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-700 text-onprimary shadow-sm"
-              style={{ backgroundColor: worker.avatar_color || 'var(--primary)' }}
-            >
-              {worker.name ? worker.name.slice(0, 2).toUpperCase() : 'W'}
+            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 border-2 border-line/60 relative">
+              <img
+                src={getWorkerImage(worker)}
+                alt={worker.name || 'Worker'}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-success border-2 border-surface" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">

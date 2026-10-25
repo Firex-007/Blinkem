@@ -60,12 +60,15 @@ function Header() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm"
-              style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
+              className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-line ring-2 ring-primary/20 flex-shrink-0"
               title="Account Menu"
               aria-label="Account Menu"
             >
-              {currentUser?.name ? currentUser.name[0] : 'U'}
+              <img
+                src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
+                alt={currentUser?.name || 'Account'}
+                className="w-full h-full object-cover"
+              />
             </button>
             <RoleSwitcher />
           </div>
@@ -140,11 +143,12 @@ function Header() {
             title="Account Menu"
             aria-expanded={isAccountFlyoutOpen}
           >
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-black shadow-xs flex-shrink-0"
-              style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
-            >
-              {currentUser?.name ? currentUser.name[0] : 'U'}
+            <div className="w-5 h-5 rounded-full overflow-hidden shadow-xs flex-shrink-0 border border-line/80">
+              <img
+                src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
+                alt=""
+                className="w-full h-full object-cover"
+              />
             </div>
             <span>Account</span>
             <ChevronDown

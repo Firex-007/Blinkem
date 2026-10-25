@@ -2,22 +2,26 @@ import { ShieldCheck, Wrench, Star, MapPin, Clock, IndianRupee } from 'lucide-re
 import { t } from '../i18n';
 import Button from './Button';
 import Chip from './Chip';
+import { getWorkerImage } from '../utils/workerImages';
 
 export default function OfferCard({ offer, onBook, onCounter, bookingLoading }) {
   const worker = offer.worker || {};
   const isCountered = offer.status === 'countered';
   const fairTone = offer.fair_label === 'fair' ? 'success' : offer.fair_label === 'high' ? 'warning' : 'neutral';
+  const workerPhoto = getWorkerImage(worker);
 
   return (
     <div className="bg-surface border border-line rounded-card shadow-card p-4 flex flex-col gap-3 transition">
       {/* Top row: Avatar + Name + Badges + Rating */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center font-700 text-sm shrink-0 text-onprimary shadow-sm"
-            style={{ backgroundColor: worker.avatar_color || 'var(--primary)' }}
-          >
-            {worker.name ? worker.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) : 'W'}
+          <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border-2 border-line/60 shadow-xs relative">
+            <img
+              src={workerPhoto}
+              alt={worker.name || 'Worker'}
+              className="w-full h-full object-cover"
+            />
+            <span className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full bg-success border-2 border-surface" />
           </div>
           <div>
             <div className="flex items-center gap-1.5 flex-wrap">

@@ -35,14 +35,14 @@ import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 
 const CATEGORIES = [
-  { slug: 'plumber', labelKey: 'cat_plumber', icon: Wrench, color: 'text-blue-500 bg-blue-500/10' },
-  { slug: 'electrician', labelKey: 'cat_electrician', icon: Zap, color: 'text-amber-500 bg-amber-500/10' },
-  { slug: 'cleaner', labelKey: 'cat_cleaner', icon: Sparkles, color: 'text-emerald-500 bg-emerald-500/10' },
-  { slug: 'carpenter', labelKey: 'cat_carpenter', icon: Hammer, color: 'text-orange-500 bg-orange-500/10' },
-  { slug: 'painter', labelKey: 'cat_painter', icon: Paintbrush, color: 'text-purple-500 bg-purple-500/10' },
-  { slug: 'ac_repair', labelKey: 'cat_ac_repair', icon: Snowflake, color: 'text-cyan-500 bg-cyan-500/10' },
-  { slug: 'cook', labelKey: 'cat_cook', icon: ChefHat, color: 'text-rose-500 bg-rose-500/10' },
-  { slug: 'appliance_repair', labelKey: 'cat_appliance_repair', icon: PlugZap, color: 'text-indigo-500 bg-indigo-500/10' },
+  { slug: 'plumber', labelKey: 'cat_plumber', image: '/images/categories/plumber.jpg', color: 'text-blue-500 bg-blue-500/10' },
+  { slug: 'electrician', labelKey: 'cat_electrician', image: '/images/categories/electrician.jpg', color: 'text-amber-500 bg-amber-500/10' },
+  { slug: 'cleaner', labelKey: 'cat_cleaner', image: '/images/categories/cleaner.jpg', color: 'text-emerald-500 bg-emerald-500/10' },
+  { slug: 'carpenter', labelKey: 'cat_carpenter', image: '/images/categories/carpenter.jpg', color: 'text-orange-500 bg-orange-500/10' },
+  { slug: 'painter', labelKey: 'cat_painter', image: '/images/categories/painter.jpg', color: 'text-purple-500 bg-purple-500/10' },
+  { slug: 'ac_repair', labelKey: 'cat_ac_repair', image: '/images/categories/ac_repair.jpg', color: 'text-cyan-500 bg-cyan-500/10' },
+  { slug: 'cook', labelKey: 'cat_cook', image: '/images/categories/cook.jpg', color: 'text-rose-500 bg-rose-500/10' },
+  { slug: 'appliance_repair', labelKey: 'cat_appliance_repair', image: '/images/categories/appliance_repair.jpg', color: 'text-indigo-500 bg-indigo-500/10' },
 ];
 
 const FILTERS = CATEGORIES.slice(0, 5);
@@ -196,28 +196,30 @@ export default function Home() {
                       </div>
                     ))
                   : availableCategories.map((category) => {
-                      const Icon = category.icon;
                       const isSelected = railCat === category.slug;
                       return (
                         <button
                           key={category.slug}
-                          className={`service-choice transition-all duration-200 ${
+                          className={`service-choice transition-all duration-200 group flex flex-col items-center justify-center p-2 rounded-2xl ${
                             isSelected
-                              ? 'ring-2 ring-primary bg-primary-soft shadow-md scale-[1.03] z-10 opacity-100'
-                              : 'hover:bg-surface hover:shadow-sm opacity-70 hover:opacity-100 hover:scale-[1.01]'
+                              ? 'ring-2 ring-primary bg-primary-soft/80 shadow-md scale-[1.03] z-10 opacity-100'
+                              : 'hover:bg-surface hover:shadow-sm opacity-75 hover:opacity-100 hover:scale-[1.02]'
                           }`}
                           onClick={() => handleSelectCategory(category.slug)}
                           onDoubleClick={() => handleStartRequestForCat(category.slug)}
                           aria-label={t(category.labelKey)}
                         >
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform ${
-                              isSelected ? 'bg-primary text-onprimary scale-110' : 'bg-surface text-primary'
-                            }`}
-                          >
-                            <Icon className="h-4 w-4" />
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shadow-xs border border-line/60 flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+                            <img
+                              src={category.image}
+                              alt={t(category.labelKey)}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
                           </div>
-                          <span className="font-800">{t(category.labelKey)}</span>
+                          <span className="font-800 text-xs sm:text-[13px] leading-tight text-ink mt-1.5 truncate max-w-full">
+                            {t(category.labelKey)}
+                          </span>
                         </button>
                       );
                     })}
@@ -300,14 +302,19 @@ export default function Home() {
                 return (
                   <button
                     key={filter.slug}
-                    className={`filter-chip transition-all duration-200 ${
+                    className={`filter-chip flex items-center gap-1.5 transition-all duration-200 ${
                       isFilterActive
-                        ? 'is-active scale-[1.02] shadow-xs opacity-100'
+                        ? 'is-active scale-[1.02] shadow-xs opacity-100 ring-2 ring-primary/20'
                         : 'opacity-70 hover:opacity-100'
                     }`}
                     onClick={() => setRailCat(filter.slug)}
                   >
-                    {t(filter.labelKey)}
+                    <img
+                      src={filter.image}
+                      alt=""
+                      className="w-5 h-5 rounded-full object-cover border border-white/30 flex-shrink-0"
+                    />
+                    <span>{t(filter.labelKey)}</span>
                   </button>
                 );
               })}
