@@ -127,33 +127,53 @@ def parse_audio(wav_bytes: bytes, lang_hint: str = "auto", client_transcript: st
     if client_transcript:
         prompt_text += f"\n\nPreliminary speech-to-text hint: '{client_transcript}'"
 
+    models_to_try = [
+        "gemini-flash-lite-latest",
+        "gemini-3.5-flash-lite",
+        getattr(settings, "GEMINI_MODEL", "gemini-flash-lite-latest"),
+        getattr(settings, "GEMINI_FALLBACK_MODEL", "gemini-3.5-flash-lite"),
+    ]
+    # Remove duplicates preserving order
+    seen = set()
+    models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
     if settings.GEMINI_API_KEY:
         try:
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
-            for model in [settings.GEMINI_MODEL, settings.GEMINI_FALLBACK_MODEL]:
-                try:
-                    r = client.models.generate_content(
-                        model=model,
-                        contents=[
-                            types.Part.from_bytes(data=wav_bytes, mime_type="audio/wav"),
-                            prompt_text,
-                        ],
-                        config=types.GenerateContentConfig(
-                            response_mime_type="application/json",
-                            response_schema=ParsedRequest,
-                            temperature=0.1,
-                        ),
-                    )
-                    data = json.loads(r.text)
-                    data["source"] = "gemini"
-                    # If gemini didn't get transcript but client transcript is available
-                    if not data.get("transcript") and client_transcript:
-                        data["transcript"] = client_transcript
-                    return normalize(data)
-                except Exception as e:
-                    log.warning("Gemini audio %s failed: %s", model, e)
+            # Only try audio if we have sufficient audio data (>44 byte WAV header)
+            if len(wav_bytes) > 200:
+                for model in models_to_try:
+                    try:
+                        r = client.models.generate_content(
+                            model=model,
+                            contents=[
+                                types.Part.from_bytes(data=wav_bytes, mime_type="audio/wav"),
+                                prompt_text,
+                            ],
+                            config=types.GenerateContentConfig(
+                                response_mime_type="application/json",
+                                response_schema=ParsedRequest,
+                                temperature=0.1,
+                            ),
+                        )
+                        data = json.loads(r.text)
+                        data["source"] = "gemini"
+                        if not data.get("transcript") and client_transcript:
+                            data["transcript"] = client_transcript
+                        return normalize(data)
+                    except Exception as e:
+                        log.warning("Gemini audio %s failed: %s", model, e)
         except Exception as e:
             log.warning("Gemini Client init failed: %s", e)
+
+    # If audio parse failed or was empty, but client provided a transcript, parse with Gemini text!
+    if client_transcript and settings.GEMINI_API_KEY:
+        try:
+            res = parse_text(client_transcript, lang_hint)
+            if res.get("source") == "gemini":
+                return res
+        except Exception as e:
+            log.warning("Gemini text fallback in parse_audio failed: %s", e)
 
     # Keyword fallback
     detected_cat = keyword_fallback(client_transcript) if client_transcript else None
@@ -173,10 +193,19 @@ def parse_audio(wav_bytes: bytes, lang_hint: str = "auto", client_transcript: st
 
 
 def parse_text(text: str, lang_hint: str = "auto") -> dict:
+    models_to_try = [
+        "gemini-flash-lite-latest",
+        "gemini-3.5-flash-lite",
+        getattr(settings, "GEMINI_MODEL", "gemini-flash-lite-latest"),
+        getattr(settings, "GEMINI_FALLBACK_MODEL", "gemini-3.5-flash-lite"),
+    ]
+    seen = set()
+    models_to_try = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
     if settings.GEMINI_API_KEY:
         try:
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
-            for model in [settings.GEMINI_MODEL, settings.GEMINI_FALLBACK_MODEL]:
+            for model in models_to_try:
                 try:
                     r = client.models.generate_content(
                         model=model,

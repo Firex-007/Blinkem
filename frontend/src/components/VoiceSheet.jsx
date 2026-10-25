@@ -17,6 +17,7 @@ import {
   CookingPot,
 } from 'lucide-react';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
+import { useApp } from '../context/AppContext';
 import { api } from '../api';
 import { t } from '../i18n';
 import Chip from './Chip';
@@ -41,6 +42,7 @@ const SAMPLE_CHIPS = [
 ];
 
 export default function VoiceSheet({ open, onClose, onResult }) {
+  const { lang } = useApp();
   const [textLoading, setTextLoading] = useState(false);
   const [reviewData, setReviewData] = useState(null);
   const [micDenied, setMicDenied] = useState(false);
@@ -57,6 +59,7 @@ export default function VoiceSheet({ open, onClose, onResult }) {
     stopRecording,
     cleanup,
   } = useVoiceRecorder({
+    lang,
     autoStopSilence: true,
     silenceThresholdMs: 1800,
     onResult: (res) => {

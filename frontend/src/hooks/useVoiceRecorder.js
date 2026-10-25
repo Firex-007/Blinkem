@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { blobToWav16kMono } from '../lib/wav';
 import { api } from '../api';
 
-export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, silenceThresholdMs = 1800 } = {}) {
+export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, silenceThresholdMs = 1800, lang = 'auto' } = {}) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -90,7 +90,12 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
           const recognition = new SpeechRec();
           recognition.continuous = true;
           recognition.interimResults = true;
-          recognition.lang = 'en-IN'; // defaults to Indian English / mixed phonetics
+          const langMap = {
+            ta: 'ta-IN',
+            hi: 'hi-IN',
+            en: 'en-IN',
+          };
+          recognition.lang = langMap[lang] || (lang === 'en' ? 'en-IN' : 'ta-IN');
           recognition.onresult = (event) => {
             let combined = '';
             for (let i = 0; i < event.results.length; ++i) {
@@ -164,11 +169,26 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
 
           const formData = new FormData();
           formData.append('audio', wavBlob, 'request.wav');
+          formData.append('lang_hint', lang || 'auto');
           if (liveTranscriptRef.current) {
             formData.append('client_transcript', liveTranscriptRef.current);
           }
 
-          const res = await api.postForm('/voice/parse', formData);
+          let res;
+          try {
+            res = await api.postForm('/voice/parse', formData);
+          } catch (audioErr) {
+            console.warn('Audio parse attempt failed, trying transcript fallback:', audioErr);
+            if (liveTranscriptRef.current) {
+              res = await api.post('/voice/parse-text', {
+                text: liveTranscriptRef.current,
+                lang_hint: lang || 'auto',
+              });
+            } else {
+              throw audioErr;
+            }
+          }
+
           // If backend didn't supply transcript but live transcript is available
           if (!res.transcript && liveTranscriptRef.current) {
             res.transcript = liveTranscriptRef.current;
