@@ -1,6 +1,11 @@
+@import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
 
 :root{
   --bg:#F4F7FF; --surface:#FFFFFF; --surface-2:#EAF0FF;

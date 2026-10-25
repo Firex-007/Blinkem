@@ -232,7 +232,8 @@ const strings = {
 export function t(key, vars = {}) {
   const lang = (typeof localStorage !== 'undefined' && localStorage.getItem('lang')) || 'en';
   const dict = strings[lang] || strings.en;
-  let text = dict[key] || strings.en[key] || key;
+  const altKey = key.includes('.') ? key.replace(/\./g, '_') : key.replace(/_/g, '.');
+  let text = dict[key] || dict[altKey] || strings.en[key] || strings.en[altKey] || key;
   return text.replace(/\{(\w+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : `{${k}}`);
 }
 
