@@ -7,14 +7,14 @@ const ROLES = [
   {
     id: '1',
     label: 'Customer',
-    desc: 'Browse & book services with voice or tap',
+    desc: 'Browse & book services on-demand',
     path: '/',
     icon: User,
     tone: 'text-primary bg-primary-soft',
   },
   {
     id: '3',
-    label: 'Worker',
+    label: 'Partner Pro',
     desc: 'Manage jobs, send quotes & enter start OTP',
     path: '/worker',
     icon: ShieldCheck,
@@ -22,7 +22,7 @@ const ROLES = [
   },
   {
     id: '99',
-    label: 'Admin',
+    label: 'Operations',
     desc: 'KYC approvals, live dispatch logs & metrics',
     path: '/admin',
     icon: Building2,
@@ -49,7 +49,7 @@ export default function RoleSwitcher({ className }) {
       <button
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-ink hover:border-primary transition shadow-sm"
-        aria-label="Switch demo role"
+        aria-label="Switch Role"
       >
         <span className={`w-5 h-5 rounded-full flex items-center justify-center ${current.tone}`}>
           <Icon className="w-3 h-3" />
@@ -68,7 +68,7 @@ export default function RoleSwitcher({ className }) {
           <div className="absolute right-0 mt-2 w-64 glass-card border border-line rounded-card shadow-2xl p-2 z-50 animate-slideUp">
             <div className="px-2 py-1.5 border-b border-line mb-1">
               <span className="text-[11px] font-700 text-muted uppercase tracking-wider block">
-                Active Perspective
+                Platform Portal
               </span>
             </div>
             {ROLES.map((r) => {

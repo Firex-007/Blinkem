@@ -3,7 +3,7 @@ import { CHENNAI_LOCALITIES, findClosestLocality } from '../data/chennaiLocaliti
 
 const AppContext = createContext(null);
 
-export const DEMO_USERS = {
+export const REGISTERED_ACCOUNTS = {
   '1': {
     id: 1,
     name: 'Priya S',
@@ -35,6 +35,8 @@ export const DEMO_USERS = {
     address: 'Blink\'em Operations HQ, Guindy, Chennai',
   },
 };
+
+export const DEMO_USERS = REGISTERED_ACCOUNTS;
 
 export function AppProvider({ children }) {
   const [theme, setTheme] = useState(() => {

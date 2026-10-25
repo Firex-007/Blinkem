@@ -147,7 +147,7 @@ export default function WorkerHome() {
   const inboxList = inbox || [];
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-32">
       {/* Toast Notification */}
       {toastMsg && (
         <div className="p-3 bg-dangersoft text-danger text-xs font-600 rounded-card flex items-center justify-between">

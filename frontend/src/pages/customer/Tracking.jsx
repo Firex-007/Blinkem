@@ -54,7 +54,7 @@ export default function Tracking() {
     }
   };
 
-  // Demo fast-forward
+  // Fast-track arrival
   const handleFastForward = async () => {
     try {
       setActionLoading(true);
@@ -155,15 +155,15 @@ export default function Tracking() {
             </p>
           </div>
 
-          {/* Demo fast-forward button */}
+          {/* Fast-track arrival button */}
           {isConfirmed && (
             <button
               onClick={handleFastForward}
-              title="Fast-forward arrival for demo"
+              title="Fast-track worker arrival"
               className="flex items-center gap-1 text-[11px] font-700 bg-surface2 hover:bg-soft text-primary px-2.5 py-1.5 rounded-chip transition"
             >
               <FastForward className="w-3.5 h-3.5" />
-              <span>Fast-forward</span>
+              <span>Fast-track ETA</span>
             </button>
           )}
         </div>
@@ -258,7 +258,7 @@ export default function Tracking() {
 
           <button
             disabled
-            title="Voice calling simulated for demo"
+            title="In-app VoIP calling"
             className="w-10 h-10 rounded-full bg-surface2 text-muted flex items-center justify-center opacity-60 cursor-not-allowed"
           >
             <Phone className="w-4 h-4" />

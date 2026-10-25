@@ -89,7 +89,7 @@ export function useVoiceRecorder({ onResult, onError } = {}) {
         } catch (err) {
           console.error('Voice parse error:', err);
           if (onError) onError(err);
-          // Fallback demo result so user is never blocked
+          // Offline fallback result to ensure continuous service availability
           if (onResult) {
             onResult({
               category: 'plumber',

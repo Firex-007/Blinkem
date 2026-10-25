@@ -65,17 +65,17 @@ export default function AdminConsole() {
     }
   };
 
-  // Reset Demo DB
-  const handleResetDemo = async () => {
-    if (!window.confirm('Reset database to clean seed state?')) return;
+  // Reset Sandbox Data
+  const handleResetSandbox = async () => {
+    if (!window.confirm('Reset sandbox environment to default state?')) return;
     try {
       setResetting(true);
       await api.post('/demo/reset');
-      setToastMsg('Database reset to fresh demo state!');
+      setToastMsg('Sandbox environment refreshed successfully.');
       setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
       console.error(err);
-      setToastMsg('Failed to reset demo data.');
+      setToastMsg('Failed to refresh sandbox data.');
     } finally {
       setResetting(false);
     }
@@ -85,7 +85,7 @@ export default function AdminConsole() {
   const bookingList = bookings || [];
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-32">
       {/* Toast Alert */}
       {toastMsg && (
         <div className="p-3 bg-surface border border-primary text-ink text-xs font-600 rounded-card flex items-center justify-between shadow-sm">
@@ -99,18 +99,18 @@ export default function AdminConsole() {
       {/* Admin Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-800 text-ink tracking-tight">Admin Console</h1>
-          <p className="text-xs text-muted">Verify workers, monitor orders &amp; platform metrics</p>
+          <h1 className="text-xl font-800 text-ink tracking-tight">Platform Operations</h1>
+          <p className="text-xs text-muted">Verify partners, monitor dispatches &amp; analytics</p>
         </div>
         <Button
           variant="secondary"
           size="sm"
           loading={resetting}
-          onClick={handleResetDemo}
+          onClick={handleResetSandbox}
           className="text-xs flex items-center gap-1"
         >
           <RefreshCw className="w-3.5 h-3.5" />
-          <span>Reset Demo</span>
+          <span>Refresh Data</span>
         </Button>
       </div>
 

@@ -29,7 +29,7 @@ export default function Bookings() {
   const displayed = tab === 'active' ? activeBookings : pastBookings;
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-32">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-800 text-ink tracking-tight">
           {t('bookings') || 'Your Bookings'}

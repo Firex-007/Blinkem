@@ -7,7 +7,7 @@ export default function LoginModal({ open, onClose }) {
   const { setUserId } = useApp();
   const navigate = useNavigate();
 
-  const [tab, setTab] = useState('demo'); // 'demo' | 'phone'
+  const [tab, setTab] = useState('accounts'); // 'accounts' | 'phone'
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState('');
@@ -48,7 +48,7 @@ export default function LoginModal({ open, onClose }) {
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div>
             <h2 className="font-800 text-ink text-lg">Welcome to Blink'em</h2>
-            <p className="text-xs text-muted">Hyperlocal blue-collar services across Chennai</p>
+            <p className="text-xs text-muted">Hyperlocal on-demand services across Chennai</p>
           </div>
           <button
             onClick={onClose}
@@ -61,12 +61,12 @@ export default function LoginModal({ open, onClose }) {
         {/* Tab switch */}
         <div className="grid grid-cols-2 p-1 bg-surface2 rounded-chip border border-line my-4">
           <button
-            onClick={() => setTab('demo')}
+            onClick={() => setTab('accounts')}
             className={`py-2 text-xs font-700 rounded-chip transition ${
-              tab === 'demo' ? 'bg-surface text-ink shadow-sm' : 'text-muted'
+              tab === 'accounts' ? 'bg-surface text-ink shadow-sm' : 'text-muted'
             }`}
           >
-            Demo Quick Access
+            Select Account
           </button>
           <button
             onClick={() => setTab('phone')}
@@ -78,10 +78,10 @@ export default function LoginModal({ open, onClose }) {
           </button>
         </div>
 
-        {tab === 'demo' ? (
+        {tab === 'accounts' ? (
           <div className="space-y-2.5">
             <span className="text-[11px] font-700 text-muted uppercase tracking-wider block">
-              Instant Persona Switch
+              Registered Accounts
             </span>
 
             {/* Customer */}
@@ -163,7 +163,7 @@ export default function LoginModal({ open, onClose }) {
                 <div className="text-center space-y-1">
                   <span className="text-sm font-800 text-ink block">Enter 4-Digit OTP</span>
                   <span className="text-xs text-muted block">
-                    Sent to +91 {phoneNumber} (Use demo OTP: 1234)
+                    Sent to +91 {phoneNumber} (Verification code: 1234)
                   </span>
                 </div>
                 <input

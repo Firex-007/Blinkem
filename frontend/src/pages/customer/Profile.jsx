@@ -42,20 +42,7 @@ export default function Profile() {
   } = useApp();
   const navigate = useNavigate();
 
-  const [resetting, setResetting] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
-
-  const handleResetDb = async () => {
-    setResetting(true);
-    try {
-      await api.post('/demo/reset');
-      setToastMsg('Demo database re-seeded successfully with fresh data.');
-    } catch (e) {
-      setToastMsg('Failed to reset demo DB: ' + (e.message || 'Error'));
-    } finally {
-      setResetting(false);
-    }
-  };
 
   const handleQuickSwitch = (newId, path) => {
     setUserId(newId);
@@ -63,7 +50,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="space-y-4 pb-20 animate-fade">
+    <div className="space-y-4 pb-32 animate-fade">
       {toastMsg && (
         <Toast
           open={!!toastMsg}
@@ -115,10 +102,10 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Quick Perspective Switcher */}
+      {/* Platform Portal Switcher */}
       <div className="p-4 rounded-card glass-card border border-line">
         <span className="text-xs font-800 text-ink block mb-2 uppercase tracking-wider">
-          Demo Quick Persona Switcher
+          Platform Portal
         </span>
         <div className="grid grid-cols-3 gap-2">
           <button
@@ -139,7 +126,7 @@ export default function Profile() {
                 : 'bg-surface2 text-muted hover:text-ink border-line'
             }`}
           >
-            Worker
+            Partner App
           </button>
           <button
             onClick={() => handleQuickSwitch('99', '/admin')}
@@ -149,7 +136,7 @@ export default function Profile() {
                 : 'bg-surface2 text-muted hover:text-ink border-line'
             }`}
           >
-            Admin
+            Ops Console
           </button>
         </div>
       </div>
@@ -242,25 +229,24 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Demo Diagnostics & DB Reset */}
-      <div className="p-4 rounded-card glass-card border border-line space-y-3">
-        <span className="text-xs font-800 text-ink block uppercase tracking-wider">
-          Hackathon Demo Controls
-        </span>
-        <button
-          onClick={handleResetDb}
-          disabled={resetting}
-          className="w-full py-2.5 px-4 rounded-chip bg-surface2 hover:bg-soft text-ink font-700 text-xs flex items-center justify-center gap-2 border border-line transition"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${resetting ? 'animate-spin' : ''}`} />
-          <span>{resetting ? 'Resetting Database...' : 'Reset Demo DB to Clean State'}</span>
-        </button>
+      {/* Platform & Account Security */}
+      <div className="p-4 rounded-card glass-card border border-line space-y-2">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-success" />
+          <span className="text-xs font-800 text-ink uppercase tracking-wider">
+            Verified Platform Guarantee
+          </span>
+        </div>
+        <p className="text-xs text-muted">
+          All service professionals are identity-verified with background verification and upfront transparent pricing.
+        </p>
       </div>
 
       {/* App Version Info */}
-      <div className="text-center text-xs text-muted pt-2 space-y-1">
-        <p className="font-700 text-ink">Blink'em (Nodi) • Hyperlocal Blue-Collar Services</p>
-        <p>Chennai Pilot • Vecnaverse Hackathon Build v1.2</p>
+      <div className="text-center text-xs text-muted pt-3 pb-2 space-y-1">
+        <p className="font-700 text-ink text-sm">Blink'em Technologies Inc.</p>
+        <p className="text-[11px] text-muted">Hyperlocal On-Demand Service Infrastructure • Chennai</p>
+        <p className="text-[10px] text-muted/70">Production Release v2.4.0 • Enterprise Cloud</p>
       </div>
     </div>
   );
