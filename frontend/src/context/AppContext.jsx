@@ -67,6 +67,7 @@ export function AppProvider({ children }) {
   const [locationStatus, setLocationStatus] = useState('idle'); // 'idle' | 'detecting' | 'granted' | 'denied'
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAccountFlyoutOpen, setIsAccountFlyoutOpen] = useState(false);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -128,6 +129,13 @@ export function AppProvider({ children }) {
   };
 
   const currentUser = DEMO_USERS[userId] || DEMO_USERS['1'];
+  const role = currentUser?.role || 'customer';
+
+  const setRole = (targetRole) => {
+    if (targetRole === 'worker') setUserIdPersist('3');
+    else if (targetRole === 'admin') setUserIdPersist('99');
+    else setUserIdPersist('1');
+  };
 
   return (
     <AppContext.Provider
@@ -138,6 +146,8 @@ export function AppProvider({ children }) {
         setLang: setLangPersist,
         userId,
         setUserId: setUserIdPersist,
+        role,
+        setRole,
         currentUser,
         location,
         setLocation: setLocationPersist,
@@ -147,6 +157,8 @@ export function AppProvider({ children }) {
         setIsLocationModalOpen,
         isLoginModalOpen,
         setIsLoginModalOpen,
+        isAccountFlyoutOpen,
+        setIsAccountFlyoutOpen,
       }}
     >
       {children}

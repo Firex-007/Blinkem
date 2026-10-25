@@ -46,7 +46,7 @@ export default function LocationModal({ open, onClose }) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] max-h-[85vh] rounded-t-[28px] glass-card border-t border-l border-r border-line shadow-2xl z-50 p-5 flex flex-col animate-slideUp">
+      <div className="fixed bottom-0 sm:bottom-auto sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 w-full max-w-[500px] max-h-[85vh] sm:max-h-[80vh] rounded-t-[28px] sm:rounded-[24px] glass-card border border-line shadow-2xl z-50 p-5 flex flex-col animate-slideUp sm:animate-scaleIn">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2">

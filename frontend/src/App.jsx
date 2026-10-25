@@ -7,6 +7,8 @@ import ThemeToggle from './components/ThemeToggle';
 import RoleSwitcher from './components/RoleSwitcher';
 import LangToggle from './components/LangToggle';
 import BottomNav from './components/BottomNav';
+import Footer from './components/Footer';
+import AccountFlyout from './components/AccountFlyout';
 import LocationModal from './components/LocationModal';
 import LoginModal from './components/LoginModal';
 import Home from './pages/customer/Home';
@@ -22,7 +24,13 @@ import ActiveJob from './pages/worker/ActiveJob';
 import AdminConsole from './pages/admin/AdminConsole';
 
 function Header() {
-  const { location: userLocation, setIsLocationModalOpen, currentUser } = useApp();
+  const {
+    location: userLocation,
+    setIsLocationModalOpen,
+    currentUser,
+    isAccountFlyoutOpen,
+    setIsAccountFlyoutOpen,
+  } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const isRoot = ['/', '/worker', '/admin', '/profile'].includes(location.pathname);
@@ -30,7 +38,6 @@ function Header() {
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/bookings', label: 'Bookings' },
-    { path: '/profile', label: 'Account' },
   ];
 
   return (
@@ -50,7 +57,18 @@ function Header() {
             )}
             <Logo className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')} />
           </div>
-          <RoleSwitcher />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm"
+              style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
+              title="Account Menu"
+              aria-label="Account Menu"
+            >
+              {currentUser?.name ? currentUser.name[0] : 'U'}
+            </button>
+            <RoleSwitcher />
+          </div>
         </div>
         <div className="flex items-center justify-between pt-1 border-t border-line/60">
           <button
@@ -107,19 +125,33 @@ function Header() {
           })}
         </nav>
 
-        {/* Right: Tools & Portal Switcher & Profile Avatar */}
+        {/* Right: Tools & Portal Switcher & Account Dropdown Button (Blinkit style) */}
         <div className="flex items-center gap-2">
           <LangToggle />
           <ThemeToggle />
           <RoleSwitcher />
           <button
-            onClick={() => navigate('/profile')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-800 shadow-md hover:scale-105 transition ml-1"
-            style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
-            title={`Account: ${currentUser?.name || 'User'}`}
-            aria-label="Account Profile"
+            onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition text-xs font-800 shadow-sm ml-1 ${
+              isAccountFlyoutOpen
+                ? 'bg-primary text-onprimary border-primary ring-2 ring-primary/30'
+                : 'glass-pill text-ink hover:border-primary'
+            }`}
+            title="Account Menu"
+            aria-expanded={isAccountFlyoutOpen}
           >
-            {currentUser?.name ? currentUser.name[0] : 'U'}
+            <div
+              className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-black shadow-xs flex-shrink-0"
+              style={{ backgroundColor: currentUser?.avatarColor || '#1F5BFF' }}
+            >
+              {currentUser?.name ? currentUser.name[0] : 'U'}
+            </div>
+            <span>Account</span>
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                isAccountFlyoutOpen ? 'rotate-180' : ''
+              }`}
+            />
           </button>
         </div>
       </div>
@@ -128,14 +160,27 @@ function Header() {
 }
 
 function Shell({ children }) {
-  const { isLocationModalOpen, setIsLocationModalOpen, isLoginModalOpen, setIsLoginModalOpen } = useApp();
+  const {
+    isLocationModalOpen,
+    setIsLocationModalOpen,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
+    isAccountFlyoutOpen,
+    setIsAccountFlyoutOpen,
+  } = useApp();
+
   return (
     <div className="nodi-shell">
       <Header />
       <main className="app-main">{children}</main>
+      <Footer />
       <div className="md:hidden">
         <BottomNav />
       </div>
+      <AccountFlyout
+        open={isAccountFlyoutOpen}
+        onClose={() => setIsAccountFlyoutOpen(false)}
+      />
       <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
       <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </div>

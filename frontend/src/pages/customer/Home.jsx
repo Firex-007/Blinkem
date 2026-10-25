@@ -201,18 +201,18 @@ export default function Home() {
                       return (
                         <button
                           key={category.slug}
-                          className={`service-choice transition-all ${
+                          className={`service-choice transition-all duration-200 ${
                             isSelected
-                              ? 'ring-2 ring-primary bg-primary-soft shadow-sm scale-[1.02]'
-                              : 'hover:bg-surface hover:shadow-sm'
+                              ? 'ring-2 ring-primary bg-primary-soft shadow-md scale-[1.03] z-10 opacity-100'
+                              : 'hover:bg-surface hover:shadow-sm opacity-70 hover:opacity-100 hover:scale-[1.01]'
                           }`}
                           onClick={() => handleSelectCategory(category.slug)}
                           onDoubleClick={() => handleStartRequestForCat(category.slug)}
                           aria-label={t(category.labelKey)}
                         >
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              isSelected ? 'bg-primary text-onprimary' : 'bg-surface text-primary'
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform ${
+                              isSelected ? 'bg-primary text-onprimary scale-110' : 'bg-surface text-primary'
                             }`}
                           >
                             <Icon className="h-4 w-4" />
@@ -295,15 +295,22 @@ export default function Home() {
 
             {/* Quick Filter Row */}
             <div className="filter-row my-2" aria-label={t('home_service_filter')}>
-              {FILTERS.map((filter) => (
-                <button
-                  key={filter.slug}
-                  className={`filter-chip transition ${railCat === filter.slug ? 'is-active' : ''}`}
-                  onClick={() => setRailCat(filter.slug)}
-                >
-                  {t(filter.labelKey)}
-                </button>
-              ))}
+              {FILTERS.map((filter) => {
+                const isFilterActive = railCat === filter.slug;
+                return (
+                  <button
+                    key={filter.slug}
+                    className={`filter-chip transition-all duration-200 ${
+                      isFilterActive
+                        ? 'is-active scale-[1.02] shadow-xs opacity-100'
+                        : 'opacity-70 hover:opacity-100'
+                    }`}
+                    onClick={() => setRailCat(filter.slug)}
+                  >
+                    {t(filter.labelKey)}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Live Leaflet Radar Map (Shown in 'both' and 'map' modes) */}
