@@ -10,3 +10,7 @@ venv/
 *.log
 page_*.png
 .system_generated/
+*.zip
+*.docx
+*.pdf
+blinkem-specs/
