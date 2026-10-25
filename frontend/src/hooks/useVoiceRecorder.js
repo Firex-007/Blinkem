@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { blobToWav16kMono } from '../lib/wav';
+import { classifyTradeFromText } from '../lib/tradeClassifier';
 import { api } from '../api';
 
 export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, silenceThresholdMs = 1800, lang = 'auto' } = {}) {
@@ -197,15 +198,17 @@ export function useVoiceRecorder({ onResult, onError, autoStopSilence = true, si
         } catch (err) {
           console.error('Voice parse error:', err);
           if (onError) onError(err);
-          // Intelligent fallback using live transcript if available
+          // Intelligent contextual fallback using trade classifier
           const text = liveTranscriptRef.current || 'Home service request';
+          const classified = classifyTradeFromText(text);
           if (onResult) {
             onResult({
-              category: 'plumber',
+              category: classified.category,
               description: text,
-              urgency: 'now',
+              urgency: classified.urgency,
               transcript: text,
-              source: 'fallback',
+              confidence: classified.confidence,
+              source: 'local_ai',
             });
           }
         } finally {

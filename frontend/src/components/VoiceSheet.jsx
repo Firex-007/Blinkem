@@ -18,9 +18,9 @@ import {
 } from 'lucide-react';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import { useApp } from '../context/AppContext';
+import { classifyTradeFromText } from '../lib/tradeClassifier';
 import { api } from '../api';
 import { t } from '../i18n';
-import Chip from './Chip';
 import Button from './Button';
 
 const CATEGORY_META = {
@@ -135,8 +135,18 @@ export default function VoiceSheet({ open, onClose, onResult }) {
         const res = await api.post('/voice/parse-text', { text });
         setReviewData(res); setEditedDesc(res.description || ''); setEditedCat(res.category || '');
       } catch {
-        const fb = { category: 'plumber', description: text, urgency: 'now', transcript: text, confidence: 0.4, source: 'fallback' };
-        setReviewData(fb); setEditedDesc(text); setEditedCat('plumber');
+        const classified = classifyTradeFromText(text);
+        const fb = {
+          category: classified.category,
+          description: text,
+          urgency: classified.urgency,
+          transcript: text,
+          confidence: classified.confidence,
+          source: 'local_ai',
+        };
+        setReviewData(fb);
+        setEditedDesc(text);
+        setEditedCat(classified.category);
       }
     } finally { setTextLoading(false); }
   };
@@ -168,23 +178,21 @@ export default function VoiceSheet({ open, onClose, onResult }) {
   const CategoryIcon = selectedMeta.icon;
 
   return (
-    <>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-fade"
         onClick={handleClose}
         aria-hidden="true"
       />
 
-      {/* Sheet Container */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] rounded-t-[32px] glass-card border-t border-l border-r border-line shadow-2xl z-50 p-6 flex flex-col space-y-5 animate-slideUp max-h-[92dvh] overflow-y-auto">
+      {/* Centered Floating Modal Card */}
+      <div className="relative w-full max-w-[480px] rounded-[28px] glass-card border border-line shadow-[0_24px_64px_rgba(0,0,0,0.3)] p-6 sm:p-7 flex flex-col space-y-5 animate-scaleIn max-h-[85dvh] overflow-y-auto z-10 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-line">
+        <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
             <span className="font-800 text-ink text-base">Voice Assistant</span>
-            <Chip tone="accent" className="h-5 px-2 text-[10px] font-800 uppercase tracking-wider">
-              Gemini AI
-            </Chip>
           </div>
           <button
             onClick={handleClose}
@@ -357,22 +365,20 @@ export default function VoiceSheet({ open, onClose, onResult }) {
                 </button>
               </div>
 
-              {/* Status & Real-time Live Transcript */}
+              {/* Status & Guidance */}
               <div className="space-y-1">
                 <span className="font-800 text-ink text-sm block">
                   {isProcessing || textLoading
-                    ? 'Processing with Gemini AI…'
+                    ? 'Processing & understanding request…'
                     : isRecording
                     ? 'Listening… (Auto-stops when you pause)'
                     : 'Tap mic or hold [Space] to speak'}
                 </span>
 
-                {/* Live Transcript Display while speaking */}
                 {isRecording && (
-                  <div className="min-h-[44px] flex items-center justify-center px-3 py-1.5 rounded-chip bg-primary-soft/40 border border-primary/20 max-w-sm mx-auto">
-                    <p className="text-xs font-700 text-primary animate-fade text-center leading-relaxed">
-                      {liveTranscript ? `"${liveTranscript}"` : 'Listening for your voice…'}
-                    </p>
+                  <div className="flex items-center justify-center gap-2 py-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-danger animate-ping" />
+                    <span className="text-xs font-700 text-danger animate-pulse">Recording audio... speak naturally</span>
                   </div>
                 )}
 
@@ -417,6 +423,6 @@ export default function VoiceSheet({ open, onClose, onResult }) {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
