@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   BadgeCheck,
   ChefHat,
@@ -45,6 +45,56 @@ const CATEGORIES = [
   { slug: 'appliance_repair', labelKey: 'cat_appliance_repair', image: '/images/categories/appliance_repair.jpg', color: 'text-indigo-500 bg-indigo-500/10' },
 ];
 
+const SEARCH_SUGGESTIONS = [
+  'kitchen sink tap leaking',
+  'split AC not cooling properly',
+  'switchboard sparking / MCB trip',
+  'wooden door lock & latch repair',
+  'bathroom wall dampness & painting',
+  'washing machine drum not spinning',
+  'deep home floor & tile cleaning',
+  'cook for party or dinner',
+];
+
+const INSTANT_FIX_PACKAGES = [
+  {
+    id: 'pipe-leak',
+    title: 'Tap & Pipe Leak Fix',
+    category: 'plumber',
+    description: 'Fix leaking kitchen/bathroom tap, loose pipe joint, or low pressure valve',
+    price: 199,
+    eta: '12 min',
+    image: '/images/categories/plumber.jpg',
+  },
+  {
+    id: 'mcb-spark',
+    title: 'Switchboard / MCB Repair',
+    category: 'electrician',
+    description: 'Diagnose tripped circuit breaker, replace burnt 16A socket or switch',
+    price: 249,
+    eta: '15 min',
+    image: '/images/categories/electrician.jpg',
+  },
+  {
+    id: 'ac-service',
+    title: 'AC Cooling & Filter Service',
+    category: 'ac_repair',
+    description: 'Deep filter wash, coil inspection, and cooling gas pressure check',
+    price: 399,
+    eta: '20 min',
+    image: '/images/categories/ac_repair.jpg',
+  },
+  {
+    id: 'door-lock',
+    title: 'Door Lock & Hinge Fix',
+    category: 'carpenter',
+    description: 'Realign jammed wooden door, replace faulty cylinder lock or loose hinges',
+    price: 279,
+    eta: '18 min',
+    image: '/images/categories/carpenter.jpg',
+  },
+];
+
 const FILTERS = CATEGORIES.slice(0, 5);
 
 export default function Home() {
@@ -54,6 +104,14 @@ export default function Home() {
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [typeQuery, setTypeQuery] = useState('');
   const [rightViewMode, setRightViewMode] = useState('both'); // 'both' | 'map' | 'cards'
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSuggestionIndex((prev) => (prev + 1) % SEARCH_SUGGESTIONS.length);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, []);
 
   const curLat = location?.lat || 13.0418;
   const curLng = location?.lng || 80.2341;
@@ -158,19 +216,35 @@ export default function Home() {
               {/* Direct Typing Input Box */}
               <form
                 onSubmit={handleTypeSubmit}
-                className="flex-1 flex items-center bg-surface2/70 hover:bg-surface2 focus-within:bg-surface rounded-chip border border-line focus-within:border-primary transition pl-3 pr-1.5 py-1.5 shadow-sm"
+                className="relative flex-1 flex items-center bg-surface2/70 hover:bg-surface2 focus-within:bg-surface rounded-chip border border-line focus-within:border-primary transition pl-3 pr-1.5 py-1.5 shadow-sm"
               >
-                <Search className="w-5 h-5 text-muted flex-shrink-0" />
+                <Search className="w-5 h-5 text-muted flex-shrink-0 z-10" />
+
+                {/* Dynamic running suggestion text with lesser opacity */}
+                {!typeQuery && (
+                  <div className="absolute left-9 sm:left-10 right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-45">
+                    <span className="text-ink dark:text-white font-500 whitespace-nowrap">
+                      Search
+                    </span>
+                    <span
+                      key={suggestionIndex}
+                      className="text-primary font-700 italic truncate animate-fadeIn"
+                    >
+                      &ldquo;{SEARCH_SUGGESTIONS[suggestionIndex]}&rdquo;
+                    </span>
+                  </div>
+                )}
+
                 <input
                   type="text"
                   value={typeQuery}
                   onChange={(e) => setTypeQuery(e.target.value)}
-                  placeholder="What needs fixing? (e.g. kitchen sink leak, fan sparking)"
-                  className="flex-1 px-2.5 py-1.5 bg-transparent text-sm text-ink placeholder:text-muted/70 focus:outline-none font-600 min-w-0"
+                  className="flex-1 px-2.5 py-1.5 bg-transparent text-sm text-ink focus:outline-none font-600 min-w-0 z-10"
+                  aria-label="Search services"
                 />
                 <button
                   type="submit"
-                  className="px-3.5 py-2 rounded-chip bg-primary hover:bg-primary600 text-onprimary font-800 text-xs flex items-center gap-1 transition shadow-sm flex-shrink-0 active:scale-95"
+                  className="px-3.5 py-2 rounded-chip bg-primary hover:bg-primary600 text-onprimary font-800 text-xs flex items-center gap-1 transition shadow-sm flex-shrink-0 active:scale-95 z-10"
                 >
                   <span className="hidden sm:inline">Find Pros</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -250,6 +324,86 @@ export default function Home() {
                 <span className="text-[11px] font-800 text-ink block">Fair Counter</span>
                 <span className="text-[10px] text-muted block">1-round price lock</span>
               </div>
+            </div>
+          </section>
+
+          {/* 4 Instant Fix Packages (2x2 Grid) to fill the left blank space */}
+          <section className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3">
+            <div className="flex items-center justify-between pb-1">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
+                  <Zap className="w-3.5 h-3.5" />
+                </div>
+                <h2 className="text-sm font-800 text-ink tracking-tight">
+                  Popular 15-Min Instant Fixes
+                </h2>
+              </div>
+              <span className="text-[11px] font-700 text-muted bg-surface2 px-2 py-0.5 rounded-full border border-line">
+                ⚡ Rapid Dispatch
+              </span>
+            </div>
+
+            {/* 2x2 Grid of 4 Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {INSTANT_FIX_PACKAGES.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  onClick={() => {
+                    navigate(`/request/new?category=${pkg.category}`, {
+                      state: {
+                        description: pkg.description,
+                        category: pkg.category,
+                        urgency: 'now',
+                        budget_hint: pkg.price,
+                      },
+                    });
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  className="group p-3 rounded-2xl bg-surface2/60 hover:bg-surface border border-line hover:border-primary/50 transition-all duration-200 cursor-pointer flex flex-col justify-between shadow-xs hover:shadow-md hover:scale-[1.01]"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs border border-line/60 flex-shrink-0 group-hover:scale-105 transition-transform">
+                      <img
+                        src={pkg.image}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-xs font-800 text-ink group-hover:text-primary transition-colors line-clamp-1">
+                        {pkg.title}
+                      </h3>
+                      <p className="text-[11px] text-muted line-clamp-1 mt-0.5">
+                        {pkg.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-line/60 text-xs">
+                    <div className="flex items-center gap-1.5 font-800 text-ink">
+                      <span>₹{pkg.price}</span>
+                      <span className="text-[10px] text-muted font-600 bg-surface px-1.5 py-0.5 rounded border border-line">
+                        ETA {pkg.eta}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-800 text-primary flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                      Book <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Trust & Direct Guarantee Footnote */}
+            <div className="p-2.5 rounded-xl bg-primary-soft/40 border border-primary/20 flex items-center justify-between text-xs text-primary font-700">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-[11px]">₹10,000 Damage Protection on all bookings</span>
+              </div>
+              <span className="text-[10px] bg-primary text-onprimary font-800 px-2 py-0.5 rounded-full">
+                Guaranteed
+              </span>
             </div>
           </section>
         </div>

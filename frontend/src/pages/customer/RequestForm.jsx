@@ -59,7 +59,7 @@ export default function RequestForm() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-xl mx-auto space-y-4 pb-24">
       {voiceTranscript && (
         <div className="p-3 bg-soft border border-primary/20 rounded-card flex items-center gap-2 text-xs text-primary font-600 animate-slideUp">
           <Sparkles className="w-4 h-4 shrink-0 text-primary" />
@@ -136,9 +136,11 @@ export default function RequestForm() {
           )}
         </div>
       </Card>
-      <Button full variant="primary" loading={submitting} disabled={!valid || submitting} onClick={handleSubmit} className="fixed bottom-4 left-4 right-4 w-auto">
-        {t('req.find')}
-      </Button>
+      <div className="sticky-cta">
+        <Button full variant="primary" loading={submitting} disabled={!valid || submitting} onClick={handleSubmit} className="shadow-card">
+          {t('req.find')}
+        </Button>
+      </div>
     </div>
   );
 }

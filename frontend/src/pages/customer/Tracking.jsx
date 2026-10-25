@@ -115,7 +115,7 @@ export default function Tracking() {
   const pendingExtra = (booking.extras || []).find((e) => e.status === 'pending');
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="max-w-3xl mx-auto space-y-4 pb-24">
       {/* Toast Alert */}
       {toastMsg && (
         <div className="p-3 bg-dangersoft text-danger text-xs font-600 rounded-card flex items-center justify-between">

@@ -1,37 +1,60 @@
-import { Download, ExternalLink, Facebook, Globe2, Instagram, Linkedin, MessageCircle } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import BrandIcon from './BrandIcon';
 import { t } from '../i18n';
 
-export default function Footer() {
-  const { pathname } = useLocation();
-  const showDownload = pathname === '/profile';
+const STORES = [
+  { key: 'apple', href: 'https://apps.apple.com', small: 'footer_download_on', big: 'footer_app_store' },
+  { key: 'googleplay', href: 'https://play.google.com', small: 'footer_get_it_on', big: 'footer_google_play' },
+];
 
+const SOCIALS = [
+  { key: 'facebook', label: 'Facebook', href: 'https://facebook.com' },
+  { key: 'x', label: 'X', href: 'https://x.com' },
+  { key: 'instagram', label: 'Instagram', href: 'https://instagram.com' },
+  { key: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com' },
+  { key: 'threads', label: 'Threads', href: 'https://threads.net' },
+];
+
+export default function Footer() {
   return (
     <footer className="site-footer" data-name="site footer">
       <div className="site-footer-inner">
-        {showDownload && (
-          <section className="footer-download" data-name="download app section">
-            <div className="footer-download-icon"><Download className="h-5 w-5" /></div>
-            <div className="footer-download-copy"><strong>{t('footer_download_title')}</strong><span>{t('footer_download_hint')}</span></div>
-            <div className="footer-download-actions">
-              <a href="#download-ios" onClick={(event) => event.preventDefault()}>{t('footer_app_store')}</a>
-              <a href="#download-android" onClick={(event) => event.preventDefault()}>{t('footer_google_play')}</a>
-            </div>
-          </section>
-        )}
-        <div className="footer-base">
-          <span>{t('footer_copyright')}</span>
-          <div className="footer-socials" aria-label={t('footer_socials')}>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin className="h-4 w-4" /></a>
-            <a href="https://threads.net" target="_blank" rel="noreferrer" aria-label="Threads"><MessageCircle className="h-4 w-4" /></a>
-          </div>
-          <div className="footer-links">
-            <a href="https://blinkem.in" target="_blank" rel="noreferrer"><Globe2 className="h-4 w-4" />{t('footer_website')}</a>
-            <a href="https://github.com/Firex-007/Blinkem" target="_blank" rel="noreferrer"><ExternalLink className="h-4 w-4" />{t('footer_project')}</a>
-          </div>
+        <p className="footer-copyright">{t('footer_copyright')}</p>
+
+        <div className="footer-download" data-name="download app">
+          <span className="footer-download-label">{t('footer_download_app')}</span>
+          {STORES.map((store) => (
+            <a
+              key={store.key}
+              href={store.href}
+              target="_blank"
+              rel="noreferrer"
+              className="store-badge"
+              aria-label={t(store.big)}
+            >
+              <BrandIcon name={store.key} className="store-badge-icon" />
+              <span className="store-badge-copy">
+                <small>{t(store.small)}</small>
+                <strong>{t(store.big)}</strong>
+              </span>
+            </a>
+          ))}
         </div>
+
+        <nav className="footer-socials" aria-label={t('footer_socials')}>
+          {SOCIALS.map((social) => (
+            <a
+              key={social.key}
+              href={social.href}
+              target="_blank"
+              rel="noreferrer"
+              className="social-circle"
+              aria-label={social.label}
+              title={social.label}
+            >
+              <BrandIcon name={social.key} className="social-circle-icon" />
+            </a>
+          ))}
+        </nav>
       </div>
     </footer>
   );

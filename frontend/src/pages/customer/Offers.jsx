@@ -92,7 +92,7 @@ export default function Offers() {
   };
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="max-w-3xl mx-auto space-y-4 pb-24">
       {/* Header with Title and Offer Count */}
       <div className="flex items-center justify-between">
         <div>

@@ -50,7 +50,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="space-y-4 pb-32 animate-fade">
+    <div className="max-w-2xl mx-auto space-y-4 pb-32 animate-fade">
       {toastMsg && (
         <Toast
           open={!!toastMsg}

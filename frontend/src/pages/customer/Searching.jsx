@@ -46,7 +46,7 @@ export default function Searching() {
   const nearestEta = request?.nearest_eta_min ?? 9;
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-[calc(100vh-140px)] py-6 text-center">
+    <div className="max-w-xl mx-auto w-full flex flex-col items-center justify-between min-h-[calc(100vh-140px)] py-6 text-center">
       {/* Top info badge */}
       <div className="w-full flex items-center justify-between px-2">
         <Chip tone="primary" className="h-7 px-3 text-xs font-700">

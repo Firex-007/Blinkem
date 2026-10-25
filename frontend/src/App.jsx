@@ -174,20 +174,23 @@ function Shell({ children }) {
   } = useApp();
 
   return (
-    <div className="nodi-shell">
-      <Header />
-      <main className="app-main">{children}</main>
-      <Footer />
-      <div className="md:hidden">
-        <BottomNav />
+    <>
+      <div className="nodi-shell">
+        <Header />
+        <main className="app-main">{children}</main>
+        <div className="md:hidden">
+          <BottomNav />
+        </div>
+        <AccountFlyout
+          open={isAccountFlyoutOpen}
+          onClose={() => setIsAccountFlyoutOpen(false)}
+        />
+        <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
+        <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       </div>
-      <AccountFlyout
-        open={isAccountFlyoutOpen}
-        onClose={() => setIsAccountFlyoutOpen(false)}
-      />
-      <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-    </div>
+      {/* Footer sits outside the min-100dvh shell: it is the dead end, only reached at the very bottom */}
+      <Footer />
+    </>
   );
 }
 
