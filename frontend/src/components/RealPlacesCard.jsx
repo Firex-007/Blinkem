@@ -41,7 +41,7 @@ export default function RealPlacesCard({ place, onBook }) {
 
   return (
     <article
-      className="p-4 rounded-2xl bg-surface border border-line shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-300 flex flex-col justify-between group"
+      className="p-4 rounded-2xl liquid-glass-card hover:border-primary/50 transition-all duration-300 flex flex-col justify-between group"
       data-name="real place card"
     >
       <div>

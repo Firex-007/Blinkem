@@ -43,7 +43,7 @@ function Header() {
   ];
 
   return (
-    <header className="app-header w-full glass sticky top-0 z-40 border-b border-line">
+    <header className="app-header w-full liquid-glass sticky top-0 z-40 border-b border-line/60">
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Mobile / Tablet Compact Header (< lg) */}
         <div className="lg:hidden flex flex-col gap-2 py-2.5">

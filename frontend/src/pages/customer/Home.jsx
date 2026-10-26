@@ -356,27 +356,26 @@ export default function Home() {
 
             {/* Unified Voice & Typing Action Console */}
             <div className="request-actions my-4 sm:my-5 flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
-              {/* Voice Orb Trigger with Tooltip & Pulsing Glow Aura */}
+              {/* Liquid Glass Convex Lens Mic Orb */}
               <div className="relative flex-shrink-0">
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-blue-400 opacity-30 blur-md group-hover:opacity-60 transition duration-500 animate-pulse pointer-events-none" />
                 <button
-                  className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-primary via-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(31,91,255,0.38)] hover:shadow-[0_12px_32px_rgba(31,91,255,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 group border-2 border-white/30"
+                  className="liquid-mic-orb w-12 h-12 sm:w-16 sm:h-16 rounded-full text-white flex items-center justify-center group cursor-pointer"
                   onClick={() => setVoiceOpen(true)}
                   aria-label={t('home_speak')}
                   title="Tap mic or hold [Space] to speak"
                 >
-                  <Mic className="h-5 w-5 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform duration-300" />
+                  <Mic className="h-5 w-5 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform duration-300 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" />
 
-                  <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-surface2 text-muted text-[10px] font-700 border border-line opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-xs">
+                  <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full liquid-glass-pill text-muted text-[10px] font-700 opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-xs">
                     Hold [Space]
                   </span>
                 </button>
               </div>
 
-              {/* Direct Typing Input Box */}
+              {/* Direct Typing Input Box - Liquid Glass Capsule */}
               <form
                 onSubmit={handleTypeSubmit}
-                className="relative flex-1 min-w-0 flex items-center bg-surface2/60 hover:bg-surface2/90 focus-within:bg-surface rounded-2xl border border-line/80 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300 pl-3 pr-1.5 sm:pr-2 py-1.5 sm:py-2 shadow-xs hover:shadow-sm"
+                className="relative flex-1 min-w-0 flex items-center liquid-glass-pill rounded-2xl border border-line/80 focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300 pl-3 pr-1.5 sm:pr-2 py-1.5 sm:py-2"
               >
                 <Search className="w-4 h-4 sm:w-5 sm:h-5 text-muted flex-shrink-0 z-10 transition-colors group-focus-within:text-primary" />
 
@@ -392,7 +391,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-xl bg-gradient-to-r from-primary to-blue-600 hover:from-primary600 hover:to-blue-700 text-onprimary font-800 text-xs flex items-center justify-center gap-1.5 transition-all duration-200 shadow-[0_4px_12px_rgba(31,91,255,0.25)] flex-shrink-0 active:scale-95 z-10"
+                  className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-xl bg-gradient-to-r from-primary to-blue-600 hover:from-primary600 hover:to-blue-700 text-onprimary font-800 text-xs flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm flex-shrink-0 active:scale-95 z-10"
                 >
                   <span className="hidden sm:inline">{t('find_pros')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -411,7 +410,7 @@ export default function Home() {
               <div className="service-grid" data-name="service category matrix">
                 {catsLoading
                   ? CATEGORIES.map((category) => (
-                      <div className="category-skeleton p-3 rounded-2xl" key={category.slug}>
+                      <div className="category-skeleton liquid-glass-card p-3 rounded-2xl" key={category.slug}>
                         <Skeleton className="h-14 w-14 rounded-xl" />
                         <Skeleton className="h-4 w-20 mt-2" />
                         <Skeleton className="h-3 w-12 mt-1" />
@@ -424,8 +423,8 @@ export default function Home() {
                           key={category.slug}
                           className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-300 text-center outline-none ${
                             isSelected
-                              ? 'bg-gradient-to-b from-primary/15 via-primary/5 to-surface dark:from-primary/25 dark:via-primary/10 dark:to-surface2/60 border-2 border-primary shadow-[0_12px_28px_-6px_rgba(31,91,255,0.28)] scale-[1.02] sm:scale-[1.03] -translate-y-0.5 sm:-translate-y-1 z-10'
-                              : 'bg-surface/90 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line hover:border-primary/50 shadow-xs hover:shadow-md hover:-translate-y-1 active:scale-95'
+                              ? 'liquid-glass border-2 border-primary shadow-[0_14px_32px_-6px_rgba(37,99,235,0.28)] scale-[1.02] sm:scale-[1.03] -translate-y-0.5 sm:-translate-y-1 z-10'
+                              : 'liquid-glass-card hover:border-primary/50 shadow-xs hover:shadow-md hover:-translate-y-1 active:scale-95'
                           }`}
                           onClick={() => handleSelectCategory(category.slug)}
                           onDoubleClick={() => handleStartRequestForCat(category.slug)}
@@ -437,7 +436,7 @@ export default function Home() {
                           )}
 
                           {/* Thumbnail: Clean and clear photo without icons */}
-                          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/70 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
+                          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/70 group-hover:shadow-[0_8px_18px_rgba(37,99,235,0.22)] group-hover:scale-105 transition-all duration-300">
                             <img
                               src={category.image}
                               alt={t(category.labelKey)}
@@ -469,9 +468,9 @@ export default function Home() {
               )}
             </div>
 
-            {/* Trust Reassurance Footnote - Prominent display cards */}
-            <div className="reassurance grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 mt-4 border-t border-line/70">
-              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-surface border border-line shadow-xs hover:border-success/40 hover:shadow-sm transition-all group">
+            {/* Trust Reassurance Footnote - Liquid Glass Micro Cards */}
+            <div className="reassurance grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 mt-4 border-t border-line/60">
+              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl liquid-glass-card hover:border-success/40 transition-all group">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-success/15 text-success flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                   <BadgeCheck className="w-5 h-5 text-success" />
                 </div>
@@ -485,7 +484,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-surface border border-line shadow-xs hover:border-primary/40 hover:shadow-sm transition-all group">
+              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl liquid-glass-card hover:border-primary/40 transition-all group">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                   <Clock3 className="w-5 h-5 text-primary" />
                 </div>
@@ -499,7 +498,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-surface border border-line shadow-xs hover:border-accent/40 hover:shadow-sm transition-all group">
+              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl liquid-glass-card hover:border-accent/40 transition-all group">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                   <ShieldCheck className="w-5 h-5 text-accent" />
                 </div>
@@ -515,8 +514,8 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 4 Instant Fix Packages (2x2 Grid) */}
-          <section className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3 scroll-reveal">
+          {/* 4 Instant Fix Packages (2x2 Grid) - Liquid Glass Container */}
+          <section className="liquid-glass rounded-card p-4 space-y-3 scroll-reveal">
             <div className="flex items-center justify-between pb-1">
               <h2 className="font-uber text-base sm:text-lg text-ink tracking-tight">
                 {t('popular_instant_fixes')}
@@ -540,7 +539,7 @@ export default function Home() {
                   }}
                   role="button"
                   tabIndex={0}
-                  className={`group p-3 rounded-2xl bg-surface2/60 hover:bg-surface border border-line hover:border-primary/50 transition-all duration-300 cursor-pointer flex flex-col justify-between shadow-xs hover:shadow-md hover:scale-[1.01] scroll-reveal scroll-reveal-delay-${idx + 1}`}
+                  className={`group p-3 rounded-2xl liquid-glass-card hover:border-primary/50 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:scale-[1.01] scroll-reveal scroll-reveal-delay-${idx + 1}`}
                 >
                   <div className="flex items-start gap-2.5">
                     <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs border border-line/60 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
@@ -563,7 +562,7 @@ export default function Home() {
                   <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-line/60 text-xs">
                     <div className="flex items-center gap-1.5 font-800 text-ink">
                       <span className="font-uber text-sm">₹{pkg.price}</span>
-                      <span className="text-[10px] text-muted font-700 bg-surface px-1.5 py-0.5 rounded border border-line">
+                      <span className="text-[10px] text-muted font-700 liquid-glass-pill px-1.5 py-0.5 rounded">
                         {t('eta_badge', { eta: pkg.eta })}
                       </span>
                     </div>
@@ -576,7 +575,7 @@ export default function Home() {
             </div>
 
             {/* Trust & Direct Guarantee Footnote */}
-            <div className="p-2.5 rounded-xl bg-primary-soft/40 border border-primary/20 flex items-center justify-between text-xs text-primary font-700">
+            <div className="p-2.5 rounded-xl liquid-glass-pill border border-primary/20 flex items-center justify-between text-xs text-primary font-700">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
                 <span className="text-[11px]">{t('damage_protection')}</span>
@@ -590,15 +589,15 @@ export default function Home() {
 
         {/* RIGHT COLUMN: Live Chennai Radar Map & Nearby Active Workers */}
         <aside className="home-secondary-column space-y-4">
-          <section className="nearby-section scroll-reveal" data-name="nearby workers">
+          <section className="nearby-section liquid-glass rounded-card p-4 space-y-3 scroll-reveal" data-name="nearby workers">
             {/* Section Header with Locality & View Toggle */}
-            <div className="section-heading flex items-center justify-between pb-2 border-b border-line">
+            <div className="section-heading flex items-center justify-between pb-2 border-b border-line/60">
               <div className="flex items-center gap-2">
                 <h2 className="font-uber text-base sm:text-lg text-ink tracking-tight">{t('home_available')}</h2>
               </div>
 
               {/* View Switcher: Map vs List */}
-              <div className="flex items-center bg-surface2 p-0.5 rounded-full border border-line text-xs">
+              <div className="flex items-center liquid-glass-pill p-0.5 rounded-full text-xs">
                 <button
                   onClick={() => setRightViewMode('both')}
                   className={`px-2.5 py-1 rounded-full font-700 transition ${
@@ -655,7 +654,7 @@ export default function Home() {
 
             {/* Live Leaflet Radar Map (Shown in 'both' and 'map' modes) */}
             {(rightViewMode === 'both' || rightViewMode === 'map') && (
-              <div className="mb-3">
+              <div className="mb-3 rounded-2xl overflow-hidden border border-line/60 shadow-xs">
                 <HomeMapCard
                   center={mapCenter}
                   workers={allMapEntities}
@@ -671,7 +670,7 @@ export default function Home() {
                 className={`px-3 py-1 rounded-full font-800 text-[11px] transition ${
                   proSourceTab === 'all'
                     ? 'bg-ink text-surface shadow-xs'
-                    : 'bg-surface2 text-muted hover:text-ink border border-line'
+                    : 'liquid-glass-pill text-muted hover:text-ink'
                 }`}
               >
                 {t('all_pros')} ({(workers?.length || 0) + realPlaces.length})
@@ -681,7 +680,7 @@ export default function Home() {
                 className={`px-3 py-1 rounded-full font-800 text-[11px] flex items-center gap-1 transition ${
                   proSourceTab === 'google'
                     ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-surface2 text-muted hover:text-ink border border-line'
+                    : 'liquid-glass-pill text-muted hover:text-ink'
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3 text-emerald-300" />
@@ -692,7 +691,7 @@ export default function Home() {
                 className={`px-3 py-1 rounded-full font-800 text-[11px] transition ${
                   proSourceTab === 'blinkem'
                     ? 'bg-primary text-onprimary shadow-xs'
-                    : 'bg-surface2 text-muted hover:text-ink border border-line'
+                    : 'liquid-glass-pill text-muted hover:text-ink'
                 }`}
               >
                 {t('blinkem_pros')} ({safeWorkers.length})

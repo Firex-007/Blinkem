@@ -20,7 +20,7 @@ export default function WorkerCard({ worker, compact = true, onSelect }) {
 
   return (
     <article
-      className="p-3.5 rounded-2xl bg-surface border border-line shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200 flex flex-col justify-between group"
+      className="p-3.5 rounded-2xl liquid-glass-card hover:border-primary/40 transition-all duration-200 flex flex-col justify-between group"
       data-name="worker card"
     >
       <div>

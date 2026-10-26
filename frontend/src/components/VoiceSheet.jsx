@@ -186,8 +186,8 @@ export default function VoiceSheet({ open, onClose, onResult }) {
         aria-hidden="true"
       />
 
-      {/* Centered Floating Modal Card */}
-      <div className="relative w-full max-w-[480px] rounded-[28px] glass-card border border-line shadow-[0_24px_64px_rgba(0,0,0,0.3)] p-6 sm:p-7 flex flex-col space-y-5 animate-scaleIn max-h-[85dvh] overflow-y-auto z-10 my-auto">
+      {/* Centered Floating Modal Card with Liquid Glass */}
+      <div className="relative w-full max-w-[480px] rounded-[28px] liquid-glass border border-line/60 shadow-[0_24px_64px_rgba(0,0,0,0.35)] p-6 sm:p-7 flex flex-col space-y-5 animate-scaleIn max-h-[85dvh] overflow-y-auto z-10 my-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2">
@@ -351,7 +351,7 @@ export default function VoiceSheet({ open, onClose, onResult }) {
                       ? 'bg-danger animate-pulse ring-4 ring-danger/40 scale-105'
                       : isProcessing || textLoading
                       ? 'bg-primary/70 cursor-wait'
-                      : 'bg-primary hover:bg-primary600 ring-4 ring-primary/20 hover:scale-105'
+                      : 'liquid-mic-orb hover:scale-105'
                   }`}
                   aria-label={isRecording ? 'Stop recording' : 'Start voice request'}
                 >
