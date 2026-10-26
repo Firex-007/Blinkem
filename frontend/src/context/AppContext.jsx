@@ -122,6 +122,11 @@ export function AppProvider({ children }) {
     else document.documentElement.classList.remove('dark');
   }, [theme]);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.lang = lang || 'en';
+  }, [lang]);
+
   const updateCookieConsent = (level) => {
     setCookieConsent(level);
     setCookieConsentState(level);

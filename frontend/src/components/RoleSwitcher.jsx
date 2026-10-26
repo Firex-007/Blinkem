@@ -2,37 +2,39 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, User, Building2, ShieldCheck, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { t } from '../i18n';
 
 const ROLES = [
   {
     id: '1',
-    label: 'Customer',
-    desc: 'Priya Sharma • Browse & book services',
+    labelKey: 'role_customer',
+    descKey: 'role_customer_desc',
     path: '/',
     image: '/images/users/priya.jpg',
   },
   {
     id: '3',
-    label: 'Partner Pro',
-    desc: 'Muthu K • Live jobs & send quotes',
+    labelKey: 'role_worker',
+    descKey: 'role_worker_desc',
     path: '/worker',
     image: '/images/users/muthu.jpg',
   },
   {
     id: '99',
-    label: 'Operations',
-    desc: 'Meera R • KYC approvals & metrics',
+    labelKey: 'role_admin',
+    descKey: 'role_admin_desc',
     path: '/admin',
     image: '/images/users/meera.jpg',
   },
 ];
 
 export default function RoleSwitcher({ className }) {
-  const { userId, setUserId } = useApp();
+  const { userId, setUserId, lang } = useApp();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const current = ROLES.find((r) => r.id === String(userId)) || ROLES[0];
+  const currentLabel = t(current.labelKey);
 
   const handleSelectRole = (role) => {
     setUserId(role.id);
@@ -49,10 +51,10 @@ export default function RoleSwitcher({ className }) {
       >
         <img
           src={current.image}
-          alt={current.label}
+          alt={currentLabel}
           className="w-5 h-5 rounded-full object-cover border border-line/80 shadow-xs"
         />
-        <span className="text-xs font-800">{current.label}</span>
+        <span className="text-xs font-800">{currentLabel}</span>
         <ChevronDown className={`w-3 h-3 text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
 
@@ -71,6 +73,8 @@ export default function RoleSwitcher({ className }) {
             </div>
             {ROLES.map((r) => {
               const isSelected = r.id === String(userId);
+              const rLabel = t(r.labelKey);
+              const rDesc = t(r.descKey);
               return (
                 <button
                   key={r.id}
@@ -80,16 +84,16 @@ export default function RoleSwitcher({ className }) {
                       ? 'bg-primary-soft/60 text-ink font-700 border border-primary/20'
                       : 'hover:bg-surface2 text-muted hover:text-ink'
                   }`}
-                  aria-label={`Switch to ${r.label}`}
+                  aria-label={`Switch to ${rLabel}`}
                 >
                   <img
                     src={r.image}
-                    alt={r.label}
+                    alt={rLabel}
                     className="w-8 h-8 rounded-full object-cover border border-line flex-shrink-0 shadow-xs"
                   />
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-700 block text-ink">{r.label}</span>
-                    <span className="text-[10px] text-muted block line-clamp-1">{r.desc}</span>
+                    <span className="text-xs font-700 block text-ink">{rLabel}</span>
+                    <span className="text-[10px] text-muted block line-clamp-1">{rDesc}</span>
                   </div>
                   {isSelected && (
                     <Check className="w-4 h-4 text-primary ml-auto flex-shrink-0" />

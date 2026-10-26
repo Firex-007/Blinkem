@@ -48,47 +48,99 @@ const CATEGORIES = [
   { slug: 'appliance_repair', labelKey: 'cat_appliance_repair', image: '/images/categories/appliance_repair.jpg', startingPrice: 249 },
 ];
 
-const SEARCH_SUGGESTIONS = [
-  'kitchen sink tap leaking',
-  'split AC not cooling properly',
-  'switchboard sparking / MCB trip',
-  'wooden door lock & latch repair',
-  'bathroom wall dampness & painting',
-  'washing machine drum not spinning',
-  'deep home floor & tile cleaning',
-  'cook for party or dinner',
-];
+const SEARCH_SUGGESTIONS = {
+  en: [
+    'kitchen sink tap leaking',
+    'split AC not cooling properly',
+    'switchboard sparking / MCB trip',
+    'wooden door lock & latch repair',
+    'bathroom wall dampness & painting',
+    'washing machine drum not spinning',
+    'deep home floor & tile cleaning',
+    'cook for party or dinner',
+  ],
+  ta: [
+    'சமையலறை குழாய் கசிகிறது',
+    'ஏசி கூலிங் வரவில்லை',
+    'சுவிட்ச்போர்டு ஸ்பார்க் ஆகிறது',
+    'மரக் கதவு பூட்டு பழுது',
+    'சுவர் பெயிண்டிங் வேலை',
+    'வாஷிங் மெஷின் ஓடவில்லை',
+    'வீடு தரை சுத்தம் செய்தல்',
+    'விசேஷத்திற்கு சமையல்காரர்',
+  ],
+  hi: [
+    'किचन सिंक का नल लीक कर रहा है',
+    'एसी सही से ठंडा नहीं कर रहा',
+    'स्विचबोर्ड में स्पार्क / MCB ट्रिप',
+    'दरवाजे का ताला और कुंडी मरम्मत',
+    'दीवार की सीलन और पेंटिंग',
+    'वॉशिंग मशीन नहीं चल रही',
+    'घर के फर्श और टाइल्स की गहरी सफाई',
+    'पार्टी या डिनर के लिए रसोइया',
+  ],
+};
 
-const DYNAMIC_ACTIONS = [
-  'to be fixed...',
-  'to be cleaned...',
-  'to be cooked...',
-  'to be repaired...',
-  'to be serviced...',
-  'to be painted...',
-  'fixing...',
-];
+const DYNAMIC_ACTIONS = {
+  en: {
+    prefix: 'Tell us what needs',
+    actions: [
+      'to be fixed...',
+      'to be cleaned...',
+      'to be cooked...',
+      'to be repaired...',
+      'to be serviced...',
+      'to be painted...',
+      'fixing...',
+    ],
+  },
+  ta: {
+    prefix: 'உங்களுக்கு என்ன',
+    actions: [
+      'சரிசெய்ய வேண்டும்...',
+      'சுத்தம் செய்ய வேண்டும்...',
+      'சமைக்க வேண்டும்...',
+      'பழுதுபார்க்க வேண்டும்...',
+      'சர்வீஸ் செய்ய வேண்டும்...',
+      'பெயிண்ட் செய்ய வேண்டும்...',
+      'தேவைப்படுகிறது...',
+    ],
+  },
+  hi: {
+    prefix: 'बताइए क्या काम',
+    actions: [
+      'करवाना है...',
+      'सफाई करवानी है...',
+      'खाना बनवाना है...',
+      'मरम्मत करवानी है...',
+      'सर्विस करवानी है...',
+      'पेंट करवाना है...',
+      'ठीक करवाना है...',
+    ],
+  },
+};
 
-function SearchSuggestions() {
+function SearchSuggestions({ lang = 'en' }) {
   const [index, setIndex] = useState(0);
+  const suggestions = SEARCH_SUGGESTIONS[lang] || SEARCH_SUGGESTIONS.en;
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % SEARCH_SUGGESTIONS.length);
+      setIndex((prev) => (prev + 1) % suggestions.length);
     }, 2800);
     return () => clearInterval(timer);
-  }, []);
+  }, [suggestions]);
 
   return (
-    <div className="absolute left-8 sm:left-9 right-12 sm:right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-45">
-      <span className="text-ink dark:text-white font-500 whitespace-nowrap">
-        Search
+    <div className="absolute left-8 sm:left-9 right-12 sm:right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-50">
+      <span className="text-ink dark:text-white font-600 whitespace-nowrap">
+        {t('search_label')}
       </span>
       <span
-        key={index}
+        key={`${lang}-${index}`}
         className="text-primary font-700 italic truncate"
       >
-        &ldquo;{SEARCH_SUGGESTIONS[index]}&rdquo;
+        &ldquo;{suggestions[index % suggestions.length]}&rdquo;
       </span>
     </div>
   );
@@ -97,36 +149,36 @@ function SearchSuggestions() {
 const INSTANT_FIX_PACKAGES = [
   {
     id: 'pipe-leak',
-    title: 'Tap & Pipe Leak Fix',
+    titleKey: 'pkg_tap_title',
+    descKey: 'pkg_tap_desc',
     category: 'plumber',
-    description: 'Fix leaking kitchen/bathroom tap, loose pipe joint, or low pressure valve',
     price: 199,
     eta: '12 min',
     image: '/images/categories/plumber.jpg',
   },
   {
     id: 'mcb-spark',
-    title: 'Switchboard / MCB Repair',
+    titleKey: 'pkg_mcb_title',
+    descKey: 'pkg_mcb_desc',
     category: 'electrician',
-    description: 'Diagnose tripped circuit breaker, replace burnt 16A socket or switch',
     price: 249,
     eta: '15 min',
     image: '/images/categories/electrician.jpg',
   },
   {
     id: 'ac-service',
-    title: 'AC Cooling & Filter Service',
+    titleKey: 'pkg_ac_title',
+    descKey: 'pkg_ac_desc',
     category: 'ac_repair',
-    description: 'Deep filter wash, coil inspection, and cooling gas pressure check',
     price: 399,
     eta: '20 min',
     image: '/images/categories/ac_repair.jpg',
   },
   {
     id: 'door-lock',
-    title: 'Door Lock & Hinge Fix',
+    titleKey: 'pkg_door_title',
+    descKey: 'pkg_door_desc',
     category: 'carpenter',
-    description: 'Realign jammed wooden door, replace faulty cylinder lock or loose hinges',
     price: 279,
     eta: '18 min',
     image: '/images/categories/carpenter.jpg',
@@ -136,7 +188,7 @@ const INSTANT_FIX_PACKAGES = [
 const FILTERS = CATEGORIES.slice(0, 5);
 
 export default function Home() {
-  const { location, setIsLocationModalOpen } = useApp();
+  const { location, setIsLocationModalOpen, lang } = useApp();
   const navigate = useNavigate();
   useScrollReveal();
   const [railCat, setRailCat] = useState('plumber');
@@ -256,6 +308,8 @@ export default function Home() {
     navigate(`/request/new?category=${slug}`);
   };
 
+  const curDynamic = DYNAMIC_ACTIONS[lang] || DYNAMIC_ACTIONS.en;
+
   return (
     <div className="home-page" data-name="customer home">
       <div className="home-desktop-grid">
@@ -266,7 +320,7 @@ export default function Home() {
             <div className="space-y-1.5">
               <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
                 <span className="block text-ink font-800">
-                  Tell us what needs
+                  {curDynamic.prefix}
                 </span>
                 <span className="block overflow-hidden relative pt-0.5 pb-1 min-h-[1.25em]">
                   <span
@@ -278,7 +332,7 @@ export default function Home() {
                         : 'translate-x-0 opacity-100 scale-100'
                     }`}
                   >
-                    {DYNAMIC_ACTIONS[actionIndex]}
+                    {curDynamic.actions[actionIndex % curDynamic.actions.length]}
                   </span>
                 </span>
               </h1>
@@ -324,7 +378,7 @@ export default function Home() {
                 <Search className="w-4 h-4 sm:w-5 sm:h-5 text-muted flex-shrink-0 z-10 transition-colors group-focus-within:text-primary" />
 
                 {/* Dynamic running suggestion text with lesser opacity */}
-                {!typeQuery && <SearchSuggestions />}
+                {!typeQuery && <SearchSuggestions lang={lang} />}
 
                 <input
                   type="text"
@@ -337,7 +391,7 @@ export default function Home() {
                   type="submit"
                   className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-xl bg-gradient-to-r from-primary to-blue-600 hover:from-primary600 hover:to-blue-700 text-onprimary font-800 text-xs flex items-center justify-center gap-1.5 transition-all duration-200 shadow-[0_4px_12px_rgba(31,91,255,0.25)] flex-shrink-0 active:scale-95 z-10"
                 >
-                  <span className="hidden sm:inline">Find Pros</span>
+                  <span className="hidden sm:inline">{t('find_pros')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </form>
@@ -396,7 +450,7 @@ export default function Home() {
                               {t(category.labelKey)}
                             </span>
                             <span className="text-xs font-800 text-primary block mt-0.5 tracking-tight">
-                              from ₹{category.startingPrice || 199}
+                              {t('from_price', { price: category.startingPrice || 199 })}
                             </span>
                           </div>
                         </button>
@@ -419,8 +473,12 @@ export default function Home() {
                   <BadgeCheck className="w-5 h-5 text-success" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">Verified Pros</span>
-                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">Govt ID &amp; skill checked</span>
+                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">
+                    {t('verified_pros')}
+                  </span>
+                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">
+                    {t('verified_pros_hint')}
+                  </span>
                 </div>
               </div>
 
@@ -429,8 +487,12 @@ export default function Home() {
                   <Clock3 className="w-5 h-5 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">&lt;10s Matching</span>
-                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">Instant quotes from pros</span>
+                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">
+                    {t('matching_speed')}
+                  </span>
+                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">
+                    {t('matching_speed_hint')}
+                  </span>
                 </div>
               </div>
 
@@ -439,8 +501,12 @@ export default function Home() {
                   <ShieldCheck className="w-5 h-5 text-accent" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">Fair Counter</span>
-                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">1-round price lock</span>
+                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">
+                    {t('fair_counter')}
+                  </span>
+                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">
+                    {t('fair_counter_hint')}
+                  </span>
                 </div>
               </div>
             </div>
@@ -450,7 +516,7 @@ export default function Home() {
           <section className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3 scroll-reveal">
             <div className="flex items-center justify-between pb-1">
               <h2 className="font-uber text-base sm:text-lg text-ink tracking-tight">
-                Popular 15-Min Instant Fixes
+                {t('popular_instant_fixes')}
               </h2>
             </div>
 
@@ -462,7 +528,7 @@ export default function Home() {
                   onClick={() => {
                     navigate(`/request/new?category=${pkg.category}`, {
                       state: {
-                        description: pkg.description,
+                        description: t(pkg.descKey),
                         category: pkg.category,
                         urgency: 'now',
                         budget_hint: pkg.price,
@@ -483,10 +549,10 @@ export default function Home() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-xs font-800 text-ink group-hover:text-primary transition-colors line-clamp-1">
-                        {pkg.title}
+                        {t(pkg.titleKey)}
                       </h3>
                       <p className="text-[11px] text-muted line-clamp-1 mt-0.5">
-                        {pkg.description}
+                        {t(pkg.descKey)}
                       </p>
                     </div>
                   </div>
@@ -495,11 +561,11 @@ export default function Home() {
                     <div className="flex items-center gap-1.5 font-800 text-ink">
                       <span className="font-uber text-sm">₹{pkg.price}</span>
                       <span className="text-[10px] text-muted font-700 bg-surface px-1.5 py-0.5 rounded border border-line">
-                        ETA {pkg.eta}
+                        {t('eta_badge', { eta: pkg.eta })}
                       </span>
                     </div>
                     <span className="text-[11px] font-800 text-primary flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-                      Book <ArrowRight className="w-3 h-3" />
+                      {t('book_now')} <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
@@ -510,10 +576,10 @@ export default function Home() {
             <div className="p-2.5 rounded-xl bg-primary-soft/40 border border-primary/20 flex items-center justify-between text-xs text-primary font-700">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-[11px]">₹10,000 Damage Protection on all bookings</span>
+                <span className="text-[11px]">{t('damage_protection')}</span>
               </div>
               <span className="text-[10px] bg-primary text-onprimary font-800 px-2 py-0.5 rounded-full">
-                Guaranteed
+                {t('guaranteed')}
               </span>
             </div>
           </section>
@@ -536,7 +602,7 @@ export default function Home() {
                     rightViewMode === 'both' ? 'bg-primary text-onprimary shadow-sm' : 'text-muted hover:text-ink'
                   }`}
                 >
-                  All
+                  {t('all_pros')}
                 </button>
                 <button
                   onClick={() => setRightViewMode('map')}
@@ -545,7 +611,7 @@ export default function Home() {
                   }`}
                 >
                   <MapIcon className="w-3 h-3" />
-                  <span>Map</span>
+                  <span>{t('map_view')}</span>
                 </button>
                 <button
                   onClick={() => setRightViewMode('cards')}
@@ -554,7 +620,7 @@ export default function Home() {
                   }`}
                 >
                   <Layers className="w-3 h-3" />
-                  <span>Pros</span>
+                  <span>{t('pros_view')}</span>
                 </button>
               </div>
             </div>
@@ -605,7 +671,7 @@ export default function Home() {
                     : 'bg-surface2 text-muted hover:text-ink border border-line'
                 }`}
               >
-                All ({(workers?.length || 0) + realPlaces.length})
+                {t('all_pros')} ({(workers?.length || 0) + realPlaces.length})
               </button>
               <button
                 onClick={() => setProSourceTab('google')}
@@ -616,7 +682,7 @@ export default function Home() {
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3 text-emerald-300" />
-                <span>Google Places Live ({safeRealPlaces.length})</span>
+                <span>{t('google_places_live')} ({safeRealPlaces.length})</span>
               </button>
               <button
                 onClick={() => setProSourceTab('blinkem')}
@@ -626,7 +692,7 @@ export default function Home() {
                     : 'bg-surface2 text-muted hover:text-ink border border-line'
                 }`}
               >
-                Blink&apos;em Pros ({safeWorkers.length})
+                {t('blinkem_pros')} ({safeWorkers.length})
               </button>
             </div>
 
@@ -646,10 +712,10 @@ export default function Home() {
                         {proSourceTab === 'all' && (
                           <div className="flex items-center justify-between text-xs font-800 text-muted px-1">
                             <span className="flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Real Google Maps Places Nearby
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> {t('real_places_nearby')}
                             </span>
                             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                              Verified Directory
+                              {t('verified_directory')}
                             </span>
                           </div>
                         )}
@@ -666,9 +732,9 @@ export default function Home() {
                       <div className="space-y-2">
                         {proSourceTab === 'all' && safeWorkers.length > 0 && (
                           <div className="flex items-center justify-between text-xs font-800 text-muted px-1 mt-2">
-                            <span>Blink&apos;em Instant Dispatch Pros</span>
+                            <span>{t('instant_dispatch_pros')}</span>
                             <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                              Online Dispatch
+                              {t('online_dispatch')}
                             </span>
                           </div>
                         )}

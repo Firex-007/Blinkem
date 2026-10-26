@@ -6,7 +6,7 @@ import { t } from '../i18n';
 export default function BottomNav({ className = '' }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userId } = useApp();
+  const { userId, lang } = useApp();
 
   let tabs = [
     { path: '/',         icon: Home,         label: t('home_tab') },
