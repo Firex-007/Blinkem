@@ -262,12 +262,8 @@ export default function Home() {
         {/* LEFT COLUMN: The Request Console */}
         <div className="home-primary-column space-y-6">
           <section className="request-console scroll-reveal" data-name="request console">
-            {/* Live Hyperlocal Dispatch Badge & Locality Subtitle */}
+            {/* Locality & Header */}
             <div className="space-y-1.5">
-                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-800 tracking-wider uppercase">
-                  {t('home_hyperlocal_dispatch')}
-                </div>
-
               <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
                 <span className="block text-ink font-800">
                   Tell us what needs
@@ -292,7 +288,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setIsLocationModalOpen(true)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface2/80 hover:bg-surface2 text-primary font-700 text-xs border border-primary/20 hover:border-primary/40 shadow-xs transition-all hover:scale-[1.02] active:scale-95"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface2/80 hover:bg-surface2 text-primary font-700 text-xs border border-primary/20 hover:border-primary/40 shadow-xs transition-colors"
                 >
                   <MapPin className="w-3.5 h-3.5 text-primary" />
                   <span>{location?.name || 'T. Nagar'}</span>
@@ -353,9 +349,6 @@ export default function Home() {
                 <span className="font-uber text-sm text-ink tracking-tight uppercase">
                   {t('home_select_category')}
                 </span>
-                <span className="text-muted font-800 tracking-wider bg-surface2 px-2.5 py-1 rounded-full border border-line text-[10px] uppercase">
-                  8 Core Trades
-                </span>
               </div>
 
               <div className="service-grid" data-name="service category matrix">
@@ -363,8 +356,8 @@ export default function Home() {
                   ? CATEGORIES.map((category) => (
                       <div className="category-skeleton p-2 sm:p-2.5 rounded-2xl" key={category.slug}>
                         <Skeleton className="h-11 w-11 sm:h-14 sm:w-14 rounded-xl" />
-                        <Skeleton className="h-3 w-12 sm:w-16 mt-1" />
-                        <Skeleton className="h-2 w-8 sm:w-10 mt-0.5" />
+                        <Skeleton className="h-3.5 w-14 sm:w-16 mt-1.5" />
+                        <Skeleton className="h-2.5 w-9 sm:w-11 mt-0.5" />
                       </div>
                     ))
                   : availableCategories.map((category) => {
@@ -372,10 +365,10 @@ export default function Home() {
                       return (
                         <button
                           key={category.slug}
-                          className={`group relative flex flex-col items-center justify-between p-1.5 sm:p-2.5 md:p-3 rounded-2xl transition-all duration-300 text-center outline-none ${
+                          className={`group relative flex flex-col items-center justify-between p-2 sm:p-2.5 md:p-3 rounded-2xl transition-all duration-300 text-center outline-none ${
                             isSelected
                               ? 'bg-gradient-to-b from-primary/15 via-primary/5 to-surface dark:from-primary/25 dark:via-primary/10 dark:to-surface2/60 border-2 border-primary shadow-[0_12px_28px_-6px_rgba(31,91,255,0.28)] scale-[1.02] sm:scale-[1.03] -translate-y-0.5 sm:-translate-y-1 z-10'
-                              : 'bg-surface/80 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line/80 hover:border-primary/50 shadow-xs hover:shadow-lg hover:-translate-y-1 active:scale-95'
+                              : 'bg-surface/90 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line hover:border-primary/50 shadow-xs hover:shadow-md hover:-translate-y-1 active:scale-95'
                           }`}
                           onClick={() => handleSelectCategory(category.slug)}
                           onDoubleClick={() => handleStartRequestForCat(category.slug)}
@@ -387,7 +380,7 @@ export default function Home() {
                           )}
 
                           {/* Thumbnail: Clean and clear photo without icons */}
-                          <div className="relative w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
+                          <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl overflow-hidden shadow-xs border border-line/70 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
                             <img
                               src={category.image}
                               alt={t(category.labelKey)}
@@ -397,12 +390,12 @@ export default function Home() {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-60 group-hover:opacity-10 transition-opacity" />
                           </div>
 
-                          {/* Category Label and Pricing Tag */}
-                          <div className="w-full text-center mt-1 sm:mt-1.5 min-w-0 px-0.5">
-                            <span className="font-800 text-[11px] sm:text-xs md:text-[13px] leading-tight text-ink block truncate group-hover:text-primary transition-colors">
+                          {/* Category Label and Pricing Tag - Popped out with bold typography & vibrant accent */}
+                          <div className="w-full text-center mt-1.5 sm:mt-2 min-w-0 px-0.5">
+                            <span className="font-900 font-uber text-[12px] sm:text-[13px] md:text-sm leading-tight text-ink block truncate group-hover:text-primary transition-colors tracking-tight">
                               {t(category.labelKey)}
                             </span>
-                            <span className="text-[9px] sm:text-[10px] font-700 text-muted/90 block mt-0.5 truncate group-hover:text-primary/80 transition-colors">
+                            <span className="text-[10px] sm:text-[11px] font-800 text-primary block mt-0.5 truncate tracking-tight">
                               from ₹{category.startingPrice || 199}
                             </span>
                           </div>
@@ -419,35 +412,35 @@ export default function Home() {
               )}
             </div>
 
-            {/* Trust Reassurance Footnote */}
+            {/* Trust Reassurance Footnote - Prominent display cards */}
             <div className="reassurance grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 mt-4 border-t border-line/70">
-              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-success/30 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-success/15 text-success flex items-center justify-center flex-shrink-0">
-                  <BadgeCheck className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-surface border border-line shadow-xs hover:border-success/40 hover:shadow-sm transition-all group">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-success/15 text-success flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <BadgeCheck className="w-5 h-5 text-success" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[12px] font-800 text-ink block leading-tight">Verified Pros</span>
-                  <span className="text-[10px] text-muted block leading-tight truncate">Govt ID &amp; skill checked</span>
+                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">Verified Pros</span>
+                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">Govt ID &amp; skill checked</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-primary/30 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center flex-shrink-0">
-                  <Clock3 className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-surface border border-line shadow-xs hover:border-primary/40 hover:shadow-sm transition-all group">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <Clock3 className="w-5 h-5 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[12px] font-800 text-ink block leading-tight">&lt;10s Matching</span>
-                  <span className="text-[10px] text-muted block leading-tight truncate">Instant quotes from pros</span>
+                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">&lt;10s Matching</span>
+                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">Instant quotes from pros</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface2/50 dark:bg-surface2/30 border border-line/50 hover:border-accent/30 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-accent/15 text-accent flex items-center justify-center flex-shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl bg-surface border border-line shadow-xs hover:border-accent/40 hover:shadow-sm transition-all group">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <ShieldCheck className="w-5 h-5 text-accent" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[12px] font-800 text-ink block leading-tight">Fair Counter</span>
-                  <span className="text-[10px] text-muted block leading-tight truncate">1-round price lock</span>
+                  <span className="text-[13px] sm:text-sm font-900 font-uber text-ink block leading-tight tracking-tight">Fair Counter</span>
+                  <span className="text-[11px] text-muted font-600 block leading-tight truncate mt-0.5">1-round price lock</span>
                 </div>
               </div>
             </div>
@@ -459,9 +452,6 @@ export default function Home() {
               <h2 className="font-uber text-base sm:text-lg text-ink tracking-tight">
                 Popular 15-Min Instant Fixes
               </h2>
-              <span className="text-[10px] font-800 tracking-wider text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20 uppercase">
-                Rapid Dispatch
-              </span>
             </div>
 
             {/* 2x2 Grid of 4 Cards */}

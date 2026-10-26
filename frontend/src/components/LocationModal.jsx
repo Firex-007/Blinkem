@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Navigation, Search, Check, AlertCircle, Loader2, Sparkles, X } from 'lucide-react';
+import { MapPin, Navigation, Search, Check, AlertCircle, Loader2, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { CHENNAI_LOCALITIES } from '../data/chennaiLocalities';
 
@@ -42,11 +42,11 @@ export default function LocationModal({ open, onClose }) {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-fade"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="fixed bottom-0 sm:bottom-auto sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 w-full max-w-[500px] max-h-[85vh] sm:max-h-[80vh] rounded-t-[28px] sm:rounded-[24px] glass-card border border-line shadow-2xl z-50 p-5 flex flex-col animate-slideUp sm:animate-scaleIn">
+      <div className="fixed bottom-0 sm:bottom-auto sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 w-full max-w-[500px] max-h-[85vh] sm:max-h-[80vh] rounded-t-[28px] sm:rounded-[24px] glass-card border border-line shadow-2xl z-50 p-5 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export default function LocationModal({ open, onClose }) {
             disabled={detecting}
             className="w-full flex items-center gap-3 p-3.5 rounded-card bg-primary-soft/60 hover:bg-primary-soft text-primary border border-primary/20 transition group"
           >
-            <div className="w-9 h-9 rounded-full bg-primary text-onprimary flex items-center justify-center group-hover:scale-110 transition shadow-sm">
+            <div className="w-9 h-9 rounded-full bg-primary text-onprimary flex items-center justify-center shadow-sm">
               {detecting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
@@ -89,7 +89,6 @@ export default function LocationModal({ open, onClose }) {
                 Requires browser permission for precise coordinates
               </span>
             </div>
-            <Sparkles className="w-4 h-4 text-primary opacity-60" />
           </button>
 
           {errorMsg && (

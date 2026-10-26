@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Clock, Send, ChevronLeft } from 'lucide-react';
+import { MapPin, Clock, Calendar, Send, ChevronLeft, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../api';
 import { t } from '../../i18n';
@@ -7,7 +7,6 @@ import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
 
 const SERVICES = [
   { slug: 'plumber', label: 'cat.plumber' },
@@ -27,9 +26,14 @@ export default function RequestForm() {
   const navigate = useNavigate();
   const voiceState = location.state || {};
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
   const [category, setCategory] = useState(voiceState.category || searchParams.get('category') || 'plumber');
   const [description, setDescription] = useState(voiceState.description || voiceState.transcript || '');
   const [urgency, setUrgency] = useState(voiceState.urgency || 'now');
+  const [scheduledDate, setScheduledDate] = useState(todayStr);
+  const [scheduledTime, setScheduledTime] = useState('10:00');
   const [address, setAddress] = useState('T. Nagar, Chennai');
   const [budget, setBudget] = useState(voiceState.budget_hint ? String(voiceState.budget_hint) : '');
   const [voiceTranscript, setVoiceTranscript] = useState(voiceState.transcript || null);
@@ -44,9 +48,13 @@ export default function RequestForm() {
     if (!valid) { setErr(t('req.validate')); return; }
     setSubmitting(true);
     try {
+      const scheduledIso = urgency === 'scheduled'
+        ? new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString()
+        : null;
+
       const res = await api.post('/requests', {
         category, description, lat: 13.0418, lng: 80.2341, address,
-        urgency, scheduled_at: null,
+        urgency, scheduled_at: scheduledIso,
         budget_hint: budget ? parseInt(budget, 10) : null,
         voice_transcript: voiceTranscript,
       });
@@ -99,13 +107,112 @@ export default function RequestForm() {
                 <button
                   key={u}
                   onClick={() => setUrgency(u)}
-                  className={`flex-1 py-2 rounded-chip text-sm font-600 border transition ${urgency === u ? 'bg-primary text-onprimary border-primary' : 'bg-surface text-ink border-line'}`}
+                  className={`flex-1 py-2.5 rounded-chip text-sm font-800 border transition flex items-center justify-center gap-1.5 ${urgency === u ? 'bg-primary text-onprimary border-primary shadow-sm' : 'bg-surface text-ink border-line hover:border-primary/40'}`}
                 >
-                  {u === 'now' ? t('req.now') : t('req.schedule')}
+                  {u === 'now' ? (
+                    <>
+                      <Clock className="w-4 h-4" />
+                      <span>{t('req.now')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="w-4 h-4" />
+                      <span>{t('req.schedule')}</span>
+                    </>
+                  )}
                 </button>
               ))}
             </div>
           </div>
+
+          {/* Interactive Date, Time and Calendar Picker (when Schedule is clicked) */}
+          {urgency === 'scheduled' && (
+            <div className="p-3.5 rounded-2xl bg-primary/5 border border-primary/25 space-y-3 animate-fadeIn">
+              <div className="flex items-center gap-2 text-xs font-800 text-primary uppercase tracking-wider">
+                <Calendar className="w-4 h-4 text-primary" />
+                <span>Select Service Date &amp; Time Slot</span>
+              </div>
+
+              {/* Date selection: Quick pills + native date input */}
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-700 text-muted">Service Date</label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setScheduledDate(todayStr)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-800 transition ${
+                      scheduledDate === todayStr
+                        ? 'bg-primary text-onprimary shadow-xs'
+                        : 'bg-surface text-ink border border-line hover:border-primary'
+                    }`}
+                  >
+                    Today
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setScheduledDate(tomorrowStr)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-800 transition ${
+                      scheduledDate === tomorrowStr
+                        ? 'bg-primary text-onprimary shadow-xs'
+                        : 'bg-surface text-ink border border-line hover:border-primary'
+                    }`}
+                  >
+                    Tomorrow
+                  </button>
+
+                  <div className="relative flex items-center min-w-[150px] flex-1">
+                    <input
+                      type="date"
+                      min={todayStr}
+                      value={scheduledDate}
+                      onChange={(e) => setScheduledDate(e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-full bg-surface border border-line text-xs font-700 text-ink outline-none focus:border-primary shadow-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Time slot selection: Quick slots + custom time */}
+              <div className="space-y-1.5 pt-1">
+                <label className="block text-[11px] font-700 text-muted">Arrival Time Slot</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { label: 'Morning', time: '10:00', desc: '9 AM - 12 PM' },
+                    { label: 'Afternoon', time: '13:30', desc: '12 PM - 3 PM' },
+                    { label: 'Evening', time: '17:00', desc: '3 PM - 6 PM' },
+                    { label: 'Night', time: '20:00', desc: '6 PM - 9 PM' },
+                  ].map((slot) => (
+                    <button
+                      key={slot.label}
+                      type="button"
+                      onClick={() => setScheduledTime(slot.time)}
+                      className={`p-2 rounded-xl text-left border transition ${
+                        scheduledTime === slot.time
+                          ? 'bg-primary text-onprimary border-primary shadow-xs'
+                          : 'bg-surface text-ink border-line hover:border-primary/50'
+                      }`}
+                    >
+                      <span className="block text-xs font-800 leading-tight">{slot.label}</span>
+                      <span className={`block text-[10px] mt-0.5 ${scheduledTime === slot.time ? 'text-onprimary/80' : 'text-muted'}`}>
+                        {slot.desc}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 pt-1 text-xs">
+                  <span className="text-muted font-600">Custom Time:</span>
+                  <input
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    className="px-3 py-1 rounded-lg bg-surface border border-line font-700 text-ink text-xs outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-xs text-muted mb-1">{t('req.address')}</label>
             <div className="flex items-center gap-2">
@@ -119,16 +226,19 @@ export default function RequestForm() {
           </div>
           <div>
             <label className="block text-xs text-muted mb-1">{t('req.budget')}</label>
-            <div className="flex items-baseline gap-1">
-              <input
-                type="number"
-                inputMode="numeric"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                className="px-3 py-2 rounded-chip bg-surface border border-line text-sm text-ink outline-none focus:border-primary w-24"
-                placeholder="₹"
-              />
-              <span className="text-xs text-muted">/visit</span>
+            <div className="flex items-center gap-2">
+              <div className="relative flex items-center w-36">
+                <span className="absolute left-3 text-sm font-800 text-ink">₹</span>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={budget}
+                  onChange={(e) => setBudget(e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 rounded-chip bg-surface border border-line text-sm font-bold text-ink outline-none focus:border-primary"
+                  placeholder="299"
+                />
+              </div>
+              <span className="text-xs text-muted font-600">/visit standard</span>
             </div>
           </div>
           {err && (

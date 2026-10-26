@@ -191,7 +191,7 @@ export default function Bookings() {
                     <div>
                       <span className="text-[11px] text-muted block">Total Amount</span>
                       <span className="font-800 text-base text-ink">
-                        ₹{b.final_price || b.agreed_price}
+                        ₹{b.final_price || b.agreed_price || b.price || b.budget_hint || 299}
                       </span>
                     </div>
 
