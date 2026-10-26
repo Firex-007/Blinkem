@@ -209,13 +209,13 @@ export default function Home() {
 
       // 2. After slide-out (280ms), switch word and reset position to far left
       enterTimer = setTimeout(() => {
-        setActionIndex((prev) => (prev + 1) % DYNAMIC_ACTIONS.length);
+        setActionIndex((prev) => (typeof prev === 'number' && !isNaN(prev) ? (prev + 1) % 7 : 0));
         setAnimPhase('enter');
 
         // 3. Immediately transition into place from left
         idleTimer = setTimeout(() => {
           setAnimPhase('idle');
-        }, 30);
+        }, 40);
       }, 280);
     }, 2400);
 
@@ -309,6 +309,9 @@ export default function Home() {
   };
 
   const curDynamic = DYNAMIC_ACTIONS[lang] || DYNAMIC_ACTIONS.en;
+  const actionsList = curDynamic?.actions || DYNAMIC_ACTIONS.en.actions;
+  const safeActionIndex = (typeof actionIndex === 'number' && !isNaN(actionIndex) ? actionIndex : 0) % actionsList.length;
+  const currentActionText = actionsList[safeActionIndex] || actionsList[0];
 
   return (
     <div className="home-page" data-name="customer home">
@@ -322,9 +325,9 @@ export default function Home() {
                 <span className="block text-ink font-800">
                   {curDynamic.prefix}
                 </span>
-                <span className="block overflow-hidden relative pt-0.5 pb-1 min-h-[1.25em]">
+                <span className="block overflow-hidden relative pt-0.5 pb-1 min-h-[1.4em]">
                   <span
-                    className={`inline-block text-primary italic font-black tracking-tight whitespace-nowrap transition-all duration-300 ease-out transform ${
+                    className={`inline-block text-primary dark:text-blue-400 italic font-black tracking-tight whitespace-nowrap transition-all duration-300 ease-out transform ${
                       animPhase === 'enter'
                         ? '-translate-x-14 opacity-0 scale-95'
                         : animPhase === 'exit'
@@ -332,7 +335,7 @@ export default function Home() {
                         : 'translate-x-0 opacity-100 scale-100'
                     }`}
                   >
-                    {curDynamic.actions[actionIndex % curDynamic.actions.length]}
+                    {currentActionText}
                   </span>
                 </span>
               </h1>
