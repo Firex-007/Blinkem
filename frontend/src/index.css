@@ -269,14 +269,29 @@ body {
   letter-spacing: -0.03em;
 }
 .home-helper { margin-top: 8px; color: var(--muted); font-size: 14px; }
-.request-actions { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+.request-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  width: 100%;
+  min-width: 0;
+}
+@media (min-width: 640px) {
+  .request-actions {
+    gap: 12px;
+    margin: 18px 0;
+  }
+}
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
 }
 @media (min-width: 640px) {
   .service-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
   }
 }

@@ -80,7 +80,7 @@ function SearchSuggestions() {
   }, []);
 
   return (
-    <div className="absolute left-9 sm:left-10 right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-45">
+    <div className="absolute left-8 sm:left-9 right-12 sm:right-28 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-1.5 overflow-hidden text-xs sm:text-sm select-none opacity-45">
       <span className="text-ink dark:text-white font-500 whitespace-nowrap">
         Search
       </span>
@@ -298,17 +298,17 @@ export default function Home() {
             </div>
 
             {/* Unified Voice & Typing Action Console */}
-            <div className="request-actions my-5">
+            <div className="request-actions my-4 sm:my-5 flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
               {/* Voice Orb Trigger with Tooltip & Pulsing Glow Aura */}
               <div className="relative flex-shrink-0">
                 <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-blue-400 opacity-30 blur-md group-hover:opacity-60 transition duration-500 animate-pulse pointer-events-none" />
                 <button
-                  className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-primary via-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(31,91,255,0.38)] hover:shadow-[0_12px_32px_rgba(31,91,255,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 group border-2 border-white/30"
+                  className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-primary via-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(31,91,255,0.38)] hover:shadow-[0_12px_32px_rgba(31,91,255,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 group border-2 border-white/30"
                   onClick={() => setVoiceOpen(true)}
                   aria-label={t('home_speak')}
                   title="Tap mic or hold [Space] to speak"
                 >
-                  <Mic className="h-6 w-6 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform duration-300" />
+                  <Mic className="h-5 w-5 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform duration-300" />
 
                   <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-surface2 text-muted text-[10px] font-700 border border-line opacity-0 group-hover:opacity-100 transition pointer-events-none shadow-xs">
                     Hold [Space]
@@ -319,9 +319,9 @@ export default function Home() {
               {/* Direct Typing Input Box */}
               <form
                 onSubmit={handleTypeSubmit}
-                className="relative flex-1 flex items-center bg-surface2/60 hover:bg-surface2/90 focus-within:bg-surface rounded-2xl border border-line/80 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300 pl-3.5 pr-2 py-2 shadow-xs hover:shadow-sm"
+                className="relative flex-1 min-w-0 flex items-center bg-surface2/60 hover:bg-surface2/90 focus-within:bg-surface rounded-2xl border border-line/80 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300 pl-3 pr-1.5 sm:pr-2 py-1.5 sm:py-2 shadow-xs hover:shadow-sm"
               >
-                <Search className="w-5 h-5 text-muted flex-shrink-0 z-10 transition-colors group-focus-within:text-primary" />
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-muted flex-shrink-0 z-10 transition-colors group-focus-within:text-primary" />
 
                 {/* Dynamic running suggestion text with lesser opacity */}
                 {!typeQuery && <SearchSuggestions />}
@@ -330,12 +330,12 @@ export default function Home() {
                   type="text"
                   value={typeQuery}
                   onChange={(e) => setTypeQuery(e.target.value)}
-                  className="flex-1 px-2.5 py-1.5 bg-transparent text-sm text-ink focus:outline-none font-600 min-w-0 z-10"
+                  className="flex-1 w-0 min-w-0 px-2 py-1 bg-transparent text-xs sm:text-sm text-ink focus:outline-none font-600 z-10"
                   aria-label="Search services"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-blue-600 hover:from-primary600 hover:to-blue-700 text-onprimary font-800 text-xs flex items-center gap-1.5 transition-all duration-200 shadow-[0_4px_12px_rgba(31,91,255,0.25)] hover:shadow-[0_6px_18px_rgba(31,91,255,0.35)] flex-shrink-0 active:scale-95 z-10"
+                  className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-xl bg-gradient-to-r from-primary to-blue-600 hover:from-primary600 hover:to-blue-700 text-onprimary font-800 text-xs flex items-center justify-center gap-1.5 transition-all duration-200 shadow-[0_4px_12px_rgba(31,91,255,0.25)] flex-shrink-0 active:scale-95 z-10"
                 >
                   <span className="hidden sm:inline">Find Pros</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -354,10 +354,10 @@ export default function Home() {
               <div className="service-grid" data-name="service category matrix">
                 {catsLoading
                   ? CATEGORIES.map((category) => (
-                      <div className="category-skeleton p-2 sm:p-2.5 rounded-2xl" key={category.slug}>
-                        <Skeleton className="h-11 w-11 sm:h-14 sm:w-14 rounded-xl" />
-                        <Skeleton className="h-3.5 w-14 sm:w-16 mt-1.5" />
-                        <Skeleton className="h-2.5 w-9 sm:w-11 mt-0.5" />
+                      <div className="category-skeleton p-3 rounded-2xl" key={category.slug}>
+                        <Skeleton className="h-14 w-14 rounded-xl" />
+                        <Skeleton className="h-4 w-20 mt-2" />
+                        <Skeleton className="h-3 w-12 mt-1" />
                       </div>
                     ))
                   : availableCategories.map((category) => {
@@ -365,7 +365,7 @@ export default function Home() {
                       return (
                         <button
                           key={category.slug}
-                          className={`group relative flex flex-col items-center justify-between p-2 sm:p-2.5 md:p-3 rounded-2xl transition-all duration-300 text-center outline-none ${
+                          className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-300 text-center outline-none ${
                             isSelected
                               ? 'bg-gradient-to-b from-primary/15 via-primary/5 to-surface dark:from-primary/25 dark:via-primary/10 dark:to-surface2/60 border-2 border-primary shadow-[0_12px_28px_-6px_rgba(31,91,255,0.28)] scale-[1.02] sm:scale-[1.03] -translate-y-0.5 sm:-translate-y-1 z-10'
                               : 'bg-surface/90 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line hover:border-primary/50 shadow-xs hover:shadow-md hover:-translate-y-1 active:scale-95'
@@ -376,11 +376,11 @@ export default function Home() {
                         >
                           {/* Top Selected Indicator Line */}
                           {isSelected && (
-                            <div className="absolute top-0 inset-x-2 sm:inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
+                            <div className="absolute top-0 inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
                           )}
 
                           {/* Thumbnail: Clean and clear photo without icons */}
-                          <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl overflow-hidden shadow-xs border border-line/70 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
+                          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/70 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
                             <img
                               src={category.image}
                               alt={t(category.labelKey)}
@@ -390,12 +390,12 @@ export default function Home() {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-60 group-hover:opacity-10 transition-opacity" />
                           </div>
 
-                          {/* Category Label and Pricing Tag - Popped out with bold typography & vibrant accent */}
-                          <div className="w-full text-center mt-1.5 sm:mt-2 min-w-0 px-0.5">
-                            <span className="font-900 font-uber text-[12px] sm:text-[13px] md:text-sm leading-tight text-ink block truncate group-hover:text-primary transition-colors tracking-tight">
+                          {/* Category Label and Pricing Tag - 2 columns gives ample room, zero truncation! */}
+                          <div className="w-full text-center mt-2 min-w-0 px-1">
+                            <span className="font-900 font-uber text-sm sm:text-base leading-tight text-ink block group-hover:text-primary transition-colors tracking-tight">
                               {t(category.labelKey)}
                             </span>
-                            <span className="text-[10px] sm:text-[11px] font-800 text-primary block mt-0.5 truncate tracking-tight">
+                            <span className="text-xs font-800 text-primary block mt-0.5 tracking-tight">
                               from ₹{category.startingPrice || 199}
                             </span>
                           </div>
