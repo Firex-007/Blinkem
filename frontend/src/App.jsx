@@ -43,122 +43,124 @@ function Header() {
   ];
 
   return (
-    <header className="app-header glass sticky top-0 z-40 border-b border-line">
-      {/* Mobile Header (< md) */}
-      <div className="md:hidden flex flex-col gap-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {!isRoot && (
+    <header className="app-header w-full glass sticky top-0 z-40 border-b border-line">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        {/* Mobile / Tablet Compact Header (< lg) */}
+        <div className="lg:hidden flex flex-col gap-2 py-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              {!isRoot && (
+                <button
+                  onClick={() => navigate(-1)}
+                  aria-label="Back"
+                  className="w-8 h-8 rounded-full bg-surface2 flex items-center justify-center text-ink hover:bg-soft transition flex-shrink-0"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
+              <Logo className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')} />
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <RoleSwitcher />
               <button
-                onClick={() => navigate(-1)}
-                aria-label="Back"
-                className="w-9 h-9 rounded-full bg-surface2 flex items-center justify-center text-ink hover:bg-soft transition"
+                onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
+                className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-line ring-2 ring-primary/20 flex-shrink-0"
+                title="Account Menu"
+                aria-label="Account Menu"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <img
+                  src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
+                  alt={currentUser?.name || 'Account'}
+                  className="w-full h-full object-cover"
+                />
               </button>
-            )}
-            <Logo className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')} />
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between pt-1 border-t border-line/50 text-xs">
             <button
-              onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
-              className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-line ring-2 ring-primary/20 flex-shrink-0"
-              title="Account Menu"
-              aria-label="Account Menu"
+              onClick={() => setIsLocationModalOpen(true)}
+              className="flex items-center gap-1.5 font-700 text-ink max-w-[200px] truncate"
+              title="Change service area"
             >
-              <img
-                src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
-                alt={currentUser?.name || 'Account'}
-                className="w-full h-full object-cover"
-              />
+              <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+              <span className="truncate">{userLocation?.name || 'T. Nagar'}, Chennai</span>
+              <ChevronDown className="w-3 h-3 text-muted flex-shrink-0" />
             </button>
-            <RoleSwitcher />
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <LangToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
-        <div className="flex items-center justify-between pt-1 border-t border-line/60">
-          <button
-            onClick={() => setIsLocationModalOpen(true)}
-            className="flex items-center gap-1.5 text-xs font-700 text-ink max-w-[210px] truncate"
-            title="Change service area"
-          >
-            <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-            <span className="truncate">{userLocation?.name || 'T. Nagar'}, Chennai</span>
-            <ChevronDown className="w-3.5 h-3.5 text-muted flex-shrink-0" />
-          </button>
-          <div className="flex items-center gap-1.5">
+
+        {/* Desktop Header (>= lg) */}
+        <div className="hidden lg:flex items-center justify-between gap-4 h-16">
+          {/* Left: Logo & Location */}
+          <div className="flex items-center gap-4 min-w-0">
+            <Logo className="cursor-pointer flex-shrink-0" onClick={() => navigate('/')} />
+            <button
+              onClick={() => setIsLocationModalOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-pill hover:border-primary transition text-xs font-700 text-ink shadow-sm group flex-shrink-0"
+              title="Change service area"
+            >
+              <MapPin className="w-4 h-4 text-primary flex-shrink-0 group-hover:scale-110 transition" />
+              <span>{userLocation?.name || 'T. Nagar'}, Chennai</span>
+              <ChevronDown className="w-3.5 h-3.5 text-muted group-hover:text-primary transition" />
+            </button>
+          </div>
+
+          {/* Center: Desktop Nav Links */}
+          <nav className="flex items-center gap-1 bg-surface2/70 p-1 rounded-full border border-line flex-shrink-0">
+            {navLinks.map((item) => {
+              const isActive = item.path === '/'
+                ? location.pathname === '/'
+                : location.pathname.startsWith(item.path);
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-800 transition ${
+                    isActive
+                      ? 'bg-primary text-onprimary shadow-sm'
+                      : 'text-muted hover:text-ink hover:bg-surface2'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right: Tools & Portal Switcher & Account Dropdown Button (Blinkit style) */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <LangToggle />
             <ThemeToggle />
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop Header (>= md) */}
-      <div className="hidden md:flex items-center justify-between gap-6">
-        {/* Left: Logo & Location */}
-        <div className="flex items-center gap-4">
-          <Logo className="cursor-pointer" onClick={() => navigate('/')} />
-          <button
-            onClick={() => setIsLocationModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-pill hover:border-primary transition text-xs font-700 text-ink shadow-sm group"
-            title="Change service area"
-          >
-            <MapPin className="w-4 h-4 text-primary flex-shrink-0 group-hover:scale-110 transition" />
-            <span>{userLocation?.name || 'T. Nagar'}, Chennai</span>
-            <ChevronDown className="w-3.5 h-3.5 text-muted group-hover:text-primary transition" />
-          </button>
-        </div>
-
-        {/* Center: Desktop Nav Links */}
-        <nav className="flex items-center gap-1 bg-surface2/70 p-1 rounded-full border border-line">
-          {navLinks.map((item) => {
-            const isActive = item.path === '/'
-              ? location.pathname === '/'
-              : location.pathname.startsWith(item.path);
-            return (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`px-4 py-1.5 rounded-full text-xs font-800 transition ${
-                  isActive
-                    ? 'bg-primary text-onprimary shadow-sm'
-                    : 'text-muted hover:text-ink hover:bg-surface2'
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Right: Tools & Portal Switcher & Account Dropdown Button (Blinkit style) */}
-        <div className="flex items-center gap-2">
-          <LangToggle />
-          <ThemeToggle />
-          <RoleSwitcher />
-          <button
-            onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition text-xs font-800 shadow-sm ml-1 ${
-              isAccountFlyoutOpen
-                ? 'bg-primary text-onprimary border-primary ring-2 ring-primary/30'
-                : 'glass-pill text-ink hover:border-primary'
-            }`}
-            title="Account Menu"
-            aria-expanded={isAccountFlyoutOpen}
-          >
-            <div className="w-5 h-5 rounded-full overflow-hidden shadow-xs flex-shrink-0 border border-line/80">
-              <img
-                src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span>Account</span>
-            <ChevronDown
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                isAccountFlyoutOpen ? 'rotate-180' : ''
+            <RoleSwitcher />
+            <button
+              onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition text-xs font-800 shadow-sm ml-1 ${
+                isAccountFlyoutOpen
+                  ? 'bg-primary text-onprimary border-primary ring-2 ring-primary/30'
+                  : 'glass-pill text-ink hover:border-primary'
               }`}
-            />
-          </button>
+              title="Account Menu"
+              aria-expanded={isAccountFlyoutOpen}
+            >
+              <div className="w-5 h-5 rounded-full overflow-hidden shadow-xs flex-shrink-0 border border-line/80">
+                <img
+                  src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span>Account</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                  isAccountFlyoutOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -176,24 +178,21 @@ function Shell({ children }) {
   } = useApp();
 
   return (
-    <>
-      <div className="nodi-shell">
-        <Header />
-        <main className="app-main">{children}</main>
-        <div className="md:hidden">
-          <BottomNav />
-        </div>
-        <AccountFlyout
-          open={isAccountFlyoutOpen}
-          onClose={() => setIsAccountFlyoutOpen(false)}
-        />
-        <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-        <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-        <CookieBanner />
-      </div>
-      {/* Footer sits outside the min-100dvh shell: it is the dead end, only reached at the very bottom */}
+    <div className="min-h-screen flex flex-col w-full bg-transparent">
+      <Header />
+      <main className="app-main flex-1 w-full flex flex-col">{children}</main>
       <Footer />
-    </>
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
+      <AccountFlyout
+        open={isAccountFlyoutOpen}
+        onClose={() => setIsAccountFlyoutOpen(false)}
+      />
+      <LocationModal open={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
+      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <CookieBanner />
+    </div>
   );
 }
 

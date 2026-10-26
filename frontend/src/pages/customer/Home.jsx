@@ -361,10 +361,10 @@ export default function Home() {
               <div className="service-grid" data-name="service category matrix">
                 {catsLoading
                   ? CATEGORIES.map((category) => (
-                      <div className="category-skeleton" key={category.slug}>
-                        <Skeleton className="h-14 w-14 rounded-xl" />
-                        <Skeleton className="h-3.5 w-16" />
-                        <Skeleton className="h-2.5 w-10" />
+                      <div className="category-skeleton p-2 sm:p-2.5 rounded-2xl" key={category.slug}>
+                        <Skeleton className="h-11 w-11 sm:h-14 sm:w-14 rounded-xl" />
+                        <Skeleton className="h-3 w-12 sm:w-16 mt-1" />
+                        <Skeleton className="h-2 w-8 sm:w-10 mt-0.5" />
                       </div>
                     ))
                   : availableCategories.map((category) => {
@@ -372,10 +372,10 @@ export default function Home() {
                       return (
                         <button
                           key={category.slug}
-                          className={`group relative flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl transition-all duration-300 text-left outline-none ${
+                          className={`group relative flex flex-col items-center justify-between p-1.5 sm:p-2.5 md:p-3 rounded-2xl transition-all duration-300 text-center outline-none ${
                             isSelected
-                              ? 'bg-gradient-to-b from-primary/15 via-primary/5 to-surface dark:from-primary/25 dark:via-primary/10 dark:to-surface2/60 border-2 border-primary shadow-[0_12px_28px_-6px_rgba(31,91,255,0.28)] scale-[1.03] -translate-y-1 z-10'
-                              : 'bg-surface/80 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line/80 hover:border-primary/50 shadow-xs hover:shadow-lg hover:-translate-y-1.5 active:scale-95'
+                              ? 'bg-gradient-to-b from-primary/15 via-primary/5 to-surface dark:from-primary/25 dark:via-primary/10 dark:to-surface2/60 border-2 border-primary shadow-[0_12px_28px_-6px_rgba(31,91,255,0.28)] scale-[1.02] sm:scale-[1.03] -translate-y-0.5 sm:-translate-y-1 z-10'
+                              : 'bg-surface/80 dark:bg-surface2/50 hover:bg-surface dark:hover:bg-surface2/80 border border-line/80 hover:border-primary/50 shadow-xs hover:shadow-lg hover:-translate-y-1 active:scale-95'
                           }`}
                           onClick={() => handleSelectCategory(category.slug)}
                           onDoubleClick={() => handleStartRequestForCat(category.slug)}
@@ -383,26 +383,26 @@ export default function Home() {
                         >
                           {/* Top Selected Indicator Line */}
                           {isSelected && (
-                            <div className="absolute top-0 inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
+                            <div className="absolute top-0 inset-x-2 sm:inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
                           )}
 
                           {/* Thumbnail: Clean and clear photo without icons */}
-                          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
+                          <div className="relative w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:shadow-[0_8px_18px_rgba(31,91,255,0.2)] group-hover:scale-105 transition-all duration-300">
                             <img
                               src={category.image}
                               alt={t(category.labelKey)}
-                              className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-500 ease-out"
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-60 group-hover:opacity-10 transition-opacity" />
                           </div>
 
                           {/* Category Label and Pricing Tag */}
-                          <div className="w-full text-center mt-2 min-w-0">
-                            <span className="font-800 text-xs sm:text-[13px] leading-tight text-ink block truncate group-hover:text-primary transition-colors">
+                          <div className="w-full text-center mt-1 sm:mt-1.5 min-w-0 px-0.5">
+                            <span className="font-800 text-[11px] sm:text-xs md:text-[13px] leading-tight text-ink block truncate group-hover:text-primary transition-colors">
                               {t(category.labelKey)}
                             </span>
-                            <span className="text-[10px] font-700 text-muted/90 block mt-0.5 truncate group-hover:text-primary/80 transition-colors">
+                            <span className="text-[9px] sm:text-[10px] font-700 text-muted/90 block mt-0.5 truncate group-hover:text-primary/80 transition-colors">
                               from ₹{category.startingPrice || 199}
                             </span>
                           </div>
