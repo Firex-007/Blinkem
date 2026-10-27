@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/demo/booking/:id/fast-forward", "destination": "/api/bookings/$id/fast-forward" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

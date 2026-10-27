@@ -14,3 +14,4 @@ page_*.png
 *.docx
 *.pdf
 blinkem-specs/
+.vercel/
