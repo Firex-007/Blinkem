@@ -310,6 +310,9 @@ export default function Login() {
                       <span className="text-xs text-muted block">
                         Sent to +91 {phoneNumber}
                       </span>
+                      <span className="inline-block mt-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+                        Test code: 1234
+                      </span>
                     </div>
 
                     <input

@@ -222,6 +222,9 @@ export default function LoginModal({ open, onClose }) {
                   <div className="text-center space-y-1">
                     <span className="text-sm font-800 text-ink block">Enter Verification Code</span>
                     <span className="text-xs text-muted block">Sent to +91 {phoneNumber}</span>
+                    <span className="inline-block mt-0.5 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                      Test code: 1234
+                    </span>
                   </div>
                   <input
                     type="text"

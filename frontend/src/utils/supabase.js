@@ -106,6 +106,20 @@ export async function registerUser({ name, email, phone, password, role = 'custo
         createdAt: new Date().toISOString(),
       };
 
+      // Always save to local store with password for seamless login even if Supabase requires email verification
+      const users = getLocalUsers();
+      const existingIdx = users.findIndex(
+        (u) =>
+          (cleanEmail && u.email === cleanEmail) ||
+          (cleanPhone && u.phone === `+91 ${cleanPhone}`)
+      );
+      if (existingIdx >= 0) {
+        users[existingIdx] = { ...users[existingIdx], ...profile, password };
+      } else {
+        users.push({ ...profile, password });
+      }
+      saveLocalUsers(users);
+
       saveSession(profile);
       return { success: true, user: profile };
     } catch (err) {
@@ -164,24 +178,24 @@ export async function signInUser({ identifier, password }) {
         password,
       });
 
-      if (error) throw error;
+      if (!error && data?.user) {
+        const metadata = data.user.user_metadata || {};
+        const profile = {
+          id: data.user.id,
+          name: metadata.name || data.user.email?.split('@')[0] || 'User',
+          email: data.user.email?.endsWith('@blinkem.local') ? '' : data.user.email,
+          phone: metadata.phone || '',
+          role: metadata.role || 'customer',
+          city: metadata.city || 'Chennai',
+          avatarUrl: metadata.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=User&backgroundColor=2563EB`,
+          isVerified: true,
+        };
 
-      const metadata = data.user.user_metadata || {};
-      const profile = {
-        id: data.user.id,
-        name: metadata.name || data.user.email?.split('@')[0] || 'User',
-        email: data.user.email?.endsWith('@blinkem.local') ? '' : data.user.email,
-        phone: metadata.phone || '',
-        role: metadata.role || 'customer',
-        city: metadata.city || 'Chennai',
-        avatarUrl: metadata.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=User&backgroundColor=2563EB`,
-        isVerified: true,
-      };
-
-      saveSession(profile);
-      return { success: true, user: profile };
+        saveSession(profile);
+        return { success: true, user: profile };
+      }
     } catch (err) {
-      console.warn('Supabase sign-in warning:', err.message);
+      console.warn('Supabase sign-in note:', err.message);
       // Fall through to check local users
     }
   }
