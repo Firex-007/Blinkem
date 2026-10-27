@@ -171,7 +171,7 @@ export default function ActiveJob() {
             </h1>
             <p className="text-xs text-muted flex items-center gap-1 mt-0.5">
               <MapPin className="w-3.5 h-3.5 text-primary" />
-              <span>{booking.address || 'Chennai'}</span>
+              <span>{booking.address || 'Service Location'}</span>
             </p>
           </div>
           <Chip

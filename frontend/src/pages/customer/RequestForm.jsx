@@ -20,21 +20,25 @@ const SERVICES = [
 ];
 
 export default function RequestForm() {
-  const { userId } = useApp();
+  const { userId, location: appLocation } = useApp();
   const [searchParams] = useSearchParams();
-  const location = useLocation();
+  const routerLocation = useLocation();
   const navigate = useNavigate();
-  const voiceState = location.state || {};
+  const voiceState = routerLocation.state || {};
 
   const todayStr = new Date().toISOString().split('T')[0];
   const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+  const defaultAddress = appLocation
+    ? `${appLocation.name}${appLocation.city ? `, ${appLocation.city}` : ''}`
+    : 'Local Area';
 
   const [category, setCategory] = useState(voiceState.category || searchParams.get('category') || 'plumber');
   const [description, setDescription] = useState(voiceState.description || voiceState.transcript || '');
   const [urgency, setUrgency] = useState(voiceState.urgency || 'now');
   const [scheduledDate, setScheduledDate] = useState(todayStr);
   const [scheduledTime, setScheduledTime] = useState('10:00');
-  const [address, setAddress] = useState('T. Nagar, Chennai');
+  const [address, setAddress] = useState(defaultAddress);
   const [budget, setBudget] = useState(voiceState.budget_hint ? String(voiceState.budget_hint) : '');
   const [voiceTranscript, setVoiceTranscript] = useState(voiceState.transcript || null);
   const [submitting, setSubmitting] = useState(false);
@@ -52,8 +56,11 @@ export default function RequestForm() {
         ? new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString()
         : null;
 
+      const reqLat = appLocation?.lat || 12.9716;
+      const reqLng = appLocation?.lng || 77.5946;
+
       const res = await api.post('/requests', {
-        category, description, lat: 13.0418, lng: 80.2341, address,
+        category, description, lat: reqLat, lng: reqLng, address,
         urgency, scheduled_at: scheduledIso,
         budget_hint: budget ? parseInt(budget, 10) : null,
         voice_transcript: voiceTranscript,

@@ -48,7 +48,7 @@ export default function LoginModal({ open, onClose }) {
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div>
             <h2 className="font-800 text-ink text-lg">Welcome to Blink'em</h2>
-            <p className="text-xs text-muted">Hyperlocal on-demand services across Chennai</p>
+            <p className="text-xs text-muted">Hyperlocal on-demand services in your city</p>
           </div>
           <button
             onClick={onClose}

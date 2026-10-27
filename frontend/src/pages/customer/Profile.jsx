@@ -157,8 +157,11 @@ export default function Profile() {
 
         <div className="p-3 rounded-chip bg-surface2/60 border border-line flex items-center justify-between">
           <div>
-            <span className="font-800 text-sm text-ink block">{location?.name || 'T. Nagar'}</span>
-            <span className="text-xs text-muted block">{location?.landmark || 'Pondy Bazaar, Chennai'}</span>
+            <span className="font-800 text-sm text-ink block">
+              {location?.name || 'Local Area'}
+              {location?.city ? `, ${location.city}` : ''}
+            </span>
+            <span className="text-xs text-muted block">{location?.landmark || 'Active Service Area'}</span>
           </div>
           <button
             onClick={detectLocation}
@@ -244,7 +247,7 @@ export default function Profile() {
       {/* App Version Info */}
       <div className="text-center text-xs text-muted pt-3 pb-2 space-y-1">
         <p className="font-700 text-ink text-sm">Blink'em Technologies Inc.</p>
-        <p className="text-[11px] text-muted">Hyperlocal On-Demand Service Infrastructure • Chennai</p>
+        <p className="text-[11px] text-muted">Hyperlocal On-Demand Service Infrastructure • Pan-India</p>
         <p className="text-[10px] text-muted/70">Production Release v2.4.0 • Enterprise Cloud</p>
       </div>
     </div>

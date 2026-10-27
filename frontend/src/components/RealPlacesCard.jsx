@@ -87,7 +87,7 @@ export default function RealPlacesCard({ place, onBook }) {
           <div className="flex items-center gap-2 pl-5 text-[11px]">
             <span className="font-800 text-ink">{place.distance_km} km away</span>
             <span>•</span>
-            <span className="text-muted">Chennai Hyperlocal Radar</span>
+            <span className="text-muted">Hyperlocal Radar</span>
           </div>
         </div>
 

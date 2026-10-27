@@ -93,7 +93,7 @@ export function CookieSettingsModal({ open, onClose }) {
                 Preferences &amp; Location Memory
               </span>
               <p className="text-xs text-muted leading-relaxed">
-                Remembers your selected Chennai neighborhood (e.g. T. Nagar, Adyar), custom profile edits, and light/dark theme across visits.
+                Remembers your selected city and neighborhood, custom profile edits, and light/dark theme across visits.
               </p>
             </div>
             <button

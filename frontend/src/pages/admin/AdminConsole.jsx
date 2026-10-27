@@ -187,7 +187,7 @@ export default function AdminConsole() {
                     <div>
                       <span className="font-800 text-sm text-ink block">{w.name}</span>
                       <span className="text-[11px] text-muted">
-                        {w.area_name || 'Chennai'} · {w.categories?.join(', ')}
+                        {w.area_name || 'Active Area'} · {w.categories?.join(', ')}
                       </span>
                       {w.phone && (
                         <span className="text-[11px] text-primary flex items-center gap-1 mt-0.5">
@@ -265,7 +265,7 @@ export default function AdminConsole() {
                     </Chip>
                   </div>
                   <span className="text-muted text-[11px] block mt-0.5">
-                    {b.address || 'Chennai'} · {b.counterpart?.name || 'Worker'}
+                    {b.address || 'Service Location'} · {b.counterpart?.name || 'Worker'}
                   </span>
                 </div>
                 <div className="text-right">

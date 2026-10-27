@@ -83,8 +83,11 @@ function Header() {
               title="Change service area"
             >
               <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-              <span className="truncate">{userLocation?.name || 'T. Nagar'}, Chennai</span>
-              <ChevronDown className="w-3 h-3 text-muted flex-shrink-0" />
+              <span className="truncate">
+                {userLocation?.name || 'Select Location'}
+                {userLocation?.city ? `, ${userLocation.city}` : ''}
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 text-muted flex-shrink-0" />
             </button>
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <LangToggle />
@@ -104,7 +107,10 @@ function Header() {
               title="Change service area"
             >
               <MapPin className="w-4 h-4 text-primary flex-shrink-0 group-hover:scale-110 transition" />
-              <span>{userLocation?.name || 'T. Nagar'}, Chennai</span>
+              <span className="truncate max-w-[190px]">
+                {userLocation?.name || 'Select Location'}
+                {userLocation?.city ? `, ${userLocation.city}` : ''}
+              </span>
               <ChevronDown className="w-3.5 h-3.5 text-muted group-hover:text-primary transition" />
             </button>
           </div>

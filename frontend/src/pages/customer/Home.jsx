@@ -226,19 +226,20 @@ export default function Home() {
     };
   }, []);
 
-  const curLat = location?.lat || 13.0418;
-  const curLng = location?.lng || 80.2341;
+  const curLat = location?.lat || 12.9716;
+  const curLng = location?.lng || 77.5946;
+  const curCity = location?.city || '';
   const mapCenter = useMemo(() => [curLat, curLng], [curLat, curLng]);
 
   useEffect(() => {
     let isMounted = true;
-    getRealPlaces(railCat, curLat, curLng).then((data) => {
+    getRealPlaces(railCat, curLat, curLng, curCity).then((data) => {
       if (isMounted) setRealPlaces(data || []);
     });
     return () => {
       isMounted = false;
     };
-  }, [railCat, curLat, curLng]);
+  }, [railCat, curLat, curLng, curCity]);
 
   const {
     data: categories,
@@ -777,7 +778,8 @@ export default function Home() {
             <div>
               <strong>{t('home_verified_workers')}</strong>
               <p>
-                {location?.name || 'T. Nagar'}, Chennai · {t('home_pay_after')}
+                {location?.name || 'Local Area'}
+                {location?.city ? `, ${location.city}` : ''} · {t('home_pay_after')}
               </p>
             </div>
           </section>

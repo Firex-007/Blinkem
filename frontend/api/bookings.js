@@ -1,4 +1,5 @@
 // Vercel Serverless Function: GET /api/bookings
+import { store } from './_store.js';
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,6 +10,6 @@ export default function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Return empty list of active bookings if none
-  return res.status(200).json([]);
+  const list = Array.from(store.bookings.values());
+  return res.status(200).json(list);
 }

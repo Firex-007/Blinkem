@@ -1,6 +1,6 @@
 // Vercel Serverless Function: GET /api/nearby-workers
 
-const WORKERS = [
+export const WORKERS = [
   {
     id: 1,
     user_id: 3,

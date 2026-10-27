@@ -175,7 +175,7 @@ export default function Bookings() {
                   <div className="flex items-center justify-between text-xs text-muted pt-2 border-t border-line/60">
                     <div className="flex items-center gap-1.5 truncate max-w-[220px]">
                       <MapPin className="w-3.5 h-3.5 shrink-0 text-muted" />
-                      <span className="truncate">{b.address || 'Chennai'}</span>
+                      <span className="truncate">{b.address || 'Service Location'}</span>
                     </div>
 
                     {b.otp_code && !isFinished && (

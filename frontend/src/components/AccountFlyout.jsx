@@ -21,7 +21,6 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { CHENNAI_LOCALITIES } from '../data/chennaiLocalities';
 
 export default function AccountFlyout({ open, onClose }) {
   const navigate = useNavigate();
@@ -336,7 +335,10 @@ export default function AccountFlyout({ open, onClose }) {
                 </div>
                 <div>
                   <span className="text-sm font-800 block">Service Location &amp; GPS</span>
-                  <span className="text-[11px] text-muted">Active: {location?.name || 'T. Nagar'}, Chennai</span>
+                  <span className="text-[11px] text-muted">
+                    Active: {location?.name || 'Local Area'}
+                    {location?.city ? `, ${location.city}` : ''}
+                  </span>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted group-hover:text-ink group-hover:translate-x-1 transition" />

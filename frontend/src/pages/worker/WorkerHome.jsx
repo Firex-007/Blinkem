@@ -269,7 +269,7 @@ export default function WorkerHome() {
                 </span>
               </div>
               <span className="text-xs opacity-90 block">
-                {activeJob.address || 'Chennai'} · ₹{activeJob.final_price || activeJob.agreed_price}
+                {activeJob.address || 'Service Location'} · ₹{activeJob.final_price || activeJob.agreed_price}
               </span>
             </div>
           </div>
@@ -379,7 +379,7 @@ export default function WorkerHome() {
                   </p>
                   <p className="text-xs text-muted mt-0.5 flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
-                    <span>{req.address || 'Chennai'}</span>
+                    <span>{req.address || 'Service Location'}</span>
                   </p>
                 </div>
 

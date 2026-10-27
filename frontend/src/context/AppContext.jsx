@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { CHENNAI_LOCALITIES, findClosestLocality } from '../data/chennaiLocalities';
+import { DEFAULT_LOCATION, reverseGeocodeGps, CITIES } from '../data/cities';
 import {
   getCookieConsent,
   setCookieConsent,
@@ -97,18 +97,18 @@ export function AppProvider({ children }) {
 
   const [location, setLocation] = useState(() => {
     const consent = getCookieConsent();
-    if (consent === 'none') return CHENNAI_LOCALITIES[0];
+    if (consent === 'none') return DEFAULT_LOCATION;
     const { location: savedLoc } = loadUserPreferences();
     if (savedLoc) return savedLoc;
     if (typeof localStorage !== 'undefined') {
       const saved = localStorage.getItem('userLocation');
       try {
-        return saved ? JSON.parse(saved) : CHENNAI_LOCALITIES[0];
+        return saved ? JSON.parse(saved) : DEFAULT_LOCATION;
       } catch {
-        return CHENNAI_LOCALITIES[0];
+        return DEFAULT_LOCATION;
       }
     }
-    return CHENNAI_LOCALITIES[0];
+    return DEFAULT_LOCATION;
   });
 
   const [locationStatus, setLocationStatus] = useState('idle');
@@ -212,7 +212,7 @@ export function AppProvider({ children }) {
     }
     if (cookieConsent === 'none') {
       setAccounts({ ...REGISTERED_ACCOUNTS });
-      setLocation(CHENNAI_LOCALITIES[0]);
+      setLocation(DEFAULT_LOCATION);
     }
   };
 
@@ -226,19 +226,17 @@ export function AppProvider({ children }) {
 
       setLocationStatus('detecting');
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          const closest = findClosestLocality(latitude, longitude);
-          const detected = {
-            name: closest.name,
-            lat: latitude,
-            lng: longitude,
-            landmark: `GPS Coordinates (${latitude.toFixed(4)}, ${longitude.toFixed(4)}) - Near ${closest.name}`,
-            isGps: true,
-          };
-          setLocationPersist(detected);
-          setLocationStatus('granted');
-          resolve(detected);
+        async (pos) => {
+          try {
+            const { latitude, longitude } = pos.coords;
+            const detected = await reverseGeocodeGps(latitude, longitude);
+            setLocationPersist(detected);
+            setLocationStatus('granted');
+            resolve(detected);
+          } catch (err) {
+            setLocationStatus('denied');
+            reject(err);
+          }
         },
         (err) => {
           setLocationStatus('denied');

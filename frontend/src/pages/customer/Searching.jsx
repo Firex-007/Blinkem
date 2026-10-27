@@ -137,7 +137,7 @@ export default function Searching() {
       {/* Bottom hint */}
       <div className="text-xs text-muted pt-6 flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-success animate-ping" />
-        <span>Live dispatching in Chennai · Average response &lt;10s</span>
+        <span>Live dispatching nearby · Average response &lt;10s</span>
       </div>
     </div>
   );
