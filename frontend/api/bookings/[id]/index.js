@@ -1,5 +1,5 @@
 // Vercel Serverless Function: GET /api/bookings/:id
-import { store } from '../_store.js';
+import { store } from '../../_store.js';
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,9 +22,9 @@ export default function handler(req, res) {
       display_status: 'on_the_way',
       category: 'plumber',
       description: 'Kitchen sink pipe repair',
-      address: 'No. 14, Usman Road, T. Nagar, Chennai',
-      lat: 13.0418,
-      lng: 80.2341,
+      address: 'Main Street, Active City',
+      lat: 12.9716,
+      lng: 77.5946,
       agreed_price: 299,
       extra_total: 0,
       final_price: 299,
@@ -32,12 +32,12 @@ export default function handler(req, res) {
       eta_min: 12,
       eta_remaining_min: 6,
       progress_pct: 50,
-      worker_pos: { lat: 13.0445, lng: 80.2355 },
+      worker_pos: { lat: 12.9750, lng: 77.5980 },
       worker: {
         id: 1,
         name: 'Muthu K',
         avatar_color: '#1F5BFF',
-        area_name: 'T. Nagar, Chennai',
+        area_name: 'Local Area',
         rating_avg: 4.8,
         rating_count: 112,
         jobs_done: 140,

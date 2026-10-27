@@ -1,5 +1,5 @@
 // Vercel Serverless Function: GET /api/bookings
-import { store } from './_store.js';
+import { store } from '../_store.js';
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

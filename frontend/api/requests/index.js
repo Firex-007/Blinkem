@@ -1,5 +1,5 @@
 // Vercel Serverless Function: POST & GET /api/requests
-import { createMockRequest, store } from './_store.js';
+import { createMockRequest, store } from '../_store.js';
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,7 +30,6 @@ export default function handler(req, res) {
     if (id) {
       const existing = store.requests.get(String(id));
       if (!existing) {
-        // Auto-generate fallback request if not in memory
         const fallback = createMockRequest({ category: 'plumber' });
         return res.status(200).json(fallback);
       }
