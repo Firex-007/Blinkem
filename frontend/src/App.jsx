@@ -62,18 +62,32 @@ function Header() {
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <RoleSwitcher />
-              <button
-                onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
-                className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-line ring-2 ring-primary/20 flex-shrink-0"
-                title="Account Menu"
-                aria-label="Account Menu"
-              >
-                <img
-                  src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
-                  alt={currentUser?.name || 'Account'}
-                  className="w-full h-full object-cover"
-                />
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
+                  className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-line ring-2 ring-primary/20 flex-shrink-0"
+                  title="Account Menu"
+                  aria-label="Account Menu"
+                >
+                  <img
+                    src={
+                      currentUser?.avatarUrl ||
+                      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                        currentUser?.name || 'User'
+                      )}&backgroundColor=2563EB`
+                    }
+                    alt={currentUser?.name || 'Account'}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="px-3 py-1.5 rounded-full bg-primary text-onprimary text-xs font-800 shadow-sm hover:bg-primary600 transition flex-shrink-0"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
           </div>
           <div className="flex items-center justify-between pt-1 border-t border-line/50 text-xs">
@@ -142,30 +156,44 @@ function Header() {
             <LangToggle />
             <ThemeToggle />
             <RoleSwitcher />
-            <button
-              onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition text-xs font-800 shadow-sm ml-1 ${
-                isAccountFlyoutOpen
-                  ? 'bg-primary text-onprimary border-primary ring-2 ring-primary/30'
-                  : 'glass-pill text-ink hover:border-primary'
-              }`}
-              title="Account Menu"
-              aria-expanded={isAccountFlyoutOpen}
-            >
-              <div className="w-5 h-5 rounded-full overflow-hidden shadow-xs flex-shrink-0 border border-line/80">
-                <img
-                  src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span>Account</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                  isAccountFlyoutOpen ? 'rotate-180' : ''
+            {isAuthenticated ? (
+              <button
+                onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition text-xs font-800 shadow-sm ml-1 ${
+                  isAccountFlyoutOpen
+                    ? 'bg-primary text-onprimary border-primary ring-2 ring-primary/30'
+                    : 'glass-pill text-ink hover:border-primary'
                 }`}
-              />
-            </button>
+                title="Account Menu"
+                aria-expanded={isAccountFlyoutOpen}
+              >
+                <div className="w-5 h-5 rounded-full overflow-hidden shadow-xs flex-shrink-0 border border-line/80">
+                  <img
+                    src={
+                      currentUser?.avatarUrl ||
+                      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                        currentUser?.name || 'User'
+                      )}&backgroundColor=2563EB`
+                    }
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="max-w-[100px] truncate">{currentUser?.name || 'Account'}</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isAccountFlyoutOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="px-4 py-1.5 rounded-full bg-primary text-onprimary text-xs font-800 shadow-sm hover:bg-primary600 transition ml-1"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -215,7 +243,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Shell><Home /></Shell></ProtectedRoute>} />
+          <Route path="/" element={<Shell><Home /></Shell>} />
           <Route path="/request/new" element={<ProtectedRoute><Shell><RequestForm /></Shell></ProtectedRoute>} />
           <Route path="/request/:id/searching" element={<ProtectedRoute><Shell><Searching /></Shell></ProtectedRoute>} />
           <Route path="/request/:id/offers" element={<ProtectedRoute><Shell><Offers /></Shell></ProtectedRoute>} />

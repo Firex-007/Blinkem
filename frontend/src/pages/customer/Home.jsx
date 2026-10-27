@@ -26,6 +26,7 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../api';
 import { t } from '../../i18n';
 import usePolling from '../../hooks/usePolling';
+import LiquidGlass from '../../components/LiquidGlass';
 import VoiceSheet from '../../components/VoiceSheet';
 import WorkerCard from '../../components/WorkerCard';
 import RealPlacesCard from '../../components/RealPlacesCard';
@@ -319,7 +320,7 @@ export default function Home() {
       <div className="home-desktop-grid">
         {/* LEFT COLUMN: The Request Console */}
         <div className="home-primary-column space-y-6">
-          <section className="request-console scroll-reveal" data-name="request console">
+          <LiquidGlass as="section" radius={28} glow={1.1} className="request-console scroll-reveal" data-name="request console">
             {/* Locality & Header */}
             <div className="space-y-1.5">
               <h1 className="home-display font-uber text-ink leading-tight" data-name="request headline">
@@ -513,7 +514,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </section>
+          </LiquidGlass>
 
           {/* 4 Instant Fix Packages (2x2 Grid) - Liquid Glass Container */}
           <section className="liquid-glass rounded-card p-4 space-y-3 scroll-reveal">

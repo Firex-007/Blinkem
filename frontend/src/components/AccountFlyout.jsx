@@ -38,14 +38,16 @@ export default function AccountFlyout({ open, onClose }) {
     lang,
     setLang,
     setIsCookieModalOpen,
+    isAuthenticated,
+    setIsLoginModalOpen,
   } = useApp();
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: currentUser?.name || 'Priya S',
-    phone: currentUser?.phone || '+91 98401 23456',
-    email: currentUser?.email || 'priya.chennai@example.com',
-    address: currentUser?.address || 'No. 14, Usman Road, T. Nagar, Chennai',
+    name: currentUser?.name || '',
+    phone: currentUser?.phone || '',
+    email: currentUser?.email || '',
+    address: currentUser?.address || '',
   });
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -146,38 +148,57 @@ export default function AccountFlyout({ open, onClose }) {
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 border-2 border-primary/40 relative">
                   <img
-                    src={currentUser?.avatarUrl || '/images/users/priya.jpg'}
+                    src={
+                      currentUser?.avatarUrl ||
+                      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                        currentUser?.name || 'User'
+                      )}&backgroundColor=2563EB`
+                    }
                     alt={currentUser?.name || 'Account'}
                     className="w-full h-full object-cover"
                   />
-                  <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-success border-2 border-surface" />
+                  {isAuthenticated && (
+                    <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-success border-2 border-surface" />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-800 text-ink text-base sm:text-lg leading-tight truncate">
-                    {currentUser?.name || 'Customer Account'}
+                    {currentUser?.name || (isAuthenticated ? 'Customer Account' : 'Guest Visitor')}
                   </h3>
                   <p className="text-xs text-muted font-medium mt-0.5 truncate flex items-center gap-1">
-                    <Phone className="w-3 h-3" /> {currentUser?.phone || '+91 98401 23456'}
+                    <Phone className="w-3 h-3" /> {currentUser?.phone || (isAuthenticated ? 'Verified User' : 'Not Signed In')}
                   </p>
                   <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-800 uppercase tracking-wider">
                     <ShieldCheck className="w-3 h-3" />
-                    {role === 'worker' ? 'Partner Pro' : role === 'admin' ? 'Admin Ops' : 'Verified Customer'}
+                    {role === 'worker' ? 'Partner Pro' : role === 'admin' ? 'Admin Ops' : isAuthenticated ? 'Verified Customer' : 'Guest'}
                   </div>
                 </div>
               </div>
 
-              <button
-                onClick={() => setIsEditing((prev) => !prev)}
-                className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-800 flex-shrink-0 ${
-                  isEditing
-                    ? 'bg-primary text-onprimary shadow-xs'
-                    : 'bg-surface hover:bg-soft text-primary border border-line'
-                }`}
-                title={isEditing ? 'Cancel Edit' : 'Edit Name and Address'}
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>{isEditing ? 'Cancel' : 'Edit'}</span>
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => setIsEditing((prev) => !prev)}
+                  className={`p-2 rounded-xl transition flex items-center gap-1 text-xs font-800 flex-shrink-0 ${
+                    isEditing
+                      ? 'bg-primary text-onprimary shadow-xs'
+                      : 'bg-surface hover:bg-soft text-primary border border-line'
+                  }`}
+                  title={isEditing ? 'Cancel Edit' : 'Edit Name and Address'}
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>{isEditing ? 'Cancel' : 'Edit'}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    onClose();
+                    setIsLoginModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-primary text-onprimary text-xs font-800 shadow-xs hover:bg-primary600 transition flex-shrink-0"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
 
             {/* Editable Form Fields */}

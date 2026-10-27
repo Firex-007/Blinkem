@@ -6,65 +6,41 @@ import {
   saveUserPreferences,
   loadUserPreferences,
 } from '../utils/cookieManager';
+import {
+  getSavedSession,
+  saveSession,
+  logoutAuth,
+  isSupabaseConfigured,
+  supabase,
+} from '../utils/supabase';
 
 const AppContext = createContext(null);
 
-export const REGISTERED_ACCOUNTS = {
-  '1': {
-    id: 1,
-    name: 'Priya S',
-    phone: '+91 98401 23456',
-    email: 'priya.chennai@example.com',
-    role: 'customer',
-    avatarUrl: '/images/users/priya.jpg',
-    avatarColor: '#1F5BFF',
-    address: 'No. 14, Usman Road, T. Nagar, Chennai',
-  },
-  '3': {
-    id: 3,
-    name: 'Muthu K',
-    phone: '+91 98403 45678',
-    email: 'muthu.plumbing@example.com',
-    role: 'worker',
-    avatarUrl: '/images/users/muthu.jpg',
-    avatarColor: '#1F5BFF',
-    category: 'plumber',
-    rating: 4.8,
-    jobsDone: 140,
-    address: 'T. Nagar & Central Chennai Cluster',
-  },
-  '99': {
-    id: 99,
-    name: 'Meera R',
-    phone: '+91 98409 99999',
-    email: 'admin.meera@blinkem.in',
-    role: 'admin',
-    avatarUrl: '/images/users/meera.jpg',
-    avatarColor: '#8B5CF6',
-    address: 'Blink\'em Operations HQ, Guindy, Chennai',
-  },
+const DEFAULT_GUEST = {
+  id: 'guest',
+  name: 'Customer',
+  phone: '',
+  email: '',
+  role: 'customer',
+  city: 'Chennai',
+  avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Customer&backgroundColor=2563EB',
+  isVerified: false,
 };
-
-export const DEMO_USERS = REGISTERED_ACCOUNTS;
 
 export function AppProvider({ children }) {
   const [cookieConsent, setCookieConsentState] = useState(() => getCookieConsent());
   const [isCookieModalOpen, setIsCookieModalOpen] = useState(false);
 
-  const [accounts, setAccounts] = useState(() => {
-    // If cookie consent is 'none', do NOT load stored profile
-    const consent = getCookieConsent();
-    if (consent === 'none') {
-      return { ...REGISTERED_ACCOUNTS };
-    }
-    const { profile } = loadUserPreferences();
-    if (profile && profile.id) {
-      return {
-        ...REGISTERED_ACCOUNTS,
-        [String(profile.id)]: { ...REGISTERED_ACCOUNTS[String(profile.id)], ...profile },
-      };
-    }
-    return { ...REGISTERED_ACCOUNTS };
+  // Active authenticated user session
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = getSavedSession();
+    if (saved && saved.id) return saved;
+    return DEFAULT_GUEST;
+  });
+
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const saved = getSavedSession();
+    return Boolean(saved && saved.id && saved.id !== 'guest');
   });
 
   const [theme, setTheme] = useState(() => {
@@ -79,20 +55,6 @@ export function AppProvider({ children }) {
     const consent = getCookieConsent();
     if (consent === 'none') return 'en';
     return localStorage.getItem('lang') || 'en';
-  });
-
-  const [userId, setUserId] = useState(() => {
-    if (typeof localStorage === 'undefined') return '1';
-    const consent = getCookieConsent();
-    if (consent === 'none') return '1';
-    return localStorage.getItem('userId') || '1';
-  });
-
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    if (typeof localStorage === 'undefined') return true;
-    const consent = getCookieConsent();
-    if (consent === 'none') return true;
-    return localStorage.getItem('isAuthenticated') === 'true';
   });
 
   const [location, setLocation] = useState(() => {
@@ -116,6 +78,38 @@ export function AppProvider({ children }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAccountFlyoutOpen, setIsAccountFlyoutOpen] = useState(false);
 
+  // Sync Supabase Auth state listener if configured
+  useEffect(() => {
+    if (isSupabaseConfigured() && supabase) {
+      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user) {
+          const meta = session.user.user_metadata || {};
+          const profile = {
+            id: session.user.id,
+            name: meta.name || session.user.email?.split('@')[0] || 'User',
+            email: session.user.email?.endsWith('@blinkem.local') ? '' : session.user.email,
+            phone: meta.phone || '',
+            role: meta.role || 'customer',
+            city: meta.city || 'Chennai',
+            avatarUrl: meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=User&backgroundColor=2563EB`,
+            isVerified: true,
+          };
+          setCurrentUser(profile);
+          setIsAuthenticated(true);
+          saveSession(profile);
+        } else if (event === 'SIGNED_OUT') {
+          setCurrentUser(DEFAULT_GUEST);
+          setIsAuthenticated(false);
+          saveSession(null);
+        }
+      });
+
+      return () => {
+        authListener?.subscription?.unsubscribe();
+      };
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof document === 'undefined') return;
     if (theme === 'dark') document.documentElement.classList.add('dark');
@@ -131,13 +125,9 @@ export function AppProvider({ children }) {
     setCookieConsent(level);
     setCookieConsentState(level);
     if (level === 'none') {
-      // Wipe preferences from storage and reset to default
-      setAccounts({ ...REGISTERED_ACCOUNTS });
-      setLocation(CHENNAI_LOCALITIES[0]);
+      setLocation(DEFAULT_LOCATION);
     } else {
-      // Save current state
-      const current = accounts[userId] || accounts['1'];
-      saveUserPreferences(current, location);
+      saveUserPreferences(currentUser, location);
     }
   };
 
@@ -155,65 +145,69 @@ export function AppProvider({ children }) {
     }
   };
 
-  const setUserIdPersist = (v) => {
-    setUserId(String(v));
-    if (cookieConsent !== 'none' && typeof localStorage !== 'undefined') {
-      localStorage.setItem('userId', String(v));
-    }
-  };
-
   const setLocationPersist = (loc) => {
     setLocation(loc);
     if (cookieConsent !== 'none') {
-      saveUserPreferences(accounts[userId] || accounts['1'], loc);
+      saveUserPreferences(currentUser, loc);
     }
+  };
+
+  const loginUser = (userProfile) => {
+    setCurrentUser(userProfile);
+    setIsAuthenticated(true);
+    saveSession(userProfile);
+    if (cookieConsent !== 'none') {
+      saveUserPreferences(userProfile, location);
+    }
+  };
+
+  const logoutUser = async () => {
+    await logoutAuth();
+    setCurrentUser(DEFAULT_GUEST);
+    setIsAuthenticated(false);
+    saveSession(null);
   };
 
   const updateUserProfile = (fields) => {
-    setAccounts((prev) => {
-      const activeId = String(userId);
-      const current = prev[activeId] || prev['1'];
-      const updated = { ...current, ...fields };
-      const nextAccounts = { ...prev, [activeId]: updated };
+    setCurrentUser((prev) => {
+      const updated = { ...prev, ...fields };
+      saveSession(updated);
       if (cookieConsent !== 'none') {
         saveUserPreferences(updated, location);
       }
-      return nextAccounts;
+      return updated;
     });
   };
 
-  const currentUser = accounts[userId] || accounts['1'];
   const role = currentUser?.role || 'customer';
+  const userId = currentUser?.id || 'guest';
 
   const setRole = (targetRole) => {
-    if (targetRole === 'worker') setUserIdPersist('3');
-    else if (targetRole === 'admin') setUserIdPersist('99');
-    else setUserIdPersist('1');
+    updateUserProfile({ role: targetRole });
   };
 
-  const login = (id) => {
-    const acct = REGISTERED_ACCOUNTS[String(id)];
-    if (!acct) return false;
-    setUserId(String(id));
-    setIsAuthenticated(true);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userId', String(id));
-    }
+  // Backwards compatibility helper for demo/legacy call sites
+  const login = (roleOrId) => {
+    let targetRole = 'customer';
+    if (roleOrId === '3' || roleOrId === 'worker') targetRole = 'worker';
+    if (roleOrId === '99' || roleOrId === 'admin') targetRole = 'admin';
+
+    const mockProfile = {
+      id: `usr_${targetRole}`,
+      name: targetRole === 'worker' ? 'Partner Pro' : targetRole === 'admin' ? 'Admin Ops' : 'Customer',
+      phone: '+91 98401 23456',
+      email: `${targetRole}@blinkem.in`,
+      role: targetRole,
+      city: location?.city || 'Chennai',
+      avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${targetRole}&backgroundColor=2563EB`,
+      isVerified: true,
+    };
+    loginUser(mockProfile);
     return true;
   };
 
-  const logoutUser = () => {
-    setUserId('1');
-    setIsAuthenticated(false);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('userId');
-    }
-    if (cookieConsent === 'none') {
-      setAccounts({ ...REGISTERED_ACCOUNTS });
-      setLocation(DEFAULT_LOCATION);
-    }
+  const setUserId = (id) => {
+    login(id);
   };
 
   const detectLocation = () => {
@@ -255,8 +249,9 @@ export function AppProvider({ children }) {
         lang,
         setLang: setLangPersist,
         userId,
-        setUserId: setUserIdPersist,
+        setUserId,
         login,
+        loginUser,
         isAuthenticated,
         setIsAuthenticated,
         role,
