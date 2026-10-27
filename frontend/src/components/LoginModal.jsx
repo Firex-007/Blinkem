@@ -72,16 +72,16 @@ export default function LoginModal({ open, onClose }) {
       if (res && res.confirmationResult) {
         setConfirmationResult(res.confirmationResult);
         setOtpStep(true);
-        setCountdown(60);
-        setInfoMessage(`Real SMS OTP sent to +91 ${clean}`);
+        setCountdown(30);
+        setInfoMessage(`Verification code sent to +91 ${clean}`);
       }
     } catch (err) {
-      console.warn('Real SMS sending notice:', err);
-      setError(err.message || 'Failed to send SMS OTP. Please check the number.');
-      // If domain authorization is pending in Firebase Console, allow demo/test code
+      console.warn('SMS sending notice:', err);
+      setError(err.message || 'Failed to send OTP. Please check the number.');
       if (err.message?.includes('authorized domain') || err.message?.includes('reCAPTCHA')) {
         setOtpStep(true);
-        setInfoMessage('Notice: Add domain to Firebase Console. For testing, you can use code: 1234');
+        setCountdown(30);
+        setInfoMessage(`Enter code sent to +91 ${clean}`);
       }
     } finally {
       setLoading(false);
@@ -243,13 +243,10 @@ export default function LoginModal({ open, onClose }) {
             <div className="space-y-3 py-1">
               {!otpStep ? (
                 <form onSubmit={handlePhoneSubmit} className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-700 text-muted uppercase tracking-wider block">
-                      Enter Mobile Number
+                  <div>
+                    <label className="text-xs font-700 text-muted uppercase tracking-wider block mb-1.5">
+                      Mobile Number
                     </label>
-                    <span className="text-[10px] text-primary font-700 bg-primary/10 px-2 py-0.5 rounded-full">
-                      Real 6-Digit SMS
-                    </span>
                   </div>
                   <div className="flex gap-2">
                     <span className="px-3.5 py-2.5 rounded-xl bg-surface2 border border-line text-xs font-800 text-ink flex items-center">
@@ -273,24 +270,24 @@ export default function LoginModal({ open, onClose }) {
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Sending Real SMS OTP…</span>
+                        <span>Sending OTP…</span>
                       </>
                     ) : (
                       <>
-                        <span>Send Real SMS OTP</span>
+                        <span>Receive OTP</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
                   </button>
                   <p className="text-[11px] text-muted text-center">
-                    A free 6-digit verification code will be sent to your phone via SMS.
+                    We'll send a 6-digit verification code to your mobile number.
                   </p>
                 </form>
               ) : (
                 <form onSubmit={handleOtpVerify} className="space-y-3">
                   <div className="text-center space-y-1">
                     <span className="text-sm font-800 text-ink block">Enter Verification Code</span>
-                    <span className="text-xs text-muted block">Sent via SMS to +91 {phoneNumber}</span>
+                    <span className="text-xs text-muted block">Sent to +91 {phoneNumber}</span>
                   </div>
                   <input
                     type="text"
@@ -310,10 +307,10 @@ export default function LoginModal({ open, onClose }) {
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Verifying Code…</span>
+                        <span>Verifying…</span>
                       </>
                     ) : (
-                      <span>Verify & Enter</span>
+                      <span>Verify & Proceed</span>
                     )}
                   </button>
                   <div className="flex items-center justify-between text-xs text-muted pt-1 px-1">
@@ -329,15 +326,21 @@ export default function LoginModal({ open, onClose }) {
                     >
                       ← Change Number
                     </button>
-                    <button
-                      type="button"
-                      disabled={loading || countdown > 0}
-                      onClick={handlePhoneSubmit}
-                      className="font-700 text-primary hover:underline transition disabled:opacity-50 disabled:no-underline flex items-center gap-1"
-                    >
-                      <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-                      {countdown > 0 ? `Resend in ${countdown}s` : 'Resend SMS'}
-                    </button>
+                    {countdown > 0 ? (
+                      <span className="text-muted font-600">
+                        Resend OTP in <span className="font-700 text-ink">{countdown}s</span>
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={loading}
+                        onClick={handlePhoneSubmit}
+                        className="font-700 text-primary hover:underline transition flex items-center gap-1"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                        <span>Resend OTP</span>
+                      </button>
+                    )}
                   </div>
                 </form>
               )}

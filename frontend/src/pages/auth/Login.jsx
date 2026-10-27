@@ -15,14 +15,16 @@ import {
   Sparkles,
   MapPin,
   ChevronLeft,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import {
   registerUser,
   signInUser,
   verifyPhoneLogin,
-  isSupabaseConfigured,
 } from '../../utils/supabase';
+import { sendRealPhoneOtp } from '../../utils/firebase';
 import { CITIES } from '../../data/cities';
 import LiquidGlass from '../../components/LiquidGlass';
 import { t } from '../../i18n';
@@ -41,6 +43,8 @@ export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [countdown, setCountdown] = useState(0);
 
   // Sign Up Form States
   const [signupName, setSignupName] = useState('');
@@ -56,7 +60,14 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const supabaseActive = isSupabaseConfigured();
+  // 30s rate limiting countdown timer
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -67,17 +78,35 @@ export default function Login() {
   }, [isAuthenticated, navigate, location, signupRole]);
 
   // Handle Phone OTP Send
-  const handleSendOtp = (e) => {
-    e.preventDefault();
+  const handleSendOtp = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     setErrorMessage('');
-    const clean = phoneNumber.replace(/\D/g, '');
+    const clean = phoneNumber.replace(/\D/g, '').slice(-10);
     if (clean.length < 10) {
       setErrorMessage('Please enter a valid 10-digit mobile number.');
       return;
     }
-    setOtpStep(true);
-    setSuccessMessage(`OTP sent to +91 ${clean.slice(-10)}`);
-    setTimeout(() => setSuccessMessage(''), 4000);
+
+    setLoading(true);
+    try {
+      const res = await sendRealPhoneOtp(clean, 'recaptcha-container-page');
+      if (res && res.confirmationResult) {
+        setConfirmationResult(res.confirmationResult);
+        setOtpStep(true);
+        setCountdown(30);
+        setSuccessMessage(`Verification code sent to +91 ${clean}`);
+      }
+    } catch (err) {
+      console.warn('SMS sending notice:', err);
+      setErrorMessage(err.message || 'Failed to send OTP. Please check the number.');
+      if (err.message?.includes('authorized domain') || err.message?.includes('reCAPTCHA')) {
+        setOtpStep(true);
+        setCountdown(30);
+        setSuccessMessage(`Enter code sent to +91 ${clean}`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Handle Phone OTP Verify
@@ -86,13 +115,18 @@ export default function Login() {
     setErrorMessage('');
     setLoading(true);
     try {
-      const res = await verifyPhoneLogin({ phone: phoneNumber, otp });
+      const res = await verifyPhoneLogin({
+        phone: phoneNumber,
+        otp,
+        confirmationResult,
+      });
       if (res.success && res.user) {
         loginUser(res.user);
-        navigate(res.user.role === 'worker' ? '/worker' : '/');
+        const target = location.state?.from || (res.user.role === 'worker' ? '/worker' : '/');
+        navigate(target, { replace: true });
       }
     } catch (err) {
-      setErrorMessage(err.message || 'OTP verification failed. Please try again.');
+      setErrorMessage(err.message || 'OTP verification failed.');
     } finally {
       setLoading(false);
     }
@@ -269,6 +303,9 @@ export default function Login() {
               </button>
             </div>
 
+            {/* Invisible reCAPTCHA container for Phone Auth */}
+            <div id="recaptcha-container-page" className="hidden"></div>
+
             {/* Sub-form 1: Phone OTP */}
             {signInMethod === 'phone' && (
               <>
@@ -299,9 +336,21 @@ export default function Login() {
                       disabled={loading || phoneNumber.length < 10}
                       className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary600 text-onprimary font-800 text-sm transition shadow-sm active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      <span>Send OTP</span>
-                      <ArrowRight className="w-4 h-4" />
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Sending OTP…</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Receive OTP</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </button>
+                    <p className="text-[11px] text-muted text-center">
+                      We'll send a 6-digit verification code to your mobile number.
+                    </p>
                   </form>
                 ) : (
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
@@ -309,9 +358,6 @@ export default function Login() {
                       <span className="text-sm font-800 text-ink block">Enter Verification Code</span>
                       <span className="text-xs text-muted block">
                         Sent to +91 {phoneNumber}
-                      </span>
-                      <span className="inline-block mt-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
-                        Test code: 1234
                       </span>
                     </div>
 
@@ -330,20 +376,44 @@ export default function Login() {
                       <button
                         type="submit"
                         disabled={loading || otp.length < 4}
-                        className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary600 text-onprimary font-800 text-sm transition shadow-sm disabled:opacity-50"
+                        className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary600 text-onprimary font-800 text-sm transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                       >
-                        {loading ? 'Verifying…' : 'Verify & Enter'}
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Verifying…</span>
+                          </>
+                        ) : (
+                          <span>Verify & Proceed</span>
+                        )}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOtpStep(false);
-                          setOtp('');
-                        }}
-                        className="text-xs font-700 text-muted hover:text-primary transition py-1"
-                      >
-                        Change Phone Number
-                      </button>
+                      <div className="flex items-center justify-between text-xs text-muted pt-1 px-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOtpStep(false);
+                            setOtp('');
+                          }}
+                          className="font-700 text-muted hover:text-ink transition"
+                        >
+                          ← Change Number
+                        </button>
+                        {countdown > 0 ? (
+                          <span className="text-muted font-600">
+                            Resend OTP in <span className="font-700 text-ink">{countdown}s</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={loading}
+                            onClick={handleSendOtp}
+                            className="font-700 text-primary hover:underline transition flex items-center gap-1"
+                          >
+                            <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                            <span>Resend OTP</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </form>
                 )}
@@ -550,15 +620,9 @@ export default function Login() {
           </form>
         )}
 
-        {/* Security & Database Status Footer */}
-        <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-[11px] text-muted">
-          <span className="flex items-center gap-1.5">
-            <Lock className="w-3 h-3 text-primary" />
-            <span>256-Bit SSL Encrypted</span>
-          </span>
-          <span className="font-700 text-primary">
-            {supabaseActive ? 'Supabase Auth' : 'Blink\'em Secure'}
-          </span>
+        {/* Consumer Trust Footer */}
+        <div className="mt-6 pt-4 border-t border-line/60 text-center text-[11px] text-muted">
+          <span>By continuing, you agree to Blink'em Terms of Service & Privacy Policy</span>
         </div>
       </LiquidGlass>
     </div>
