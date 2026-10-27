@@ -78,6 +78,22 @@ export async function registerUser({ name, email, phone, password, role = 'custo
 
       if (error) throw error;
 
+      // Ensure profile row exists in profiles table
+      try {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          name: cleanName,
+          email: cleanEmail,
+          phone: cleanPhone ? `+91 ${cleanPhone}` : '',
+          role,
+          city,
+          avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=2563EB`,
+          is_verified: true,
+        });
+      } catch (profileErr) {
+        console.warn('Profile upsert note:', profileErr.message);
+      }
+
       const profile = {
         id: data.user.id,
         name: cleanName,
