@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Phone,
@@ -10,6 +10,8 @@ import {
   Mail,
   AlertCircle,
   CheckCircle2,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import {
@@ -17,6 +19,7 @@ import {
   verifyPhoneLogin,
   registerUser,
 } from '../utils/supabase';
+import { sendRealPhoneOtp } from '../utils/firebase';
 import LiquidGlass from './LiquidGlass';
 
 export default function LoginModal({ open, onClose }) {
@@ -27,6 +30,8 @@ export default function LoginModal({ open, onClose }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [countdown, setCountdown] = useState(0);
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -38,18 +43,49 @@ export default function LoginModal({ open, onClose }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
+
+  // Resend OTP countdown timer (always runs unconditionally)
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   if (!open) return null;
 
-  const handlePhoneSubmit = (e) => {
-    e.preventDefault();
+  const handlePhoneSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
-    const clean = phoneNumber.replace(/\D/g, '');
+    setInfoMessage('');
+    const clean = phoneNumber.replace(/\D/g, '').slice(-10);
     if (clean.length < 10) {
       setError('Please enter a valid 10-digit mobile number.');
       return;
     }
-    setOtpStep(true);
+
+    setLoading(true);
+    try {
+      const res = await sendRealPhoneOtp(clean, 'recaptcha-container');
+      if (res && res.confirmationResult) {
+        setConfirmationResult(res.confirmationResult);
+        setOtpStep(true);
+        setCountdown(60);
+        setInfoMessage(`Real SMS OTP sent to +91 ${clean}`);
+      }
+    } catch (err) {
+      console.warn('Real SMS sending notice:', err);
+      setError(err.message || 'Failed to send SMS OTP. Please check the number.');
+      // If domain authorization is pending in Firebase Console, allow demo/test code
+      if (err.message?.includes('authorized domain') || err.message?.includes('reCAPTCHA')) {
+        setOtpStep(true);
+        setInfoMessage('Notice: Add domain to Firebase Console. For testing, you can use code: 1234');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOtpVerify = async (e) => {
@@ -57,7 +93,11 @@ export default function LoginModal({ open, onClose }) {
     setError('');
     setLoading(true);
     try {
-      const res = await verifyPhoneLogin({ phone: phoneNumber, otp });
+      const res = await verifyPhoneLogin({
+        phone: phoneNumber,
+        otp,
+        confirmationResult,
+      });
       if (res.success && res.user) {
         loginUser(res.user);
         onClose();
@@ -179,6 +219,14 @@ export default function LoginModal({ open, onClose }) {
             </button>
           </div>
 
+          {/* Status / Info Message */}
+          {infoMessage && (
+            <div className="mb-3 p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-700 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              <span>{infoMessage}</span>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="mb-3 p-2.5 rounded-xl bg-danger/10 border border-danger/20 text-danger text-xs font-700 flex items-center gap-2">
@@ -187,14 +235,22 @@ export default function LoginModal({ open, onClose }) {
             </div>
           )}
 
+          {/* Invisible reCAPTCHA container for Firebase Phone Auth */}
+          <div id="recaptcha-container" className="hidden"></div>
+
           {/* TAB 1: PHONE OTP */}
           {tab === 'phone' && (
             <div className="space-y-3 py-1">
               {!otpStep ? (
                 <form onSubmit={handlePhoneSubmit} className="space-y-3">
-                  <label className="text-xs font-700 text-muted uppercase tracking-wider block">
-                    Enter Mobile Number
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-700 text-muted uppercase tracking-wider block">
+                      Enter Mobile Number
+                    </label>
+                    <span className="text-[10px] text-primary font-700 bg-primary/10 px-2 py-0.5 rounded-full">
+                      Real 6-Digit SMS
+                    </span>
+                  </div>
                   <div className="flex gap-2">
                     <span className="px-3.5 py-2.5 rounded-xl bg-surface2 border border-line text-xs font-800 text-ink flex items-center">
                       +91
@@ -211,20 +267,30 @@ export default function LoginModal({ open, onClose }) {
                   </div>
                   <button
                     type="submit"
-                    disabled={phoneNumber.length < 10}
-                    className="w-full py-3 rounded-xl bg-primary text-onprimary font-800 text-sm hover:bg-primary600 transition disabled:opacity-50"
+                    disabled={loading || phoneNumber.length < 10}
+                    className="w-full py-3 rounded-xl bg-primary text-onprimary font-800 text-sm hover:bg-primary600 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                   >
-                    Send OTP
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Sending Real SMS OTP…</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Send Real SMS OTP</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
+                  <p className="text-[11px] text-muted text-center">
+                    A free 6-digit verification code will be sent to your phone via SMS.
+                  </p>
                 </form>
               ) : (
                 <form onSubmit={handleOtpVerify} className="space-y-3">
                   <div className="text-center space-y-1">
                     <span className="text-sm font-800 text-ink block">Enter Verification Code</span>
-                    <span className="text-xs text-muted block">Sent to +91 {phoneNumber}</span>
-                    <span className="inline-block mt-0.5 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
-                      Test code: 1234
-                    </span>
+                    <span className="text-xs text-muted block">Sent via SMS to +91 {phoneNumber}</span>
                   </div>
                   <input
                     type="text"
@@ -239,17 +305,40 @@ export default function LoginModal({ open, onClose }) {
                   <button
                     type="submit"
                     disabled={loading || otp.length < 4}
-                    className="w-full py-3 rounded-xl bg-primary text-onprimary font-800 text-sm hover:bg-primary600 transition disabled:opacity-50"
+                    className="w-full py-3 rounded-xl bg-primary text-onprimary font-800 text-sm hover:bg-primary600 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                   >
-                    {loading ? 'Verifying…' : 'Verify & Enter'}
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Verifying Code…</span>
+                      </>
+                    ) : (
+                      <span>Verify & Enter</span>
+                    )}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setOtpStep(false)}
-                    className="w-full text-xs font-700 text-muted hover:text-ink transition py-1 text-center"
-                  >
-                    Change Number
-                  </button>
+                  <div className="flex items-center justify-between text-xs text-muted pt-1 px-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOtpStep(false);
+                        setOtp('');
+                        setError('');
+                        setInfoMessage('');
+                      }}
+                      className="font-700 hover:text-ink transition"
+                    >
+                      ← Change Number
+                    </button>
+                    <button
+                      type="button"
+                      disabled={loading || countdown > 0}
+                      onClick={handlePhoneSubmit}
+                      className="font-700 text-primary hover:underline transition disabled:opacity-50 disabled:no-underline flex items-center gap-1"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                      {countdown > 0 ? `Resend in ${countdown}s` : 'Resend SMS'}
+                    </button>
+                  </div>
                 </form>
               )}
             </div>
