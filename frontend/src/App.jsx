@@ -12,6 +12,7 @@ import AccountFlyout from './components/AccountFlyout';
 import CookieBanner from './components/CookieBanner';
 import LocationModal from './components/LocationModal';
 import LoginModal from './components/LoginModal';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/auth/Login';
 import Home from './pages/customer/Home';
 import RequestForm from './pages/customer/RequestForm';
@@ -30,8 +31,10 @@ function Header() {
     location: userLocation,
     setIsLocationModalOpen,
     currentUser,
+    isAuthenticated,
     isAccountFlyoutOpen,
     setIsAccountFlyoutOpen,
+    setIsLoginModalOpen,
   } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
@@ -238,24 +241,26 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   return (
-    <AppProvider>
-      <BackgroundWallpaper />
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Shell><Home /></Shell>} />
-          <Route path="/request/new" element={<ProtectedRoute><Shell><RequestForm /></Shell></ProtectedRoute>} />
-          <Route path="/request/:id/searching" element={<ProtectedRoute><Shell><Searching /></Shell></ProtectedRoute>} />
-          <Route path="/request/:id/offers" element={<ProtectedRoute><Shell><Offers /></Shell></ProtectedRoute>} />
-          <Route path="/booking/:id" element={<ProtectedRoute><Shell><Tracking /></Shell></ProtectedRoute>} />
-          <Route path="/booking/:id/complete" element={<ProtectedRoute><Shell><Complete /></Shell></ProtectedRoute>} />
-          <Route path="/bookings" element={<ProtectedRoute><Shell><Bookings /></Shell></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Shell><Profile /></Shell></ProtectedRoute>} />
-          <Route path="/worker" element={<ProtectedRoute><Shell><WorkerHome /></Shell></ProtectedRoute>} />
-          <Route path="/worker/job/:id" element={<ProtectedRoute><Shell><ActiveJob /></Shell></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute><Shell><AdminConsole /></Shell></ProtectedRoute>} />
-        </Routes>
-      </Router>
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <BackgroundWallpaper />
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Shell><Home /></Shell>} />
+            <Route path="/request/new" element={<ProtectedRoute><Shell><RequestForm /></Shell></ProtectedRoute>} />
+            <Route path="/request/:id/searching" element={<ProtectedRoute><Shell><Searching /></Shell></ProtectedRoute>} />
+            <Route path="/request/:id/offers" element={<ProtectedRoute><Shell><Offers /></Shell></ProtectedRoute>} />
+            <Route path="/booking/:id" element={<ProtectedRoute><Shell><Tracking /></Shell></ProtectedRoute>} />
+            <Route path="/booking/:id/complete" element={<ProtectedRoute><Shell><Complete /></Shell></ProtectedRoute>} />
+            <Route path="/bookings" element={<ProtectedRoute><Shell><Bookings /></Shell></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Shell><Profile /></Shell></ProtectedRoute>} />
+            <Route path="/worker" element={<ProtectedRoute><Shell><WorkerHome /></Shell></ProtectedRoute>} />
+            <Route path="/worker/job/:id" element={<ProtectedRoute><Shell><ActiveJob /></Shell></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><Shell><AdminConsole /></Shell></ProtectedRoute>} />
+          </Routes>
+        </Router>
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

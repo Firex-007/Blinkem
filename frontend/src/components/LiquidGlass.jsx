@@ -59,63 +59,13 @@ export default function LiquidGlass({
     if (!wrap || !canvas) return;
 
     let gl;
-    try {
-      gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false });
-    } catch {
-      return; // Fallback to CSS glass if WebGL unavailable
-    }
-    if (!gl) return;
-
+    let buf;
+    let prog;
+    let ro;
+    let raf;
     const reduceMotion =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const compile = (type, src) => {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      return s;
-    };
-
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 3, -1, -1, 3]),
-      gl.STATIC_DRAW
-    );
-    const loc = gl.getAttribLocation(prog, 'a');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-    const uRes = gl.getUniformLocation(prog, 'uRes');
-    const uMouse = gl.getUniformLocation(prog, 'uMouse');
-    const uRadius = gl.getUniformLocation(prog, 'uRadius');
-    const uGlow = gl.getUniformLocation(prog, 'uGlow');
-
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let mouse = { x: -1e4, y: -1e4 };
-
-    const resize = () => {
-      if (!wrap || !canvas) return;
-      const r = wrap.getBoundingClientRect();
-      canvas.width = Math.max(1, Math.round(r.width * dpr));
-      canvas.height = Math.max(1, Math.round(r.height * dpr));
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    };
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(wrap);
-    resize();
 
     const onPointer = (e) => {
       if (!wrap) return;
@@ -136,38 +86,95 @@ export default function LiquidGlass({
       };
     };
 
-    if (!reduceMotion) {
-      window.addEventListener('pointermove', onPointer, { passive: true });
-      window.addEventListener('pointerdown', onPointer, { passive: true });
-      window.addEventListener('touchmove', onTouch, { passive: true });
-      window.addEventListener('touchstart', onTouch, { passive: true });
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let mouse = { x: -1e4, y: -1e4 };
+
+    try {
+      gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false });
+      if (!gl) return; // Fallback to CSS glass if WebGL unavailable
+
+      const compile = (type, src) => {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      };
+
+      prog = gl.createProgram();
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+      gl.linkProgram(prog);
+      gl.useProgram(prog);
+
+      buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 3, -1, -1, 3]),
+        gl.STATIC_DRAW
+      );
+      const loc = gl.getAttribLocation(prog, 'a');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      const uRes = gl.getUniformLocation(prog, 'uRes');
+      const uMouse = gl.getUniformLocation(prog, 'uMouse');
+      const uRadius = gl.getUniformLocation(prog, 'uRadius');
+      const uGlow = gl.getUniformLocation(prog, 'uGlow');
+
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      const resize = () => {
+        if (!wrap || !canvas) return;
+        const r = wrap.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.round(r.width * dpr));
+        canvas.height = Math.max(1, Math.round(r.height * dpr));
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      };
+
+      ro = new ResizeObserver(resize);
+      ro.observe(wrap);
+      resize();
+
+      if (!reduceMotion) {
+        window.addEventListener('pointermove', onPointer, { passive: true });
+        window.addEventListener('pointerdown', onPointer, { passive: true });
+        window.addEventListener('touchmove', onTouch, { passive: true });
+        window.addEventListener('touchstart', onTouch, { passive: true });
+      }
+
+      const draw = () => {
+        if (!gl || !canvas) return;
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform2f(uMouse, mouse.x, mouse.y);
+        gl.uniform1f(uRadius, radius * dpr);
+        gl.uniform1f(uGlow, glow);
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        if (!reduceMotion) raf = requestAnimationFrame(draw);
+      };
+      draw();
+    } catch (webglErr) {
+      console.warn('LiquidGlass WebGL fallback to CSS:', webglErr);
     }
 
-    let raf;
-    const draw = () => {
-      if (!gl || !canvas) return;
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform2f(uMouse, mouse.x, mouse.y);
-      gl.uniform1f(uRadius, radius * dpr);
-      gl.uniform1f(uGlow, glow);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      if (!reduceMotion) raf = requestAnimationFrame(draw);
-    };
-    draw();
-
     return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      if (ro) ro.disconnect();
       if (!reduceMotion) {
         window.removeEventListener('pointermove', onPointer);
         window.removeEventListener('pointerdown', onPointer);
         window.removeEventListener('touchmove', onTouch);
         window.removeEventListener('touchstart', onTouch);
       }
-      gl.deleteBuffer(buf);
-      gl.deleteProgram(prog);
+      try {
+        if (gl && buf) gl.deleteBuffer(buf);
+        if (gl && prog) gl.deleteProgram(prog);
+      } catch {
+        // ignore cleanup errors
+      }
     };
   }, [radius, glow]);
 
