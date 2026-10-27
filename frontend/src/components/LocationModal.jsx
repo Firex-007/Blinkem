@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Navigation, Search, Check, AlertCircle, Loader2, X, Building2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { CITIES } from '../data/cities';
@@ -12,13 +12,22 @@ export default function LocationModal({ open, onClose }) {
   const [detecting, setDetecting] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  if (!open) return null;
+  // Sync selected city whenever location or modal opening state changes
+  useEffect(() => {
+    if (open && location) {
+      const cId = location.cityId || location.city?.toLowerCase() || 'bengaluru';
+      setSelectedCityId(cId);
+      setSearch('');
+      setErrorMsg(null);
+    }
+  }, [open, location]);
 
   // Selected city object
   const currentCity = CITIES.find((c) => c.id === selectedCityId) || CITIES[0];
 
-  // Filter localities based on active city and search text
+  // Filter localities based on active city and search text (always called unconditionally)
   const filteredLocalities = useMemo(() => {
+    if (!open) return [];
     const q = search.trim().toLowerCase();
     if (!q) {
       return currentCity.localities.map((loc) => ({ ...loc, city: currentCity.name, cityId: currentCity.id }));
@@ -51,7 +60,9 @@ export default function LocationModal({ open, onClose }) {
     }
 
     return matches;
-  }, [currentCity, search]);
+  }, [open, currentCity, search]);
+
+  if (!open) return null;
 
   const handleDetect = async () => {
     setDetecting(true);
