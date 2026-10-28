@@ -170,7 +170,7 @@ export default function AccountFlyout({ open, onClose }) {
                   </p>
                   <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-800 uppercase tracking-wider">
                     <ShieldCheck className="w-3 h-3" />
-                    {role === 'worker' ? 'Partner Pro' : role === 'admin' ? 'Admin Ops' : isAuthenticated ? 'Verified Customer' : 'Guest'}
+                    {isAuthenticated ? 'Verified Customer' : 'Guest'}
                   </div>
                 </div>
               </div>
@@ -272,54 +272,6 @@ export default function AccountFlyout({ open, onClose }) {
                 </p>
               </div>
             )}
-          </div>
-
-          {/* Portal Switcher (Customer / Partner / Admin) */}
-          <div className="p-3 rounded-2xl bg-surface2/50 border border-line">
-            <span className="text-[10px] uppercase tracking-wider font-800 text-muted block mb-2">
-              Select Platform Role
-            </span>
-            <div className="grid grid-cols-3 gap-1.5">
-              <button
-                onClick={() => {
-                  setRole('customer');
-                  handleNav('/');
-                }}
-                className={`py-2 text-center rounded-xl text-xs font-800 transition ${
-                  role === 'customer'
-                    ? 'bg-primary text-onprimary shadow-xs'
-                    : 'text-muted hover:text-ink hover:bg-surface'
-                }`}
-              >
-                Customer
-              </button>
-              <button
-                onClick={() => {
-                  setRole('worker');
-                  handleNav('/worker');
-                }}
-                className={`py-2 text-center rounded-xl text-xs font-800 transition ${
-                  role === 'worker'
-                    ? 'bg-primary text-onprimary shadow-xs'
-                    : 'text-muted hover:text-ink hover:bg-surface'
-                }`}
-              >
-                Partner
-              </button>
-              <button
-                onClick={() => {
-                  setRole('admin');
-                  handleNav('/admin');
-                }}
-                className={`py-2 text-center rounded-xl text-xs font-800 transition ${
-                  role === 'admin'
-                    ? 'bg-primary text-onprimary shadow-xs'
-                    : 'text-muted hover:text-ink hover:bg-surface'
-                }`}
-              >
-                Admin
-              </button>
-            </div>
           </div>
 
           {/* Navigation Links */}

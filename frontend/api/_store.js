@@ -21,7 +21,20 @@ export function getWorkersForCategory(category) {
   return list;
 }
 
-export function createMockRequest({ category, description, lat, lng, address, urgency, budget_hint, voice_transcript }) {
+export function createMockRequest({
+  category,
+  description,
+  lat,
+  lng,
+  address,
+  pincode,
+  flat_no,
+  landmark,
+  urgency,
+  budget_hint,
+  voice_transcript,
+  media,
+}) {
   const id = store.nextRequestId++;
   const matchedWorkers = getWorkersForCategory(category);
 
@@ -31,11 +44,15 @@ export function createMockRequest({ category, description, lat, lng, address, ur
     category: category || 'plumber',
     description: description || 'General service needed',
     address: address || 'Current Service Location',
-    lat: lat || 12.9716,
-    lng: lng || 77.5946,
+    pincode: pincode || '600017',
+    flat_no: flat_no || '',
+    landmark: landmark || '',
+    lat: lat || 13.0418,
+    lng: lng || 80.2341,
     urgency: urgency || 'now',
     budget_hint: budget_hint || null,
     voice_transcript: voice_transcript || null,
+    media: media || [],
     status: 'offers_ready',
     created_at: new Date().toISOString(),
     first_offer_at: new Date().toISOString(),

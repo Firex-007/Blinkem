@@ -4,7 +4,6 @@ import { AppProvider, useApp } from './context/AppContext';
 import Logo from './components/Logo';
 import BackgroundWallpaper from './components/BackgroundWallpaper';
 import ThemeToggle from './components/ThemeToggle';
-import RoleSwitcher from './components/RoleSwitcher';
 import LangToggle from './components/LangToggle';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
@@ -65,7 +64,6 @@ function Header() {
               <Logo className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')} />
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <RoleSwitcher />
               {isAuthenticated ? (
                 <button
                   onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}
@@ -159,7 +157,6 @@ function Header() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <LangToggle />
             <ThemeToggle />
-            <RoleSwitcher />
             {isAuthenticated ? (
               <button
                 onClick={() => setIsAccountFlyoutOpen((prev) => !prev)}

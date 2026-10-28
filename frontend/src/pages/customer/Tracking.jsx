@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ShieldCheck,
-  Wrench,
-  Star,
+  MapPin,
   Clock,
   Phone,
-  IndianRupee,
+  ShieldCheck,
+  Star,
+  Wrench,
   AlertCircle,
   CheckCircle2,
   FastForward,
+  Navigation,
+  KeyRound,
+  Sparkles,
 } from 'lucide-react';
 import { api } from '../../api';
 import { t } from '../../i18n';
@@ -17,7 +20,6 @@ import usePolling from '../../hooks/usePolling';
 import MapCard from '../../components/MapCard';
 import StatusStepper from '../../components/StatusStepper';
 import Button from '../../components/Button';
-import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 import Skeleton from '../../components/Skeleton';
 import { getWorkerImage } from '../../utils/workerImages';
@@ -35,7 +37,7 @@ export default function Tracking() {
   const [realtimeEta, setRealtimeEta] = useState(null);
   const [isWsConnected, setIsWsConnected] = useState(false);
 
-  // Relaxed heartbeat polling every 8s (graceful backup) instead of aggressive 2s loop
+  // Relaxed heartbeat polling every 8s as reliable background backup
   const { data: booking, error, loading, refetch } = usePolling(
     () => api.get(`/bookings/${id}`),
     8000,
@@ -99,7 +101,6 @@ export default function Tracking() {
       refetch();
     } catch (err) {
       console.error(err);
-      // If endpoint not implemented yet, just refetch
       refetch();
     } finally {
       setActionLoading(false);
@@ -123,19 +124,18 @@ export default function Tracking() {
 
   if (loading && !booking) {
     return (
-      <div className="space-y-4 py-4">
-        <Skeleton className="w-full h-48 rounded-card" />
-        <Skeleton className="w-full h-24 rounded-card" />
-        <Skeleton className="w-full h-32 rounded-card" />
+      <div className="max-w-2xl mx-auto space-y-4 py-4">
+        <Skeleton className="w-full h-72 rounded-3xl" />
+        <Skeleton className="w-full h-44 rounded-3xl" />
       </div>
     );
   }
 
   if (error || !booking) {
     return (
-      <div className="py-12 text-center space-y-4">
+      <div className="py-16 text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-danger mx-auto" />
-        <h2 className="text-lg font-700 text-ink">Booking not found</h2>
+        <h2 className="text-lg font-800 text-ink">Booking not found</h2>
         <Button variant="secondary" onClick={() => navigate('/')}>
           Go to Home
         </Button>
@@ -152,23 +152,10 @@ export default function Tracking() {
   const pendingExtra = (booking.extras || []).find((e) => e.status === 'pending');
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4 pb-24">
-      {/* Live WebSocket Status Banner */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2 text-[11px] font-800 bg-surface border border-line/60 px-3 py-1 rounded-full shadow-xs">
-          <span className="relative flex h-2 w-2">
-            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isWsConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-            <span className={`relative inline-flex rounded-full h-2 w-2 ${isWsConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-          </span>
-          <span className={isWsConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted'}>
-            {isWsConnected ? 'Live WebSocket Stream (<50ms)' : 'Connecting Realtime Stream…'}
-          </span>
-        </div>
-      </div>
-
+    <div className="max-w-2xl mx-auto space-y-4 pb-28">
       {/* Toast Alert */}
       {toastMsg && (
-        <div className="p-3 bg-dangersoft text-danger text-xs font-600 rounded-card flex items-center justify-between">
+        <div className="p-3 bg-dangersoft text-danger text-xs font-700 rounded-2xl flex items-center justify-between shadow-sm">
           <span>{toastMsg}</span>
           <button onClick={() => setToastMsg(null)} className="underline ml-2">
             Dismiss
@@ -176,179 +163,217 @@ export default function Tracking() {
         </div>
       )}
 
-      {/* Live Map Card */}
-      <MapCard
-        customerPos={customerPos}
-        workerPos={workerPos}
-        workerName={worker.name || 'Worker'}
-      />
+      {/* 1. Immersive Hero Map with Overlaid Realtime Indicators */}
+      <div className="relative w-full h-72 sm:h-80 rounded-3xl overflow-hidden border border-line/70 shadow-lg">
+        <MapCard
+          customerPos={customerPos}
+          workerPos={workerPos}
+          workerName={worker.name || 'Worker'}
+          className="w-full h-full rounded-none border-0 shadow-none"
+        />
 
-      {/* ETA & Status Header */}
-      <div className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3">
-        <div className="flex items-center justify-between">
+        {/* Floating Top Bar on Map: Live WebSocket Stream Indicator */}
+        <div className="absolute top-3 left-3 z-10">
+          <div className="flex items-center gap-2 text-[11px] font-800 bg-surface/90 dark:bg-black/75 backdrop-blur-md border border-line/80 px-3 py-1.5 rounded-full shadow-md text-ink">
+            <span className="relative flex h-2 w-2">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isWsConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isWsConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+            </span>
+            <span className={isWsConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted'}>
+              {isWsConnected ? 'Live Stream (<50ms)' : 'Connecting stream…'}
+            </span>
+          </div>
+        </div>
+
+        {/* Floating Fast-Track ETA button */}
+        {isConfirmed && (
+          <div className="absolute top-3 right-3 z-10">
+            <button
+              onClick={handleFastForward}
+              title="Fast-track worker arrival"
+              className="flex items-center gap-1.5 text-xs font-800 bg-surface/90 dark:bg-black/75 backdrop-blur-md hover:bg-surface text-primary border border-primary/30 px-3 py-1.5 rounded-full transition shadow-md active:scale-95"
+            >
+              <FastForward className="w-3.5 h-3.5" />
+              <span>Fast-track</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 2. Single Unified Cohesive Tracking Panel (No fragmented boxed divs) */}
+      <div className="bg-surface border border-line/80 rounded-3xl shadow-xl p-5 sm:p-6 space-y-5">
+        {/* Status Header */}
+        <div className="flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-800 text-ink capitalize">
+              <h1 className="text-xl sm:text-2xl font-900 text-ink tracking-tight capitalize">
                 {t(`status.${displayStatus}`) || displayStatus.replace(/_/g, ' ')}
-              </span>
+              </h1>
               {booking.progress_pct !== undefined && isConfirmed && (
-                <Chip tone="primary" className="h-5 px-1.5 text-[10px]">
+                <Chip tone="primary" className="h-5 px-2 text-[10px] font-800">
                   {booking.progress_pct}%
                 </Chip>
               )}
             </div>
-            <p className="text-xs text-muted mt-0.5">
-              {displayStatus === 'on_the_way'
-                ? `Arrives in ~${displayEta} min`
-                : displayStatus === 'arrived'
-                ? 'Worker is at your doorstep'
-                : 'Service underway'}
+
+            <p className="text-xs sm:text-sm text-muted font-600 mt-1 flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+              <span>
+                {displayStatus === 'on_the_way'
+                  ? `Arrives in ~${displayEta} mins at ${booking.address || 'your location'}`
+                  : displayStatus === 'arrived'
+                  ? 'Technician has reached your doorstep'
+                  : 'Service is underway at your address'}
+              </span>
             </p>
           </div>
 
-          {/* Fast-track arrival button */}
-          {isConfirmed && (
-            <button
-              onClick={handleFastForward}
-              title="Fast-track worker arrival"
-              className="flex items-center gap-1 text-[11px] font-700 bg-surface2 hover:bg-soft text-primary px-2.5 py-1.5 rounded-chip transition"
-            >
-              <FastForward className="w-3.5 h-3.5" />
-              <span>Fast-track ETA</span>
-            </button>
-          )}
+          <Chip
+            tone={booking.status === 'completed' ? 'success' : isConfirmed ? 'primary' : 'accent'}
+            className="h-7 px-3 text-xs font-800 capitalize flex-shrink-0"
+          >
+            {booking.category ? t(`cat.${booking.category}`) : 'Service'}
+          </Chip>
         </div>
 
-        {/* Stepper */}
-        <StatusStepper currentStatus={displayStatus} />
-      </div>
+        {/* Stepper (Clean & integrated) */}
+        <div className="pt-1">
+          <StatusStepper currentStatus={displayStatus} />
+        </div>
 
-      {/* OTP Display Card (Shown to customer to share with worker) */}
-      {booking.otp && isConfirmed && (
-        <div className="bg-primary/5 border border-primary/20 rounded-card p-5 text-center space-y-2">
-          <span className="text-xs font-700 text-primary uppercase tracking-wider block">
-            {t('track.code') || 'Share this code when worker arrives'}
-          </span>
-          <div className="flex items-center justify-center gap-3 py-1">
-            {booking.otp.split('').map((digit, idx) => (
-              <div
-                key={idx}
-                className="w-12 h-14 bg-surface border-2 border-primary rounded-xl flex items-center justify-center text-2xl font-800 text-primary shadow-sm"
-              >
-                {digit}
+        {/* Doorstep Arrival OTP Code (Unified sleek security element) */}
+        {booking.otp && isConfirmed && (
+          <div className="p-4 rounded-2xl bg-surface2/80 border border-primary/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-xs">
+                <KeyRound className="w-5 h-5" />
               </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-muted">
-            The worker will enter this 4-digit code in their app to start the job.
-          </p>
-        </div>
-      )}
+              <div>
+                <span className="text-[11px] font-800 text-primary uppercase tracking-wider block">
+                  Arrival Code (Share at Doorstep)
+                </span>
+                <span className="text-xs text-muted font-medium block">
+                  Share this 4-digit code with the technician to verify &amp; start the job.
+                </span>
+              </div>
+            </div>
 
-      {/* Pending Extra Charge Request Alert */}
-      {pendingExtra && (
-        <div className="bg-accent/10 border-2 border-accent rounded-card p-4 space-y-3 animate-pulse">
-          <div className="flex items-center gap-2 text-ink font-800 text-sm">
-            <AlertCircle className="w-4 h-4 text-accent" />
-            <span>Extra Work Requested: ₹{pendingExtra.amount}</span>
+            <div className="flex items-center gap-1.5 justify-center sm:justify-end">
+              {booking.otp.split('').map((digit, idx) => (
+                <span
+                  key={idx}
+                  className="w-10 h-12 rounded-xl bg-surface border-2 border-primary/40 text-xl font-900 text-primary flex items-center justify-center shadow-xs font-mono"
+                >
+                  {digit}
+                </span>
+              ))}
+            </div>
           </div>
-          <p className="text-xs text-ink/80">
-            {pendingExtra.reason || 'Additional materials / repairs needed.'}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              loading={actionLoading}
-              onClick={() => handleExtraRespond(pendingExtra.id, false)}
-              className="flex-1 text-xs"
-            >
-              Decline
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              loading={actionLoading}
-              onClick={() => handleExtraRespond(pendingExtra.id, true)}
-              className="flex-1 text-xs font-700 bg-accent text-onaccent hover:brightness-110"
-            >
-              Approve ₹{pendingExtra.amount}
-            </Button>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Worker Card Info */}
-      <div className="bg-surface border border-line rounded-card shadow-card p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 border-2 border-line/60 relative">
+        {/* Pending Extra Charge Approval Banner */}
+        {pendingExtra && (
+          <div className="p-4 rounded-2xl bg-accent/10 border-2 border-accent space-y-3 animate-pulse">
+            <div className="flex items-center gap-2 text-ink font-800 text-sm">
+              <AlertCircle className="w-4 h-4 text-accent flex-shrink-0" />
+              <span>Extra Work Requested: ₹{pendingExtra.amount}</span>
+            </div>
+            <p className="text-xs text-ink/80">
+              {pendingExtra.reason || 'Additional materials or extra labor needed.'}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                loading={actionLoading}
+                onClick={() => handleExtraRespond(pendingExtra.id, false)}
+                className="flex-1 text-xs"
+              >
+                Decline
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                loading={actionLoading}
+                onClick={() => handleExtraRespond(pendingExtra.id, true)}
+                className="flex-1 text-xs font-800 bg-accent text-onaccent hover:brightness-110"
+              >
+                Approve ₹{pendingExtra.amount}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Worker Profile & Details Row */}
+        <div className="pt-4 border-t border-line/70 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-13 h-13 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 border-2 border-line/80 relative">
               <img
                 src={getWorkerImage(worker)}
                 alt={worker.name || 'Worker'}
                 className="w-full h-full object-cover"
               />
-              <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-success border-2 border-surface" />
+              <span className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full bg-success border-2 border-surface" />
             </div>
-            <div>
+
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-700 text-ink text-base">{worker.name}</span>
+                <span className="font-800 text-ink text-base truncate">{worker.name || 'Technician'}</span>
                 {worker.id_verified && (
-                  <ShieldCheck className="w-4 h-4 text-success" title="ID verified" />
+                  <ShieldCheck className="w-4 h-4 text-success flex-shrink-0" title="ID verified" />
                 )}
                 {worker.skill_verified && (
-                  <Wrench className="w-3.5 h-3.5 text-success" title="Skill verified" />
+                  <Wrench className="w-3.5 h-3.5 text-success flex-shrink-0" title="Skill verified" />
                 )}
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted">
-                <Star className="w-3 h-3 fill-accent text-accent" />
-                <span className="font-700 text-ink">{worker.rating_avg || '5.0'}</span>
+              <div className="flex items-center gap-1 text-xs text-muted font-medium mt-0.5">
+                <Star className="w-3.5 h-3.5 fill-accent text-accent" />
+                <span className="font-800 text-ink">{worker.rating_avg || '4.8'}</span>
                 <span>•</span>
-                <span>{booking.category ? t(`cat.${booking.category}`) : 'Expert'}</span>
+                <span className="truncate">{worker.jobs_done || 120}+ jobs completed</span>
               </div>
             </div>
           </div>
 
-          <button
-            disabled
-            title="In-app VoIP calling"
-            className="w-10 h-10 rounded-full bg-surface2 text-muted flex items-center justify-center opacity-60 cursor-not-allowed"
-          >
-            <Phone className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Pricing breakdown */}
-        <div className="pt-3 border-t border-line flex items-center justify-between text-xs">
-          <div className="space-y-0.5">
-            <span className="text-muted block">Agreed Price</span>
-            <span className="font-800 text-ink text-base">
+          <div className="text-right flex-shrink-0">
+            <span className="text-[11px] text-muted block font-700">Agreed Price</span>
+            <span className="font-900 text-ink text-lg sm:text-xl block">
               ₹{booking.final_price || booking.agreed_price}
             </span>
-            {booking.extra_total > 0 && (
-              <span className="text-[11px] text-muted block">
-                (Includes ₹{booking.extra_total} approved extras)
-              </span>
-            )}
+            <span className="text-[10px] text-success font-700 uppercase tracking-wide block">
+              Pay After Fix
+            </span>
           </div>
-          <Chip tone="success" className="h-6 px-2 text-[11px]">
-            Pay after service
-          </Chip>
         </div>
-      </div>
 
-      {/* Cancel option */}
-      {isConfirmed && (
-        <div className="text-center pt-2">
-          <button
-            onClick={handleCancel}
-            disabled={actionLoading}
-            className="text-xs text-muted hover:text-danger underline transition"
-          >
-            Cancel this booking
-          </button>
+        {/* Service Details & Address */}
+        <div className="p-3.5 rounded-2xl bg-surface2/60 border border-line/60 text-xs space-y-1.5">
+          <div className="flex items-start gap-2">
+            <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
+            <span className="text-muted leading-tight font-medium">
+              {booking.address || 'Service Location'}
+            </span>
+          </div>
+          {booking.description && (
+            <p className="text-ink/80 text-[11px] font-semibold pl-5">
+              "{booking.description}"
+            </p>
+          )}
         </div>
-      )}
+
+        {/* Cancel Booking Link */}
+        {isConfirmed && (
+          <div className="text-center pt-1 border-t border-line/40">
+            <button
+              onClick={handleCancel}
+              disabled={actionLoading}
+              className="text-xs text-muted hover:text-danger font-700 transition"
+            >
+              Need to cancel this booking?
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
