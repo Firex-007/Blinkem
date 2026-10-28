@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   MapPin,
@@ -9,6 +9,7 @@ import {
   AlertCircle,
   PlusCircle,
   IndianRupee,
+  Navigation,
 } from 'lucide-react';
 import { api } from '../../api';
 import { t } from '../../i18n';
@@ -17,6 +18,7 @@ import MapCard from '../../components/MapCard';
 import Button from '../../components/Button';
 import Chip from '../../components/Chip';
 import Skeleton from '../../components/Skeleton';
+import { createTrackingPublisher } from '../../utils/realtimeTracking';
 
 export default function ActiveJob() {
   const { id } = useParams();
@@ -31,14 +33,59 @@ export default function ActiveJob() {
   const [errorToast, setErrorToast] = useState(null);
   const [shakeOtp, setShakeOtp] = useState(false);
 
+  // Real-time WebSocket broadcasting states
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [localWorkerPos, setLocalWorkerPos] = useState(null);
+  const publisherRef = useRef(null);
+
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
-  // Poll booking state every 2s
+  // Relaxed heartbeat polling every 8s as reliable metadata backup
   const { data: booking, error, loading, refetch } = usePolling(
     () => api.get(`/bookings/${id}`),
-    2000,
+    8000,
     true
   );
+
+  // Setup Real-time WebSocket Broadcaster
+  useEffect(() => {
+    if (!id) return;
+    const publisher = createTrackingPublisher(id, (status) => {
+      setIsBroadcasting(status === 'SUBSCRIBED');
+    });
+    publisherRef.current = publisher;
+
+    // Start live GPS watch to stream coordinates to the customer
+    const stopGps = publisher.startGpsWatch({
+      onLocalPos: (pos) => setLocalWorkerPos(pos),
+    });
+
+    return () => {
+      stopGps();
+      publisher.stop();
+      publisherRef.current = null;
+    };
+  }, [id]);
+
+  // Simulated step movement (convenient for desktop/laptop testing without moving physically)
+  const handleSimulateMove = () => {
+    if (!publisherRef.current) return;
+    const baseLat = localWorkerPos?.lat || booking?.worker_pos?.lat || 13.0460;
+    const baseLng = localWorkerPos?.lng || booking?.worker_pos?.lng || 80.2380;
+    const targetLat = booking?.lat || 13.0418;
+    const targetLng = booking?.lng || 80.2341;
+
+    const nextLat = baseLat + (targetLat - baseLat) * 0.25;
+    const nextLng = baseLng + (targetLng - baseLng) * 0.25;
+    const newPos = { lat: nextLat, lng: nextLng };
+    setLocalWorkerPos(newPos);
+
+    publisherRef.current.broadcastPosition({
+      lat: nextLat,
+      lng: nextLng,
+      eta_remaining_min: Math.max(1, (booking?.eta_remaining_min || 10) - 2),
+    });
+  };
 
   // OTP input handler
   const handleOtpChange = (index, val) => {
@@ -69,6 +116,7 @@ export default function ActiveJob() {
       setStartLoading(true);
       setErrorToast(null);
       await api.post(`/bookings/${id}/start`, { otp: code });
+      publisherRef.current?.broadcastStatus({ status: 'in_progress', display_status: 'Work in progress' });
       refetch();
     } catch (err) {
       console.error(err);
@@ -110,6 +158,7 @@ export default function ActiveJob() {
       setCompleteLoading(true);
       setErrorToast(null);
       await api.post(`/bookings/${id}/complete`);
+      publisherRef.current?.broadcastStatus({ status: 'completed', display_status: 'Job completed' });
       refetch();
       setTimeout(() => navigate('/worker'), 1200);
     } catch (err) {
@@ -159,8 +208,37 @@ export default function ActiveJob() {
         </div>
       )}
 
-      {/* Customer Location Map */}
-      <MapCard customerPos={customerPos} workerName="Customer" />
+      {/* Real-time WebSocket broadcasting pill & test controls */}
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2 text-[11px] font-800 bg-surface border border-line/60 px-3 py-1 rounded-full shadow-xs">
+          <span className="relative flex h-2 w-2">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isBroadcasting ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${isBroadcasting ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+          </span>
+          <span className={isBroadcasting ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted'}>
+            {isBroadcasting ? 'Broadcasting Live Location (<50ms)' : 'Connecting Live Channel…'}
+          </span>
+        </div>
+
+        {isConfirmed && (
+          <button
+            type="button"
+            onClick={handleSimulateMove}
+            className="text-[11px] font-700 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-2.5 py-1 rounded-full transition flex items-center gap-1 active:scale-95"
+            title="Click to move closer to customer for desktop demo"
+          >
+            <Navigation className="w-3 h-3" />
+            <span>Simulate Move →</span>
+          </button>
+        )}
+      </div>
+
+      {/* Customer Location Map with Worker Pin */}
+      <MapCard
+        customerPos={customerPos}
+        workerPos={localWorkerPos || booking.worker_pos}
+        workerName="You (Worker)"
+      />
 
       {/* Status Bar */}
       <div className="bg-surface border border-line rounded-card shadow-card p-4 space-y-2">

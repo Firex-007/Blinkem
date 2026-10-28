@@ -21,6 +21,7 @@ import Card from '../../components/Card';
 import Chip from '../../components/Chip';
 import Skeleton from '../../components/Skeleton';
 import { getWorkerImage } from '../../utils/workerImages';
+import { subscribeToRealtimeTracking } from '../../utils/realtimeTracking';
 
 export default function Tracking() {
   const { id } = useParams();
@@ -28,12 +29,47 @@ export default function Tracking() {
   const [actionLoading, setActionLoading] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
 
-  // Poll booking every 2s
+  // Real-time WebSocket telemetry states (<50ms latency)
+  const [realtimePos, setRealtimePos] = useState(null);
+  const [realtimeStatus, setRealtimeStatus] = useState(null);
+  const [realtimeEta, setRealtimeEta] = useState(null);
+  const [isWsConnected, setIsWsConnected] = useState(false);
+
+  // Relaxed heartbeat polling every 8s (graceful backup) instead of aggressive 2s loop
   const { data: booking, error, loading, refetch } = usePolling(
     () => api.get(`/bookings/${id}`),
-    2000,
+    8000,
     true
   );
+
+  // Subscribe to live WebSocket Broadcast channel (<50ms updates)
+  useEffect(() => {
+    if (!id) return;
+    const sub = subscribeToRealtimeTracking(id, {
+      onPositionUpdate: (payload) => {
+        if (payload?.lat && payload?.lng) {
+          setRealtimePos({ lat: payload.lat, lng: payload.lng, heading: payload.heading });
+          if (payload.eta_remaining_min !== undefined && payload.eta_remaining_min !== null) {
+            setRealtimeEta(payload.eta_remaining_min);
+          }
+        }
+      },
+      onStatusUpdate: (payload) => {
+        if (payload?.status) {
+          setRealtimeStatus(payload.status);
+          if (payload.status === 'completed') {
+            navigate(`/booking/${id}/complete`, { replace: true });
+          }
+        }
+        refetch();
+      },
+      onConnectionChange: (status) => {
+        setIsWsConnected(status === 'SUBSCRIBED');
+      },
+    });
+
+    return () => sub.unsubscribe();
+  }, [id, navigate, refetch]);
 
   useEffect(() => {
     if (booking?.status === 'completed') {
@@ -109,13 +145,27 @@ export default function Tracking() {
 
   const worker = booking.worker || {};
   const customerPos = { lat: booking.lat || 13.0418, lng: booking.lng || 80.2341 };
-  const workerPos = booking.worker_pos || customerPos;
-  const displayStatus = booking.display_status || booking.status;
+  const workerPos = realtimePos || booking.worker_pos || customerPos;
+  const displayStatus = realtimeStatus || booking.display_status || booking.status;
+  const displayEta = realtimeEta !== null ? realtimeEta : (booking.eta_remaining_min || booking.eta_min || 10);
   const isConfirmed = booking.status === 'confirmed';
   const pendingExtra = (booking.extras || []).find((e) => e.status === 'pending');
 
   return (
     <div className="max-w-3xl mx-auto space-y-4 pb-24">
+      {/* Live WebSocket Status Banner */}
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2 text-[11px] font-800 bg-surface border border-line/60 px-3 py-1 rounded-full shadow-xs">
+          <span className="relative flex h-2 w-2">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isWsConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${isWsConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+          </span>
+          <span className={isWsConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted'}>
+            {isWsConnected ? 'Live WebSocket Stream (<50ms)' : 'Connecting Realtime Stream…'}
+          </span>
+        </div>
+      </div>
+
       {/* Toast Alert */}
       {toastMsg && (
         <div className="p-3 bg-dangersoft text-danger text-xs font-600 rounded-card flex items-center justify-between">
@@ -149,7 +199,7 @@ export default function Tracking() {
             </div>
             <p className="text-xs text-muted mt-0.5">
               {displayStatus === 'on_the_way'
-                ? `Arrives in ~${booking.eta_remaining_min || booking.eta_min || 10} min`
+                ? `Arrives in ~${displayEta} min`
                 : displayStatus === 'arrived'
                 ? 'Worker is at your doorstep'
                 : 'Service underway'}

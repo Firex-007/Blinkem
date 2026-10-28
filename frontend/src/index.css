@@ -675,4 +675,10 @@ body {
   background: rgba(18, 22, 34, 0.45);
 }
 
-
+/* Smooth real-time GPS marker gliding transition (Uber / Lyft style) */
+.custom-worker-icon,
+.leaflet-marker-icon.custom-worker-icon,
+.leaflet-marker-icon {
+  transition: transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform;
+}
