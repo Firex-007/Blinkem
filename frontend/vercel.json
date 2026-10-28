@@ -1,6 +1,10 @@
 {
   "rewrites": [
-    { "source": "/api/demo/booking/:id/fast-forward", "destination": "/api/bookings/$id/fast-forward" },
+    { "source": "/api/offers/:id/:action", "destination": "/api/offers/[...slug]?slug=:id/:action" },
+    { "source": "/api/offers/:id", "destination": "/api/offers/[...slug]?slug=:id" },
+    { "source": "/api/bookings/:id/:action*", "destination": "/api/bookings/[...slug]?slug=:id/:action" },
+    { "source": "/api/bookings/:id", "destination": "/api/bookings/[...slug]?slug=:id" },
+    { "source": "/api/demo/booking/:id/fast-forward", "destination": "/api/bookings/[...slug]?slug=:id/fast-forward" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
