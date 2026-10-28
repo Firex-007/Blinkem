@@ -246,6 +246,11 @@ export default function Terms({ tab: initialTab = 'terms' }) {
                 The platform's aggregate liability for verified claims shall not exceed the total fee paid
                 for the specific service booking in question.
               </p>
+              <p className="text-muted leading-relaxed">
+                <strong>Governing Law & Jurisdiction:</strong> These terms shall be governed by and construed in
+                accordance with the laws of India. Any disputes arising out of or in connection with these terms
+                shall be subject to the exclusive jurisdiction of the competent courts in Chennai, Tamil Nadu.
+              </p>
             </section>
           </div>
         ) : (
@@ -365,7 +370,7 @@ export default function Terms({ tab: initialTab = 'terms' }) {
               <div className="p-4 rounded-card bg-surface2/60 border border-line text-xs space-y-1.5 font-600">
                 <p className="text-ink">Grievance & Privacy Officer: Blink'em Technologies</p>
                 <p className="text-muted">Email: legal@blinkem.in • support@blinkem.in</p>
-                <p className="text-muted">Headquarters: Indiranagar, Bengaluru, Karnataka, India</p>
+                <p className="text-muted">Headquarters: Chennai, Tamil Nadu, India</p>
               </div>
             </section>
           </div>
