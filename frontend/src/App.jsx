@@ -25,6 +25,7 @@ import Profile from './pages/customer/Profile';
 import WorkerHome from './pages/worker/WorkerHome';
 import ActiveJob from './pages/worker/ActiveJob';
 import AdminConsole from './pages/admin/AdminConsole';
+import Terms from './pages/legal/Terms';
 
 function Header() {
   const {
@@ -258,6 +259,8 @@ export default function App() {
             <Route path="/worker" element={<ProtectedRoute><Shell><WorkerHome /></Shell></ProtectedRoute>} />
             <Route path="/worker/job/:id" element={<ProtectedRoute><Shell><ActiveJob /></Shell></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Shell><AdminConsole /></Shell></ProtectedRoute>} />
+            <Route path="/terms" element={<Shell><Terms tab="terms" /></Shell>} />
+            <Route path="/privacy" element={<Shell><Terms tab="privacy" /></Shell>} />
           </Routes>
         </Router>
       </AppProvider>

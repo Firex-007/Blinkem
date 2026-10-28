@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   Phone,
   ShieldCheck,
@@ -622,7 +622,16 @@ export default function Login() {
 
         {/* Consumer Trust Footer */}
         <div className="mt-6 pt-4 border-t border-line/60 text-center text-[11px] text-muted">
-          <span>By continuing, you agree to Blink'em Terms of Service & Privacy Policy</span>
+          <span>
+            By continuing, you agree to Blink'em{' '}
+            <Link to="/terms" className="text-primary font-700 hover:underline">
+              Terms of Service
+            </Link>{' '}
+            &{' '}
+            <Link to="/privacy" className="text-primary font-700 hover:underline">
+              Privacy Policy
+            </Link>
+          </span>
         </div>
       </LiquidGlass>
     </div>

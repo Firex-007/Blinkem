@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Phone,
   ShieldCheck,
@@ -466,6 +466,28 @@ export default function LoginModal({ open, onClose }) {
               </button>
             </form>
           )}
+
+          {/* Consumer Terms & Privacy Hyperlinks */}
+          <div className="mt-3.5 pt-3 border-t border-line/60 text-center text-[11px] text-muted">
+            <span>
+              By continuing, you agree to Blink'em{' '}
+              <Link
+                to="/terms"
+                onClick={onClose}
+                className="text-primary font-700 hover:underline"
+              >
+                Terms of Service
+              </Link>{' '}
+              &{' '}
+              <Link
+                to="/privacy"
+                onClick={onClose}
+                className="text-primary font-700 hover:underline"
+              >
+                Privacy Policy
+              </Link>
+            </span>
+          </div>
         </LiquidGlass>
       </div>
     </>

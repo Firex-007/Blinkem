@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import BrandIcon from './BrandIcon';
 import { t } from '../i18n';
 
@@ -18,7 +19,19 @@ export default function Footer() {
   return (
     <footer className="site-footer" data-name="site footer">
       <div className="site-footer-inner">
-        <p className="footer-copyright">{t('footer_copyright')}</p>
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-xs text-muted">
+          <p className="footer-copyright">{t('footer_copyright')}</p>
+          <span className="hidden sm:inline opacity-40">•</span>
+          <div className="flex items-center gap-3 font-600">
+            <Link to="/terms" className="hover:text-ink hover:underline transition">
+              Terms of Service
+            </Link>
+            <span className="opacity-40">•</span>
+            <Link to="/privacy" className="hover:text-ink hover:underline transition">
+              Privacy Policy
+            </Link>
+          </div>
+        </div>
 
         <div className="footer-download" data-name="download app">
           <span className="footer-download-label">{t('footer_download_app')}</span>
