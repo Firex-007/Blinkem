@@ -68,7 +68,7 @@ export default function handler(req, res) {
   if (req.method === 'POST') {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
 
-    if (action === 'verify-otp') {
+    if (action === 'verify-otp' || action === 'start') {
       booking.status = 'in_progress';
       booking.display_status = 'in_progress';
       booking.started_at = new Date().toISOString();
