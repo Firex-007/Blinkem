@@ -111,6 +111,11 @@ export async function sendRealPhoneOtp(phone, containerId = 'recaptcha-container
       window.recaptchaVerifier = null;
     }
 
+    if (err.code === 'auth/configuration-not-found' || err.message?.includes('configuration-not-found')) {
+      throw new Error(
+        'Phone authentication is not enabled yet in your Firebase Console. Go to Firebase Console > Authentication > Sign-in method > Enable Phone.'
+      );
+    }
     if (err.code === 'auth/invalid-phone-number') {
       throw new Error('The phone number format is invalid. Please check the 10 digits.');
     }
