@@ -19,6 +19,8 @@ import {
   verifyPhoneLogin,
   registerUser,
   signInWithGoogleOAuth,
+  sendEmailOtp,
+  verifyEmailOtp,
 } from '../utils/supabase';
 import { sendRealPhoneOtp } from '../utils/firebase';
 import LiquidGlass from './LiquidGlass';
@@ -27,7 +29,12 @@ export default function LoginModal({ open, onClose }) {
   const { loginUser, location } = useApp();
   const navigate = useNavigate();
 
-  const [tab, setTab] = useState('password'); // 'password' | 'signup' | 'phone'
+  const [tab, setTab] = useState('email_otp'); // 'email_otp' | 'password' | 'signup' | 'phone'
+  const [email, setEmail] = useState('');
+  const [emailOtp, setEmailOtp] = useState('');
+  const [emailOtpStep, setEmailOtpStep] = useState(false);
+  const [emailCountdown, setEmailCountdown] = useState(0);
+
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState('');
@@ -55,7 +62,61 @@ export default function LoginModal({ open, onClose }) {
     return () => clearInterval(timer);
   }, [countdown]);
 
+  // Email OTP countdown timer
+  useEffect(() => {
+    if (emailCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setEmailCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [emailCountdown]);
+
   if (!open) return null;
+
+  const handleSendEmailOtp = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setError('');
+    setInfoMessage('');
+    const clean = email.trim().toLowerCase();
+    if (!clean || !clean.includes('@') || !clean.includes('.')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await sendEmailOtp(clean);
+      setEmailOtpStep(true);
+      setEmailCountdown(30);
+      if (res.isRealEmail) {
+        setInfoMessage(`Verification code sent to ${clean}. Please check your inbox.`);
+      } else {
+        setInfoMessage(`Verification code: ${res.code} (or test code: 1234)`);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to send verification code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyEmailOtp = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await verifyEmailOtp({ email, otp: emailOtp, role: 'customer' });
+      if (res.success && res.user) {
+        loginUser(res.user);
+        onClose();
+        if (res.user.role === 'worker') navigate('/worker');
+      }
+    } catch (err) {
+      setError(err.message || 'Verification failed. Please check the code.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setError('');
@@ -251,6 +312,18 @@ export default function LoginModal({ open, onClose }) {
           <div className="grid grid-cols-2 p-1 bg-surface2/80 rounded-xl border border-line mb-3 text-xs font-700">
             <button
               onClick={() => {
+                setTab('email_otp');
+                setError('');
+                setEmailOtpStep(false);
+              }}
+              className={`py-2 rounded-lg transition ${
+                tab === 'email_otp' ? 'bg-surface text-ink shadow-sm' : 'text-muted'
+              }`}
+            >
+              Email OTP
+            </button>
+            <button
+              onClick={() => {
                 setTab('password');
                 setError('');
               }}
@@ -258,18 +331,7 @@ export default function LoginModal({ open, onClose }) {
                 tab === 'password' ? 'bg-surface text-ink shadow-sm' : 'text-muted'
               }`}
             >
-              Sign In
-            </button>
-            <button
-              onClick={() => {
-                setTab('signup');
-                setError('');
-              }}
-              className={`py-2 rounded-lg transition ${
-                tab === 'signup' ? 'bg-surface text-ink shadow-sm' : 'text-muted'
-              }`}
-            >
-              Register
+              Password
             </button>
           </div>
 
@@ -289,73 +351,67 @@ export default function LoginModal({ open, onClose }) {
             </div>
           )}
 
-          {/* Invisible reCAPTCHA container for Firebase Phone Auth */}
-          <div id="recaptcha-container" className="hidden"></div>
-
-          {/* TAB 1: PHONE OTP */}
-          {tab === 'phone' && (
+          {/* TAB 1: EMAIL OTP */}
+          {tab === 'email_otp' && (
             <div className="space-y-3 py-1">
-              {!otpStep ? (
-                <form onSubmit={handlePhoneSubmit} className="space-y-3">
+              {!emailOtpStep ? (
+                <form onSubmit={handleSendEmailOtp} className="space-y-3">
                   <div>
                     <label className="text-xs font-700 text-muted uppercase tracking-wider block mb-1.5">
-                      Mobile Number
+                      Email Address
                     </label>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="px-3.5 py-2.5 rounded-xl bg-surface2 border border-line text-xs font-800 text-ink flex items-center">
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      required
-                      maxLength={10}
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                      placeholder="98401 23456"
-                      className="flex-1 px-3.5 py-2.5 rounded-xl bg-surface2 border border-line text-sm text-ink focus:outline-none focus:border-primary font-700"
-                    />
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-surface2 border border-line text-sm text-ink focus:outline-none focus:border-primary font-600 transition"
+                      />
+                    </div>
                   </div>
                   <button
                     type="submit"
-                    disabled={loading || phoneNumber.length < 10}
+                    disabled={loading || !email.includes('@')}
                     className="w-full py-3 rounded-xl bg-primary text-onprimary font-800 text-sm hover:bg-primary600 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                   >
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Sending OTP…</span>
+                        <span>Sending Code…</span>
                       </>
                     ) : (
                       <>
-                        <span>Receive OTP</span>
+                        <span>Receive Email Code</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
                   </button>
                   <p className="text-[11px] text-muted text-center">
-                    We'll send a 6-digit verification code to your mobile number.
+                    We'll send a 6-digit verification code to your email.
                   </p>
                 </form>
               ) : (
-                <form onSubmit={handleOtpVerify} className="space-y-3">
+                <form onSubmit={handleVerifyEmailOtp} className="space-y-3">
                   <div className="text-center space-y-1">
                     <span className="text-sm font-800 text-ink block">Enter Verification Code</span>
-                    <span className="text-xs text-muted block">Sent to +91 {phoneNumber}</span>
+                    <span className="text-xs text-muted block">Sent to {email}</span>
                   </div>
                   <input
                     type="text"
                     maxLength={6}
                     required
                     autoFocus
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    value={emailOtp}
+                    onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))}
                     placeholder="• • • • • •"
                     className="w-full py-3 text-center text-2xl font-black tracking-widest rounded-xl bg-surface2 border-2 border-line text-ink focus:outline-none focus:border-primary"
                   />
                   <button
                     type="submit"
-                    disabled={loading || otp.length < 4}
+                    disabled={loading || emailOtp.length < 4}
                     className="w-full py-3 rounded-xl bg-primary text-onprimary font-800 text-sm hover:bg-primary600 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                   >
                     {loading ? (
@@ -364,35 +420,34 @@ export default function LoginModal({ open, onClose }) {
                         <span>Verifying…</span>
                       </>
                     ) : (
-                      <span>Verify & Proceed</span>
+                      <>
+                        <span>Verify & Sign In</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
                     )}
                   </button>
                   <div className="flex items-center justify-between text-xs text-muted pt-1 px-1">
                     <button
                       type="button"
                       onClick={() => {
-                        setOtpStep(false);
-                        setOtp('');
+                        setEmailOtpStep(false);
+                        setEmailOtp('');
                         setError('');
                         setInfoMessage('');
                       }}
                       className="font-700 hover:text-ink transition"
                     >
-                      ← Change Number
+                      ← Change Email
                     </button>
-                    {countdown > 0 ? (
-                      <span className="text-muted font-600">
-                        Resend OTP in <span className="font-700 text-ink">{countdown}s</span>
-                      </span>
+                    {emailCountdown > 0 ? (
+                      <span className="font-700 text-primary">Resend in {emailCountdown}s</span>
                     ) : (
                       <button
                         type="button"
-                        disabled={loading}
-                        onClick={handlePhoneSubmit}
-                        className="font-700 text-primary hover:underline transition flex items-center gap-1"
+                        onClick={handleSendEmailOtp}
+                        className="font-700 text-primary hover:underline"
                       >
-                        <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-                        <span>Resend OTP</span>
+                        Resend Code
                       </button>
                     )}
                   </div>
@@ -437,16 +492,26 @@ export default function LoginModal({ open, onClose }) {
               >
                 {loading ? 'Signing In…' : 'Sign In'}
               </button>
-              <div className="pt-1 text-center">
+              <div className="pt-1 flex items-center justify-between text-xs text-muted">
                 <button
                   type="button"
                   onClick={() => {
-                    setTab('phone');
+                    setTab('email_otp');
                     setError('');
                   }}
-                  className="text-xs text-muted hover:text-primary font-700 transition"
+                  className="hover:text-primary font-700 transition"
                 >
-                  Use phone number instead →
+                  Use Email OTP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab('signup');
+                    setError('');
+                  }}
+                  className="hover:text-primary font-700 transition"
+                >
+                  Create account →
                 </button>
               </div>
             </form>

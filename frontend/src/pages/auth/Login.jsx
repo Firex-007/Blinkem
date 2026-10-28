@@ -24,6 +24,8 @@ import {
   signInUser,
   verifyPhoneLogin,
   signInWithGoogleOAuth,
+  sendEmailOtp,
+  verifyEmailOtp,
 } from '../../utils/supabase';
 import { sendRealPhoneOtp } from '../../utils/firebase';
 import { CITIES } from '../../data/cities';
@@ -36,7 +38,11 @@ export default function Login() {
   const location = useLocation();
 
   const [mode, setMode] = useState('signin'); // 'signin' | 'signup'
-  const [signInMethod, setSignInMethod] = useState('password'); // 'password' | 'phone'
+  const [signInMethod, setSignInMethod] = useState('email_otp'); // 'email_otp' | 'password'
+  const [email, setEmail] = useState('');
+  const [emailOtp, setEmailOtp] = useState('');
+  const [emailOtpStep, setEmailOtpStep] = useState(false);
+  const [emailCountdown, setEmailCountdown] = useState(0);
 
   // Sign In Form States
   const [identifier, setIdentifier] = useState('');
@@ -70,6 +76,15 @@ export default function Login() {
     return () => clearInterval(timer);
   }, [countdown]);
 
+  // Email countdown timer
+  useEffect(() => {
+    if (emailCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setEmailCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [emailCountdown]);
+
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
@@ -93,6 +108,54 @@ export default function Login() {
       }
     } catch (err) {
       setErrorMessage(err.message || 'Google Sign-In failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Email OTP Send
+  const handleSendEmailOtp = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
+    const clean = email.trim().toLowerCase();
+    if (!clean || !clean.includes('@') || !clean.includes('.')) {
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await sendEmailOtp(clean);
+      setEmailOtpStep(true);
+      setEmailCountdown(30);
+      if (res.isRealEmail) {
+        setSuccessMessage(`Verification code sent to ${clean}. Please check your inbox.`);
+      } else {
+        setSuccessMessage(`Verification code: ${res.code} (or test code: 1234)`);
+      }
+    } catch (err) {
+      setErrorMessage(err.message || 'Failed to send verification code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Email OTP Verify
+  const handleVerifyEmailOtp = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setErrorMessage('');
+    setLoading(true);
+    try {
+      const res = await verifyEmailOtp({ email, otp: emailOtp, role: 'customer' });
+      if (res.success && res.user) {
+        loginUser(res.user);
+        setTimeout(() => {
+          navigate(res.user.role === 'worker' ? '/worker' : '/');
+        }, 500);
+      }
+    } catch (err) {
+      setErrorMessage(err.message || 'Verification failed. Please check the code.');
     } finally {
       setLoading(false);
     }
@@ -341,8 +404,22 @@ export default function Login() {
         {/* ===================== MODE 1: SIGN IN ===================== */}
         {mode === 'signin' && (
           <div className="space-y-4">
-            {/* Method Toggle: Password vs Phone */}
+            {/* Method Toggle: Email OTP vs Password */}
             <div className="flex items-center justify-center gap-4 text-xs font-700 text-muted pb-1 border-b border-line/50">
+              <button
+                type="button"
+                onClick={() => {
+                  setSignInMethod('email_otp');
+                  setEmailOtpStep(false);
+                }}
+                className={`pb-1.5 transition-colors relative ${
+                  signInMethod === 'email_otp'
+                    ? 'text-primary font-800 border-b-2 border-primary -mb-[1px]'
+                    : 'hover:text-ink'
+                }`}
+              >
+                Email OTP
+              </button>
               <button
                 type="button"
                 onClick={() => setSignInMethod('password')}
@@ -354,77 +431,57 @@ export default function Login() {
               >
                 Password Login
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSignInMethod('phone');
-                  setOtpStep(false);
-                }}
-                className={`pb-1.5 transition-colors relative ${
-                  signInMethod === 'phone'
-                    ? 'text-primary font-800 border-b-2 border-primary -mb-[1px]'
-                    : 'hover:text-ink'
-                }`}
-              >
-                Phone Verification
-              </button>
             </div>
 
-            {/* Invisible reCAPTCHA container for Phone Auth */}
-            <div id="recaptcha-container-page" className="hidden"></div>
-
-            {/* Sub-form 1: Phone OTP */}
-            {signInMethod === 'phone' && (
+            {/* Sub-form 1: Email OTP */}
+            {signInMethod === 'email_otp' && (
               <>
-                {!otpStep ? (
-                  <form onSubmit={handleSendOtp} className="space-y-3.5">
+                {!emailOtpStep ? (
+                  <form onSubmit={handleSendEmailOtp} className="space-y-3.5">
                     <div>
                       <label className="text-[11px] font-800 text-muted uppercase tracking-wider block mb-1.5">
-                        Mobile Number
+                        Email Address
                       </label>
-                      <div className="flex gap-2">
-                        <span className="px-3.5 py-3 rounded-xl bg-surface2 border border-line text-xs font-800 text-ink flex items-center flex-shrink-0">
-                          +91
-                        </span>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
-                          type="tel"
+                          type="email"
                           required
-                          maxLength={10}
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                          placeholder="98401 23456"
-                          className="flex-1 px-3.5 py-3 rounded-xl bg-surface2 border border-line text-sm text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-700 transition"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@example.com"
+                          className="w-full pl-10 pr-3.5 py-3 rounded-xl bg-surface2 border border-line text-sm text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 font-600 transition"
                         />
                       </div>
                     </div>
 
                     <button
                       type="submit"
-                      disabled={loading || phoneNumber.length < 10}
+                      disabled={loading || !email.includes('@')}
                       className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary600 text-onprimary font-800 text-sm transition shadow-sm active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {loading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Sending OTP…</span>
+                          <span>Sending Code…</span>
                         </>
                       ) : (
                         <>
-                          <span>Receive OTP</span>
+                          <span>Receive Email Code</span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </button>
                     <p className="text-[11px] text-muted text-center">
-                      We'll send a 6-digit verification code to your mobile number.
+                      We'll send a 6-digit verification code to your email.
                     </p>
                   </form>
                 ) : (
-                  <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <form onSubmit={handleVerifyEmailOtp} className="space-y-4">
                     <div className="text-center space-y-1">
                       <span className="text-sm font-800 text-ink block">Enter Verification Code</span>
                       <span className="text-xs text-muted block">
-                        Sent to +91 {phoneNumber}
+                        Sent to {email}
                       </span>
                     </div>
 
@@ -433,8 +490,8 @@ export default function Login() {
                       maxLength={6}
                       required
                       autoFocus
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                      value={emailOtp}
+                      onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))}
                       placeholder="• • • • • •"
                       className="w-full py-3.5 text-center text-2xl font-black tracking-widest rounded-xl bg-surface2 border-2 border-line text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                     />
@@ -442,7 +499,7 @@ export default function Login() {
                     <div className="flex flex-col gap-2">
                       <button
                         type="submit"
-                        disabled={loading || otp.length < 4}
+                        disabled={loading || emailOtp.length < 4}
                         className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary600 text-onprimary font-800 text-sm transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                       >
                         {loading ? (
@@ -451,33 +508,38 @@ export default function Login() {
                             <span>Verifying…</span>
                           </>
                         ) : (
-                          <span>Verify & Proceed</span>
+                          <>
+                            <span>Verify & Sign In</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
                         )}
                       </button>
                       <div className="flex items-center justify-between text-xs text-muted pt-1 px-1">
                         <button
                           type="button"
                           onClick={() => {
-                            setOtpStep(false);
-                            setOtp('');
+                            setEmailOtpStep(false);
+                            setEmailOtp('');
+                            setErrorMessage('');
+                            setSuccessMessage('');
                           }}
-                          className="font-700 text-muted hover:text-ink transition"
+                          className="font-700 hover:text-ink transition"
                         >
-                          ← Change Number
+                          ← Change Email
                         </button>
-                        {countdown > 0 ? (
+                        {emailCountdown > 0 ? (
                           <span className="text-muted font-600">
-                            Resend OTP in <span className="font-700 text-ink">{countdown}s</span>
+                            Resend in <span className="font-700 text-primary">{emailCountdown}s</span>
                           </span>
                         ) : (
                           <button
                             type="button"
                             disabled={loading}
-                            onClick={handleSendOtp}
+                            onClick={handleSendEmailOtp}
                             className="font-700 text-primary hover:underline transition flex items-center gap-1"
                           >
                             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-                            <span>Resend OTP</span>
+                            <span>Resend Code</span>
                           </button>
                         )}
                       </div>
