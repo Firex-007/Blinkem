@@ -3,6 +3,8 @@ import {
   getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -168,4 +170,17 @@ export async function verifyRealPhoneOtp(otp, confirmationResult = null) {
     }
     throw new Error(err.message || 'OTP verification failed.');
   }
+}
+
+/**
+ * Sign in using Google Account via Firebase Auth Popup
+ * @returns {Promise<any>} Firebase User object
+ */
+export async function signInWithFirebaseGoogle() {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: 'select_account',
+  });
+  const result = await signInWithPopup(firebaseAuth, provider);
+  return result.user;
 }

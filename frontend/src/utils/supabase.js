@@ -301,6 +301,105 @@ export async function verifyPhoneLogin({ phone, otp, confirmationResult }) {
 }
 
 /**
+ * Sign in with Google Account (Firebase Auth popup or Supabase OAuth)
+ * Syncs user profile with Google name, email, and avatar directly to Supabase PostgreSQL
+ */
+export async function signInWithGoogleOAuth(role = 'customer') {
+  let googleUser = null;
+
+  // 1. Try Firebase Google Popup first (seamless popup, zero redirect)
+  try {
+    const { signInWithFirebaseGoogle } = await import('./firebase');
+    googleUser = await signInWithFirebaseGoogle();
+  } catch (fbErr) {
+    console.warn('Firebase Google Sign-In notice:', fbErr);
+
+    // If popup closed by user, don't fallback to redirect
+    if (fbErr.code === 'auth/popup-closed-by-user') {
+      throw new Error('Google Sign-In was cancelled.');
+    }
+
+    // If Firebase Google provider isn't enabled or configured, fallback to Supabase OAuth
+    if (isSupabaseConfigured() && supabase) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+        },
+      });
+      if (error) {
+        throw new Error(fbErr.message || error.message);
+      }
+      return { success: true, redirecting: true };
+    }
+
+    if (fbErr.code === 'auth/operation-not-allowed') {
+      throw new Error(
+        'Google Sign-In is not enabled yet in Firebase Console. Go to Authentication > Sign-in method > Google > Enable.'
+      );
+    }
+    if (fbErr.code === 'auth/unauthorized-domain') {
+      throw new Error(
+        'This domain is not authorized in Firebase Console. Please add blinkem.vercel.app under Authentication > Settings > Authorized domains.'
+      );
+    }
+
+    throw new Error(fbErr.message || 'Google Sign-In failed.');
+  }
+
+  if (!googleUser) {
+    throw new Error('Could not retrieve Google profile details.');
+  }
+
+  const userId = googleUser.uid || `usr_g_${Date.now()}`;
+  const profile = {
+    id: userId,
+    name: googleUser.displayName || googleUser.email?.split('@')[0] || 'Google User',
+    email: googleUser.email || '',
+    phone: googleUser.phoneNumber || '',
+    role: role || 'customer',
+    city: 'Chennai',
+    avatarUrl:
+      googleUser.photoURL ||
+      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(googleUser.displayName || 'Google')}&backgroundColor=2563EB`,
+    isVerified: true,
+    createdAt: new Date().toISOString(),
+  };
+
+  // Sync to Supabase PostgreSQL profiles table
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      await supabase.from('profiles').upsert({
+        id: userId,
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        role: profile.role,
+        city: profile.city,
+        avatar_url: profile.avatarUrl,
+        is_verified: true,
+        updated_at: new Date().toISOString(),
+      });
+    } catch (dbErr) {
+      console.warn('Supabase profile sync note:', dbErr.message);
+    }
+  }
+
+  // Also save in local store
+  const users = getLocalUsers();
+  const existingIdx = users.findIndex((u) => (profile.email && u.email === profile.email) || u.id === profile.id);
+  if (existingIdx >= 0) {
+    users[existingIdx] = { ...users[existingIdx], ...profile };
+  } else {
+    users.push(profile);
+  }
+  saveLocalUsers(users);
+
+  saveSession(profile);
+  return { success: true, user: profile };
+}
+
+/**
  * Sign out
  */
 export async function logoutAuth() {
