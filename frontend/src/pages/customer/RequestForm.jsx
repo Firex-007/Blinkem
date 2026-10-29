@@ -63,6 +63,41 @@ export default function RequestForm() {
   const [streetArea, setStreetArea] = useState(defaultLocality);
   const [pincode, setPincode] = useState('600017');
   const [landmark, setLandmark] = useState('');
+  const [isPrefilledFromProfile, setIsPrefilledFromProfile] = useState(false);
+
+  // Auto pre-fill saved address and PIN code from user profile
+  useEffect(() => {
+    if (currentUser) {
+      let pinFound = currentUser.pincode || '';
+      let rawAddr = (currentUser.address || '').trim();
+
+      if (!pinFound && rawAddr) {
+        const match = rawAddr.match(/\b(6\d{5})\b/) || rawAddr.match(/\b(\d{6})\b/);
+        if (match) pinFound = match[1];
+      }
+
+      if (pinFound) {
+        setPincode(pinFound);
+      }
+
+      if (rawAddr) {
+        const parts = rawAddr.split(',').map((p) => p.trim()).filter(Boolean);
+        if (parts.length > 1) {
+          const firstPart = parts[0];
+          // Check if first segment looks like flat/door no (e.g. "65/15", "Flat 4B", "No. 12")
+          if (firstPart.length <= 25 && (/[\d\/\-]/.test(firstPart) || /^(flat|no|door|plot|house)/i.test(firstPart))) {
+            setFlatNo(firstPart);
+            setStreetArea(parts.slice(1).join(', '));
+          } else {
+            setStreetArea(rawAddr);
+          }
+        } else {
+          setStreetArea(rawAddr);
+        }
+        setIsPrefilledFromProfile(true);
+      }
+    }
+  }, [currentUser]);
 
   // Media attachments: Photos (up to 3) or 1 short video (< 15s), under 10MB total
   const [mediaList, setMediaList] = useState([]);
@@ -423,11 +458,19 @@ export default function RequestForm() {
 
         {/* 3. Detailed Address with PIN Code */}
         <div className="space-y-3 pt-1 border-t border-line/60">
-          <div className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 text-primary" />
-            <label className="text-xs font-800 text-ink uppercase tracking-wider">
-              Service Address &amp; Location
-            </label>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-primary" />
+              <label className="text-xs font-800 text-ink uppercase tracking-wider">
+                Service Address &amp; Location
+              </label>
+            </div>
+            {isPrefilledFromProfile && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-successsoft border border-success/30 text-success text-[10px] font-800 animate-slideUp">
+                <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+                Pre-filled from profile
+              </span>
+            )}
           </div>
 
           <div className="space-y-2">

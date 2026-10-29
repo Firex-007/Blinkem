@@ -100,6 +100,7 @@ def get_nearby_places(
     lat: Optional[float] = Query(None),
     lng: Optional[float] = Query(None),
     city: Optional[str] = Query(None),
+    address: Optional[str] = Query(None),
     radius_km: float = Query(10.0),
 ):
     """
@@ -117,6 +118,7 @@ def get_nearby_places(
         service=category,
         radius_km=radius_km,
         city=city,
+        address=address,
     )
 
 

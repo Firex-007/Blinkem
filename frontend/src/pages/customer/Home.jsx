@@ -189,7 +189,7 @@ const INSTANT_FIX_PACKAGES = [
 const FILTERS = CATEGORIES.slice(0, 5);
 
 export default function Home() {
-  const { location, setIsLocationModalOpen, lang } = useApp();
+  const { location, setIsLocationModalOpen, lang, currentUser } = useApp();
   const navigate = useNavigate();
   useScrollReveal();
   const [railCat, setRailCat] = useState('plumber');
@@ -227,20 +227,21 @@ export default function Home() {
     };
   }, []);
 
-  const curLat = location?.lat || 12.9716;
-  const curLng = location?.lng || 77.5946;
-  const curCity = location?.city || '';
+  const curLat = location?.lat || 13.0418;
+  const curLng = location?.lng || 80.2341;
+  const curCity = location?.city || location?.name || 'Chennai';
+  const userSavedAddress = currentUser?.address || '';
   const mapCenter = useMemo(() => [curLat, curLng], [curLat, curLng]);
 
   useEffect(() => {
     let isMounted = true;
-    getRealPlaces(railCat, curLat, curLng, curCity).then((data) => {
+    getRealPlaces(railCat, curLat, curLng, curCity, userSavedAddress).then((data) => {
       if (isMounted) setRealPlaces(data || []);
     });
     return () => {
       isMounted = false;
     };
-  }, [railCat, curLat, curLng, curCity]);
+  }, [railCat, curLat, curLng, curCity, userSavedAddress]);
 
   const {
     data: categories,

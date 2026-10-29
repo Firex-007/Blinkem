@@ -253,12 +253,12 @@ export async function reverseGeocodeGps(lat, lng) {
 
 // Default initial location: Bengaluru (or first city)
 export const DEFAULT_LOCATION = {
-  name: 'Indiranagar',
-  city: 'Bengaluru',
-  state: 'Karnataka',
-  cityId: 'bengaluru',
-  lat: 12.9784,
-  lng: 77.6408,
-  pin_code: '560038',
-  landmark: '100ft Road / CMH Road',
+  name: 'T. Nagar',
+  city: 'Chennai',
+  state: 'Tamil Nadu',
+  cityId: 'chennai',
+  lat: 13.0418,
+  lng: 80.2341,
+  pin_code: '600017',
+  landmark: 'Pondy Bazaar / Panagal Park',
 };

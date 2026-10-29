@@ -48,6 +48,7 @@ export default function AccountFlyout({ open, onClose }) {
     phone: currentUser?.phone || '',
     email: currentUser?.email || '',
     address: currentUser?.address || '',
+    pincode: currentUser?.pincode || '',
   });
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -59,6 +60,7 @@ export default function AccountFlyout({ open, onClose }) {
         phone: currentUser.phone || '',
         email: currentUser.email || '',
         address: currentUser.address || '',
+        pincode: currentUser.pincode || '',
       });
     }
   }, [currentUser]);
@@ -91,6 +93,7 @@ export default function AccountFlyout({ open, onClose }) {
       phone: formData.phone.trim() || currentUser.phone,
       email: formData.email.trim() || currentUser.email,
       address: formData.address.trim() || currentUser.address,
+      pincode: formData.pincode ? formData.pincode.trim() : (currentUser.pincode || ''),
     });
     setSaveSuccess(true);
     setIsEditing(false);
@@ -268,7 +271,7 @@ export default function AccountFlyout({ open, onClose }) {
               <div className="pt-2 border-t border-line/60 text-xs space-y-1">
                 <p className="text-muted flex items-start gap-1.5 truncate">
                   <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="truncate">{currentUser?.address || 'No. 14, Usman Road, T. Nagar, Chennai'}</span>
+                  <span className="truncate">{currentUser?.address || 'No. 14, Usman Road, T. Nagar, Chennai'}{currentUser?.pincode ? ` - ${currentUser.pincode}` : ''}</span>
                 </p>
               </div>
             )}
