@@ -94,14 +94,10 @@ body {
   position: relative;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.75) 0%,
-    rgba(240, 249, 255, 0.68) 25%,
-    rgba(250, 245, 255, 0.65) 55%,
-    rgba(254, 243, 199, 0.65) 80%,
-    rgba(255, 255, 255, 0.72) 100%
+    rgba(255, 255, 255, 0.94) 0%, rgba(240, 249, 255, 0.92) 25%, rgba(250, 245, 255, 0.92) 55%, rgba(254, 243, 199, 0.92) 80%, rgba(255, 255, 255, 0.94) 100%
   );
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  /* backdrop-filter: blur(28px) saturate(200%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: 
     /* Specular White Light Crest */
@@ -120,14 +116,10 @@ body {
 .dark .liquid-glass {
   background: linear-gradient(
     135deg,
-    rgba(14, 15, 22, 0.75) 0%,
-    rgba(15, 23, 42, 0.70) 30%,
-    rgba(24, 16, 38, 0.68) 60%,
-    rgba(28, 20, 16, 0.65) 85%,
-    rgba(12, 13, 18, 0.75) 100%
+    rgba(14, 15, 22, 0.95) 0%, rgba(15, 23, 42, 0.92) 30%, rgba(24, 16, 38, 0.92) 60%, rgba(28, 20, 16, 0.92) 85%, rgba(12, 13, 18, 0.95) 100%
   );
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  /* backdrop-filter: blur(28px) saturate(200%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
     inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.35),
@@ -147,8 +139,8 @@ body {
     rgba(253, 244, 255, 0.60) 70%,
     rgba(255, 255, 255, 0.68) 100%
   );
-  backdrop-filter: blur(22px) saturate(190%);
-  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  /* backdrop-filter: blur(22px) saturate(190%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.68);
   box-shadow: 
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
@@ -167,8 +159,8 @@ body {
     rgba(26, 18, 38, 0.62) 75%,
     rgba(16, 17, 24, 0.70) 100%
   );
-  backdrop-filter: blur(22px) saturate(190%);
-  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  /* backdrop-filter: blur(22px) saturate(190%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.11);
   box-shadow: 
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
@@ -206,8 +198,8 @@ body {
     rgba(245, 243, 255, 0.65) 50%,
     rgba(255, 241, 242, 0.65) 100%
   );
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  /* backdrop-filter: blur(16px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow: 
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
@@ -216,8 +208,8 @@ body {
 
 .dark .liquid-glass-pill {
   background: rgba(22, 24, 32, 0.70);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  /* backdrop-filter: blur(16px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
@@ -234,8 +226,8 @@ body {
     #1d4ed8 72%,
     #1e3a8a 100%
   );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* backdrop-filter: blur(20px); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1.5px solid rgba(255, 255, 255, 0.65);
   box-shadow: 
     inset 0 2.5px 3px 0 rgba(255, 255, 255, 0.95),
@@ -301,43 +293,43 @@ body {
 /* Glassmorphism legacy aliases */
 .glass {
   background: rgba(255, 255, 255, 0.70);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* backdrop-filter: blur(24px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.75);
 }
 
 .dark .glass {
   background: rgba(13, 13, 16, 0.70);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* backdrop-filter: blur(24px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .glass-card {
   background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* backdrop-filter: blur(20px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.72);
   box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.85), 0 8px 32px 0 rgba(31, 91, 255, 0.07);
 }
 
 .dark .glass-card {
   background: rgba(14, 14, 18, 0.70);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* backdrop-filter: blur(20px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), 0 16px 40px 0 rgba(0, 0, 0, 0.75);
 }
 
 .glass-pill {
   background: rgba(238, 244, 255, 0.65);
-  backdrop-filter: blur(14px) saturate(170%);
+  /* backdrop-filter: blur(14px) saturate(170%); -- commented for lag-free UI */
   border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .dark .glass-pill {
   background: rgba(24, 24, 30, 0.65);
-  backdrop-filter: blur(14px) saturate(170%);
+  /* backdrop-filter: blur(14px) saturate(170%); -- commented for lag-free UI */
   border: 1px solid rgba(255, 255, 255, 0.13);
 }
 
@@ -439,8 +431,8 @@ body {
   position: relative;
   padding: 20px 16px;
   background: rgba(255, 255, 255, 0.40);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* backdrop-filter: blur(24px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.65);
   border-radius: 24px;
   box-shadow: 
@@ -478,8 +470,8 @@ body {
 
 .dark .request-console {
   background: rgba(18, 22, 34, 0.50);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* backdrop-filter: blur(24px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.3),
@@ -536,20 +528,19 @@ body {
 }
 .category-skeleton { min-height: 90px; border-radius: 16px; background: var(--surface-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px; }
 
-/* Scroll-triggered blur and deblur reveal animations */
+/* Scroll-triggered reveal animations (optimized: blur commented out for lag-free 60/120fps scrolling) */
 .scroll-reveal {
   opacity: 0.15;
-  filter: blur(8px);
-  transform: translateY(20px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, filter, transform;
+  /* filter: blur(8px); -- commented for lag-free performance */
+  transform: translateY(16px);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
 .scroll-reveal.is-revealed {
   opacity: 1;
-  filter: blur(0px);
+  /* filter: blur(0px); */
   transform: translateY(0px);
 }
 
@@ -594,7 +585,7 @@ body {
 .booking-copy strong, .booking-copy span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .booking-copy strong { font-size: 13px; }
 .booking-copy span { margin-top: 2px; opacity: .82; font-size: 12px; }
-.bottom-nav { position: fixed; z-index: 40; left: 16px; right: 16px; bottom: 12px; max-width: 448px; height: 66px; margin: 0 auto; display: flex; align-items: center; justify-content: space-around; gap: 4px; padding: 7px; background: var(--liquid-glass-bg); backdrop-filter: blur(28px) saturate(190%); -webkit-backdrop-filter: blur(28px) saturate(190%); border: 1px solid var(--liquid-glass-border); border-radius: 24px; box-shadow: var(--liquid-glass-shadow); }
+.bottom-nav { position: fixed; z-index: 40; left: 16px; right: 16px; bottom: 12px; max-width: 448px; height: 66px; margin: 0 auto; display: flex; align-items: center; justify-content: space-around; gap: 4px; padding: 7px; background: var(--liquid-glass-bg); /* backdrop-filter: blur(28px) saturate(190%); */ /* -webkit-backdrop-filter: none; */ border: 1px solid var(--liquid-glass-border); border-radius: 24px; box-shadow: var(--liquid-glass-shadow); }
 .bottom-nav-item { min-width: 86px; min-height: 50px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 16px; color: var(--muted); background: transparent; font-size: 12px; font-weight: 700; transition: all 0.2s ease; }
 .bottom-nav-item.is-active { color: var(--primary); background: var(--primary-soft); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.2); }
 /* Footer: full-width dead end in normal flow, below the min-100dvh shell */
@@ -660,8 +651,8 @@ body {
 /* Liquid Glass base layer (Apple-style specular frosted glass) */
 .liquid-glass {
   background: rgba(255, 255, 255, 0.20);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* backdrop-filter: blur(20px) saturate(180%); -- commented for lag-free UI */
+  /* -webkit-backdrop-filter: none; */
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {

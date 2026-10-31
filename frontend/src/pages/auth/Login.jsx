@@ -285,9 +285,15 @@ export default function Login() {
 
   return (
     <div className="min-h-[100dvh] w-full flex items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-bg">
-      {/* Background Soft Lighting Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[680px] h-[680px] rounded-full bg-primary/[0.07] blur-[130px] -mt-36 pointer-events-none" />
-      <div className="absolute bottom-0 right-1/2 translate-x-1/2 w-[540px] h-[540px] rounded-full bg-accent/[0.06] blur-[110px] -mb-28 pointer-events-none" />
+      {/* Background Soft Lighting Glows (Hardware-friendly radial gradients) */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[680px] h-[680px] rounded-full -mt-36 pointer-events-none opacity-30 dark:opacity-20"
+        style={{ background: 'radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(37, 99, 235, 0) 70%)' }}
+      />
+      <div
+        className="absolute bottom-0 right-1/2 translate-x-1/2 w-[540px] h-[540px] rounded-full -mb-28 pointer-events-none opacity-25 dark:opacity-15"
+        style={{ background: 'radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0) 70%)' }}
+      />
 
       {/* Main Liquid Glass Auth Card */}
       <LiquidGlass

@@ -2,34 +2,38 @@ import { useEffect } from 'react';
 
 /**
  * useScrollReveal: observes all elements with the .scroll-reveal class.
- * As user scrolls down, triggers blur -> deblur and fade-in smoothly.
+ * Triggers smooth, hardware-accelerated fade-in without any blur calculation overhead.
  */
 export function useScrollReveal() {
   useEffect(() => {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    if (typeof window === 'undefined') return;
+
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.scroll-reveal').forEach((el) => el.classList.add('is-revealed'));
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
           }
         });
       },
       {
         root: null,
-        rootMargin: '0px 0px -30px 0px',
-        threshold: 0.08,
+        rootMargin: '50px 0px',
+        threshold: 0.01,
       }
     );
 
-    // Initial query
     const attach = () => {
       const elements = document.querySelectorAll('.scroll-reveal:not(.is-revealed)');
       elements.forEach((el) => {
-        // If element is already in viewport on initial mount, reveal immediately
         const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
+        if (rect.top < window.innerHeight + 50 && rect.bottom > -50) {
           el.classList.add('is-revealed');
         } else {
           observer.observe(el);
@@ -38,10 +42,12 @@ export function useScrollReveal() {
     };
 
     attach();
-    const timer = setTimeout(attach, 200);
+    const t1 = setTimeout(attach, 150);
+    const t2 = setTimeout(attach, 500);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(t1);
+      clearTimeout(t2);
       observer.disconnect();
     };
   }, []);

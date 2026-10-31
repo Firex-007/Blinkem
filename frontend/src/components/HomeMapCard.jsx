@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { memo, useMemo, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Navigation, Star, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function MapController({ center }) {
@@ -23,27 +23,52 @@ function MapController({ center }) {
   return null;
 }
 
-export default function HomeMapCard({ center, workers = [], selectedCategory = 'plumber', onSelectWorker }) {
+const iconCache = new Map();
+
+function getCachedWorkerIcon(pinColor, initials) {
+  const key = `${pinColor}-${initials}`;
+  if (iconCache.has(key)) return iconCache.get(key);
+
+  const icon = L.divIcon({
+    className: 'custom-worker-pin',
+    html: `
+      <div style="background: ${pinColor}; color: white; width: 32px; height: 32px; border-radius: 10px; border: 2.5px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">
+        ${initials}
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+
+  iconCache.set(key, icon);
+  return icon;
+}
+
+function HomeMapCard({ center, workers = [], selectedCategory = 'plumber' }) {
   const navigate = useNavigate();
   const safeWorkers = Array.isArray(workers) ? workers : [];
 
-  // Custom User Marker DivIcon
-  const userIcon = L.divIcon({
-    className: 'custom-user-marker',
-    html: `
-      <div style="position: relative; width: 28px; height: 28px;">
-        <div style="position: absolute; inset: -8px; background: rgba(31, 91, 255, 0.25); border-radius: 9999px; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-        <div style="position: relative; width: 28px; height: 28px; background: #1F5BFF; border: 3px solid #FFFFFF; border-radius: 9999px; box-shadow: 0 4px 12px rgba(31,91,255,0.4); display: flex; align-items: center; justify-content: center; color: white;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  // Memoized user marker icon
+  const userIcon = useMemo(
+    () =>
+      L.divIcon({
+        className: 'custom-user-marker',
+        html: `
+        <div style="position: relative; width: 28px; height: 28px;">
+          <div style="position: absolute; inset: -8px; background: rgba(31, 91, 255, 0.25); border-radius: 9999px;"></div>
+          <div style="position: relative; width: 28px; height: 28px; background: #1F5BFF; border: 3px solid #FFFFFF; border-radius: 9999px; box-shadow: 0 4px 12px rgba(31,91,255,0.4); display: flex; align-items: center; justify-content: center; color: white;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
         </div>
-      </div>
-    `,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-  });
+      `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+      }),
+    []
+  );
 
   return (
-    <div className="relative w-full h-64 rounded-card overflow-hidden border border-line shadow-card glass-card">
+    <div className="relative w-full h-64 rounded-card overflow-hidden border border-line shadow-card bg-surface">
       <MapContainer
         center={center}
         zoom={14}
@@ -66,7 +91,6 @@ export default function HomeMapCard({ center, workers = [], selectedCategory = '
           </Popup>
         </Marker>
 
-        {/* Workers Markers */}
         {/* Workers & Real Google Places Markers */}
         {safeWorkers.map((w, idx) => {
           const lat = w.lat ?? w.latitude;
@@ -79,17 +103,7 @@ export default function HomeMapCard({ center, workers = [], selectedCategory = '
             ? `${w.name.split(' ')[0][0] || 'P'}${w.name.split(' ')[1] ? w.name.split(' ')[1][0] : ''}`
             : 'P';
 
-          const workerIcon = L.divIcon({
-            className: 'custom-worker-pin',
-            html: `
-              <div style="background: ${pinColor}; color: white; width: 32px; height: 32px; border-radius: 10px; border: 2.5px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">
-                ${initials}
-              </div>
-            `,
-            iconSize: [32, 32],
-            iconAnchor: [16, 16],
-          });
-
+          const workerIcon = getCachedWorkerIcon(pinColor, initials);
           const ratingVal = w.rating_avg ?? w.rating ?? 4.8;
           const key = w.id || `place-${idx}-${lat}`;
 
@@ -131,10 +145,12 @@ export default function HomeMapCard({ center, workers = [], selectedCategory = '
 
       {/* Floating Info Overlay */}
       <div className="absolute top-3 left-3 z-20 pointer-events-none">
-        <div className="px-3 py-1.5 rounded-full glass-card border border-white/40 shadow-sm flex items-center gap-2 text-xs font-700 text-ink">
+        <div className="px-3 py-1.5 rounded-full bg-surface/90 border border-line shadow-xs flex items-center gap-2 text-xs font-700 text-ink">
           <span>{safeWorkers.length} verified pros live in your area</span>
         </div>
       </div>
     </div>
   );
 }
+
+export default memo(HomeMapCard);
